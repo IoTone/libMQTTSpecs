@@ -1,0 +1,42 @@
+- !<AssetImportMetadata/3b6a1ad8-c414-492b-8e99-76b2fc031992>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 2cf8d3d7-a6e2-49de-a681-bb064bb6a9e1
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 2cf8d3d7-a6e2-49de-a681-bb064bb6a9e1
+  PackageType: NotAPackage
+  PackagePolicy: CannotBeUnpacked
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> 9b0669bb-7533-4981-9360-b591f0dce7a3
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/9b0669bb-7533-4981-9360-b591f0dce7a3>
+  SvgIcon: ""
+  Description: ""
+  InternalVersion: 0
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  ComponentUid: 455e45da-f749-441a-8001-9231ef730e05
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  CurrentVisibility: Editable
+  MaxVisibility: Editable
+  ScriptInputsHidden:
+    sobj: false
+    toggles: false
+  ScriptTypesHidden:
+    {}
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  DefaultScriptInputs:
+    - sobj: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      toggles: !<MappingBased.ToggleButton> 00000000-0000-0000-0000-000000000000
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - // @input SceneObject sobj
+    - // @input ToggleButton toggles

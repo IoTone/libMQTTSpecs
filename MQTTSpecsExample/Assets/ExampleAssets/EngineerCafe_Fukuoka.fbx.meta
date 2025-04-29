@@ -1,0 +1,114 @@
+- !<AssetImportMetadata/39345b4d-2002-4454-949f-2fc47400b1e2>
+  ImportedAssetIds:
+    .hidden/Material 1: !<reference> c2d184e7-88c8-4d79-8a1b-5f1e819bf622
+    .hidden/white: !<reference> b3141c36-e9dd-4910-98b6-416bc2534acd
+    0644de75ab5a6c3f: !<reference> 551a39ca-849e-4482-bd85-8fdf43cd2e0a
+    3ac8a399e9fad7b4: !<reference> f1a83923-c00a-4182-9589-e1fd58d8ac25
+    66780cf3a4dcb2b8: !<reference> 31951f76-0f68-4b4a-927f-afef53252c80
+    Materials/Material 1: !<reference> af791acf-93f6-47d0-9f93-12d7d683f15a
+    Materials/Material 1|Material 1|GraphPassInfo: !<reference> cbb4003c-21cc-42c3-a458-e0b382385824
+    "Meshes/meshes[0]": !<reference> 8a06cb40-4b7d-480b-85d2-feecf654c607
+    Scene: !<reference> 27d94a5d-5c77-4845-ba3a-3723ce4bf7aa
+  ImporterName: FbxImporter
+  PrimaryAsset: !<reference> 27d94a5d-5c77-4845-ba3a-3723ce4bf7aa
+  PackageType: LegacyPackage
+  PackagePolicy: CanBeUnpacked
+  ExtraData:
+    {}
+  AssetDataMap:
+    Scene: !<own> 85414287-b91c-4a5b-9301-da9cb71b5513
+  DependentFiles:
+    []
+  ImporterSettings: !<FbxImporterSettings>
+    UseLegacyImporter: false
+    WithMaterials: true
+    NamingConvention: ByCategorySanitizeV2
+    PersistentIdGenerationAlgorithm: DescriptorBased
+    AnimationCurveOptimization: true
+    CustomAnimationSamplingRate: 30.000000
+    ImportVertexColor: true
+    ImportTangentsAndBinormals: true
+    RegenerateTangentsAndBinormals: false
+    RegenerateNormalsForSkinnedMeshes: true
+    ImportBlendShapeAnimation: true
+    ImportVertexAnimation: true
+    GeneratePivots: true
+    TriangulateNURBS: true
+    UseLegacyFbxLoader: false
+  CompressionSettings: !<ComplexCompressionSettings>
+    Presets:
+      None Compression: !<SingleCompressionSettings>
+        CompressorName: None
+        CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+      Performance Compression: !<SingleCompressionSettings>
+        CompressorName: Performance
+        CompressionSettings: !<TextureCompressionSettings>
+          Level: Medium
+    ExtensionMappings:
+      mesh: None Compression
+      jpg: Performance Compression
+    Overrides:
+      {}
+- !<RenderMeshVisual/4ddfc0bb-8eb5-4e54-bb74-ff9831d9b468>
+  PrefabRemaps:
+    []
+  Name: component_0
+  Enabled: true
+  RenderOrder: 0
+  StretchMode: Stretch
+  VerticalAlignment: Center
+  HorizontalAlignment: Center
+  MeshShadowMode: None
+  ShadowColor: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+  ShadowDensity: 1.000000
+  Materials:
+    - !<reference> af791acf-93f6-47d0-9f93-12d7d683f15a
+  Mesh: !<reference> 8a06cb40-4b7d-480b-85d2-feecf654c607
+  Skin: !<reference> 00000000-0000-0000-0000-000000000000
+  BlendShapesEnabled: true
+  BlendNormals: false
+  BlendShapes:
+    {}
+- !<SceneObject/577e3784-afdf-4993-9ff0-60b36ddb3f85>
+  PrefabRemaps:
+    []
+  Name: "meshes[0]"
+  Enabled: true
+  Layers: 1
+  LocalTransform:
+    position: {x: 0.000000, y: 0.000000, z: 0.000000}
+    rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    hasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> 4ddfc0bb-8eb5-4e54-bb74-ff9831d9b468
+- !<ObjectPrefabAssetData/85414287-b91c-4a5b-9301-da9cb71b5513>
+  SourceRemaps:
+    - 27d94a5d-5c77-4845-ba3a-3723ce4bf7aa: b2644550-f96b-4269-b8ca-0ec6f51e79c9
+    - 31951f76-0f68-4b4a-927f-afef53252c80: e8537461-80b1-4564-a455-c3f77f2219e1
+    - 551a39ca-849e-4482-bd85-8fdf43cd2e0a: 577e3784-afdf-4993-9ff0-60b36ddb3f85
+    - f1a83923-c00a-4182-9589-e1fd58d8ac25: 4ddfc0bb-8eb5-4e54-bb74-ff9831d9b468
+  SourceState: !<own> b2644550-f96b-4269-b8ca-0ec6f51e79c9
+- !<ObjectPrefab/b2644550-f96b-4269-b8ca-0ec6f51e79c9>
+  PackagePath: ""
+  objects:
+    - !<own> e8537461-80b1-4564-a455-c3f77f2219e1
+  LazyLoading: false
+  RetainAssets: true
+- !<SceneObject/e8537461-80b1-4564-a455-c3f77f2219e1>
+  PrefabRemaps:
+    []
+  Name: EngineerCafe_Fukuoka
+  Enabled: true
+  Layers: 1
+  LocalTransform:
+    position: {x: 0.000000, y: 0.000000, z: 0.000000}
+    rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    hasSegmentScaleCompensation: false
+  Children:
+    - !<own> 577e3784-afdf-4993-9ff0-60b36ddb3f85
+  Components:
+    []
