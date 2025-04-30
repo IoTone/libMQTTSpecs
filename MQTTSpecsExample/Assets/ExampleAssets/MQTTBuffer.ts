@@ -2,6 +2,7 @@
 //
 // Attribution: https://github.com/i8beef/MQTTClient.js/blob/master/src/buffer.js
 //
+
 export namespace Assertion {
 // Interface for the assert object (based on the assert.ok usage in the original code)
     export interface Assert {
