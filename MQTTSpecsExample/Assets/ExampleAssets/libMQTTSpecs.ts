@@ -10,16 +10,12 @@ import {Interactable} from "../SpectaclesInteractionKit/Components/Interaction/I
 import {validate} from "../SpectaclesInteractionKit/Utils/validate"
 
 // eventEmitter.ts
-
-// Type for event listeners
 type Listener<T extends any[] = any[]> = (...args: T) => void;
 
-// Interface for event map (users can extend this for typed events)
 interface EventMap {
   [event: string]: any[];
 }
 
-// EventEmitter class
 export class EventEmitter<TEventMap extends EventMap = Record<string, any[]>> {
   private _events: Map<keyof TEventMap, Set<Listener<TEventMap[keyof TEventMap]>>> = new Map();
 
@@ -27,7 +23,6 @@ export class EventEmitter<TEventMap extends EventMap = Record<string, any[]>> {
     this._events = new Map();
   }
 
-  // Add a listener for an event
   public on<K extends keyof TEventMap>(event: K, listener: Listener<TEventMap[K]>): this {
     let listeners = this._events.get(event);
     if (!listeners) {
@@ -38,7 +33,6 @@ export class EventEmitter<TEventMap extends EventMap = Record<string, any[]>> {
     return this;
   }
 
-  // Add a one-time listener for an event
   public once<K extends keyof TEventMap>(event: K, listener: Listener<TEventMap[K]>): this {
     const onceListener: Listener<TEventMap[K]> = (...args: TEventMap[K]) => {
       this.off(event, onceListener);
@@ -47,7 +41,6 @@ export class EventEmitter<TEventMap extends EventMap = Record<string, any[]>> {
     return this.on(event, onceListener);
   }
 
-  // Remove a specific listener or all listeners for an event
   public off<K extends keyof TEventMap>(event: K, listener?: Listener<TEventMap[K]>): this {
     if (!listener) {
       this._events.delete(event);
@@ -63,13 +56,11 @@ export class EventEmitter<TEventMap extends EventMap = Record<string, any[]>> {
     return this;
   }
 
-  // Remove all listeners for all events
   public removeAllListeners(): this {
     this._events.clear();
     return this;
   }
 
-  // Emit an event with arguments
   public emit<K extends keyof TEventMap>(event: K, ...args: TEventMap[K]): boolean {
     const listeners = this._events.get(event);
     if (!listeners || listeners.size === 0) {
@@ -79,37 +70,30 @@ export class EventEmitter<TEventMap extends EventMap = Record<string, any[]>> {
       try {
         listener(...args);
       } catch (err) {
-        print(`Error in listener for event "${String(event)}":` + err);
+        print(`Error in listener for event "${String(event)}": ${err}`);
       }
     }
     return true;
-        
   }
 
-    
-  // Get all listeners for an event
   public listeners<K extends keyof TEventMap>(event: K): Listener<TEventMap[K]>[] {
     const listeners = this._events.get(event);
     return listeners ? Array.from(listeners) : [];
   }
 
-  // Get the number of listeners for an event
   public listenerCount<K extends keyof TEventMap>(event: K): number {
     const listeners = this._events.get(event);
     return listeners ? listeners.size : 0;
   }
 
-  // Get all event names
   public eventNames(): (keyof TEventMap)[] {
     return Array.from(this._events.keys());
   }
 
-  // Add a listener (alias for on)
   public addListener<K extends keyof TEventMap>(event: K, listener: Listener<TEventMap[K]>): this {
     return this.on(event, listener);
   }
 
-  // Remove a listener (alias for off)
   public removeListener<K extends keyof TEventMap>(event: K, listener: Listener<TEventMap[K]>): this {
     return this.off(event, listener);
   }
@@ -153,196 +137,24 @@ declare namespace FooMit {
     }
 }
 
-// Buffer class to manage a dynamic byte buffer
-class Buffer {
-  private _buffer: number[] = [];
-  private _offset: number = 0;
 
-  // Constructor: Initializes the buffer with optional data
-  constructor(data?: number[] | number) {
-    if (data === undefined) {
-      this._buffer = [];
-      this._offset = 0;
-    } else if (typeof data === "number") {
-      assert.ok(data >= 0, "Length must be positive");
-      this._buffer = new Array(data).fill(0);
-      this._offset = 0;
-    } else if (Array.isArray(data)) {
-      this._buffer = data.slice(); // Create a copy of the input array
-      this._offset = 0;
-    } else {
-      throw new Error("Invalid data type for Buffer constructor");
-    }
-  }
+//
+// Rev 2 of mqttclient
+//
 
-  // Appends data to the buffer
-  public append(data: number | number[] | Buffer): void {
-    if (typeof data === "number") {
-      this._buffer.push(data);
-    } else if (Array.isArray(data)) {
-      this._buffer.push(...data);
-    } else if (data instanceof Buffer) {
-      this._buffer.push(...data._buffer);
-    } else {
-      throw new Error("Invalid data type for append");
-    }
-  }
-
-  // Returns the available bytes to read
-  public available(): number {
-    return this._buffer.length - this._offset;
-  }
-
-  // Returns the total buffer length
-  public length(): number {
-    return this._buffer.length;
-  }
-
-  // Clears the buffer
-  public clear(): void {
-    this._buffer = [];
-    this._offset = 0;
-  }
-
-  // Reads a single byte
-  public readByte(): number {
-    assert.ok(this.available() >= 1, "Not enough bytes available to read");
-    return this._buffer[this._offset++];
-  }
-
-  // Reads an unsigned 16-bit integer (big-endian)
-  public readUInt16(): number {
-    assert.ok(this.available() >= 2, "Not enough bytes available to read");
-    const value = (this._buffer[this._offset++] << 8) + this._buffer[this._offset++];
-    return value >>> 0; // Ensure unsigned
-  }
-
-  // Reads an unsigned 32-bit integer (big-endian)
-  public readUInt32(): number {
-    assert.ok(this.available() >= 4, "Not enough bytes available to read");
-    const value =
-      (this._buffer[this._offset++] << 24) +
-      (this._buffer[this._offset++] << 16) +
-      (this._buffer[this._offset++] << 8) +
-      this._buffer[this._offset++];
-    return value >>> 0; // Ensure unsigned
-  }
-
-  // Reads a string of specified length
-  public readString(length: number): string {
-    assert.ok(this.available() >= length, "Not enough bytes available to read");
-    const chars: string[] = [];
-    for (let i = 0; i < length; i++) {
-      chars.push(String.fromCharCode(this._buffer[this._offset++]));
-    }
-    return chars.join("");
-  }
-
-  // Writes a single byte
-  public writeByte(value: number): void {
-    assert.ok(value >= 0 && value <= 255, "Byte value out of range");
-    this._buffer.push(value);
-  }
-
-  // Writes an unsigned 16-bit integer (big-endian)
-  public writeUInt16(value: number): void {
-    assert.ok(value >= 0 && value <= 65535, "UInt16 value out of range");
-    this._buffer.push((value >> 8) & 0xff, value & 0xff);
-  }
-
-  // Writes an unsigned 32-bit integer (big-endian)
-  public writeUInt32(value: number): void {
-    assert.ok(value >= 0 && value <= 4294967295, "UInt32 value out of range");
-    this._buffer.push(
-      (value >> 24) & 0xff,
-      (value >> 16) & 0xff,
-      (value >> 8) & 0xff,
-      value & 0xff
-    );
-  }
-
-  // Writes a string
-  public writeString(value: string): void {
-    for (let i = 0; i < value.length; i++) {
-      this._buffer.push(value.charCodeAt(i));
-    }
-  }
-    
-
-  // Returns the internal buffer
-  public getBuffer(): number[] {
-    return this._buffer.slice();
-  }
-    
-  // XXX Added for Lens Studio Scirpting
-  public getBufferAsUint8Array(): Uint8Array {
-    return new Uint8Array(this.getBuffer());
-  }
-    
-    
-  // Sets the read offset
-  public setReadOffset(offset: number): void {
-    assert.ok(offset >= 0 && offset <= this._buffer.length, "Invalid read offset");
-    this._offset = offset;
-  }
-
-  // Gets the current read offset
-  public getReadOffset(): number {
-    return this._offset;
-  }
+// Event map for MQTT client
+interface MqttEvents extends Record<string, any[]> {
+  connect: [];
+  message: [string, Uint8Array];
+  error: [Error];
+  close: [];
 }
 
-//
-// Buffer
-//
-// declare const assert: Assertion.Assert;
-
-
-// Interfaces for options and packet structures
+// Interfaces for options
 interface ConnectOptions {
-  host: string;
-  port: number;
-  username?: string;
-  password?: string;
+  url: string; // WebSocket URL (e.g., ws://broker:9001/mqtt)
   clientId?: string;
   keepAlive?: number;
-  cleanSession?: boolean;
-  will?: {
-    topic: string;
-    payload: string;
-    qos?: number;
-    retain?: boolean;
-  };
-  ssl?: boolean;
-}
-
-interface SubscribeOptions {
-  topic: string;
-  qos?: number;
-}
-
-interface PublishOptions {
-  topic: string;
-  payload: string | Buffer;
-  qos?: number;
-  retain?: boolean;
-}
-
-interface SocketOptions  {
-      host: string,
-      port: number,
-}
-
-interface MqttPacket {
-  type: number;
-  flags: number;
-  length: number;
-  packetId?: number;
-  topic?: string;
-  payload?: Buffer;
-  subscriptions?: { topic: string; qos: number }[];
-  qos?: number;
-  retain?: boolean;
 }
 
 // Constants for MQTT packet types
@@ -360,120 +172,48 @@ const enum PacketType {
   UNSUBACK = 11,
   PINGREQ = 12,
   PINGRESP = 13,
-  DISCONNECT = 14,
+  DISCONNECT = 14
 }
 
-class MqttConn extends EventEmitter {
-  _socket: Number;
-  _buffer: Buffer;
-  _options: ConnectOptions;// private _options: ConnectOptions;
-  _connected: boolean;
-  _packetId: number;
-  // private _keepAliveTimer?: NodeJS.Timeout;
-  _keepAliveTimer?: DelayedCallbackEvent | null = null;
-  _subscriptions: Map<string, number>;
-  _wss_socket: WebSocket;
-    
-  constructor(options: ConnectOptions, private parent: MqttClient) {
+// Simple MQTT Client
+export class MqttClientLib2 extends EventEmitter<MqttEvents> {
+  // private _ws?: ls.WebSocket;
+  private _ws?: WebSocket;
+  private _buffer: Uint8Array;
+  private _offset: number;
+  private _options: ConnectOptions;
+  private _connected: boolean;
+  private _packetId: number;
+  private _keepAliveTimer?: number;
+
+  constructor(options: ConnectOptions, private parent: MqttClient2) {
     super();
-            
-    
     this._options = {
-      host: options.host,
-      port: options.port,
-      username: options.username,
-      password: options.password,
-      clientId: options.clientId, // || this._generateClientID(),
-      keepAlive: options.keepAlive !== undefined ? options.keepAlive : 60,
-      cleanSession: options.cleanSession !== undefined ? options.cleanSession : true,
-      will: options.will,
-      ssl: options.ssl || false,
+      url: options.url,
+      clientId: options.clientId,
+      keepAlive: options.keepAlive,
     };
-    this._buffer = new Buffer();
+    this._buffer = new Uint8Array(0);
+    this._offset = 0;
     this._connected = false;
     this._packetId = 1;
-    this._subscriptions = new Map<string, number>();
-    
   }
-        
+
   public connect(): void {
     if (this._connected) {
       this.emit('error', new Error('Already connected'));
       return;
     }
 
-    const socketOptions = {
-      host: this._options.host,
-      port: this._options.port,
-    };
-        
-    
-    // XXX TODO: setup connection
-    // this._socket = this._options.ssl
-    //  ? tls.connect(socketOptions, this._onConnect.bind(this))
-    //  : net.connect(socketOptions, this._onConnect.bind(this));
-
-    // this._socket.on('data', this._onData.bind(this));
-    // this._socket.on('error', this._onError.bind(this));
-    // this._socket.on('close', this._onClose.bind(this));
-    // Listen for the open event
-    this.parent._wss_socket.onopen = this._onConnect.bind(this);
-    /*
-    this.parent._wss_socket.onopen = (event: WebSocketEvent) => {
-      // Socket has opened, send a message back to the server
-      this.parent._wss_socket.send('Hello Spectacles');
-      this._onConnect.bind(this);
-      this._connected = true;
-         
-      
-
-      // Try sending a binary message
-      // (the bytes below spell 'Message 2')
-      // const message: number[] = [77, 101, 115, 115, 97, 103, 101, 32, 50];
-      // const bytes = new Uint8Array(message);
-      // socket.send(bytes);
-      
-       print("Socket opened");
-    };
-    */
-        
-    this.parent._wss_socket.onclose = (event: WebSocketCloseEvent) => {
-          print("onClose");
-          this._onClose.bind(this)
-          if (event.wasClean) {
-            print('Socket closed cleanly');
-          } else {
-            print('Socket closed with error, code: ' + event.code);
-          }
-        };
-    
-    this.parent._wss_socket.onerror = (event: WebSocketErrorEvent) => {
-        // This crashes on socket error    
-        try {  /* ... */
-            print('WSS websocket error');        
-            this._onError.bind(this);
-        }
-        catch (e: unknown) { // <-- note `e` has explicit `unknown` type
-        }
-        
-    };
-        
-    // Listen for messages
-    this.parent._wss_socket.onmessage = async (event: WebSocketMessageEvent) => {
-      if (event.data instanceof Blob) {
-        // Binary frame, can be retrieved as either Uint8Array or string
-        const bytes = await event.data.bytes();
-        const text = await event.data.text();
-
-        print('Received binary message, printing as text: ' + text);
-        // Ignore these binary messages for now
-      } else {
-        // Text frame
-        const text: string = event.data;
-        print('Received text message: ' + text);
-      }
-      this._onData.bind(this)
-    };
+    try {
+      // this._ws = new ls.WebSocket(this._options.url);
+      this.parent._ws.onopen = this._onConnect.bind(this);
+      this.parent._ws.onmessage = this._onMessage.bind(this);
+      this.parent._ws.onerror = this._onError.bind(this);
+      this.parent._ws.onclose = this._onClose.bind(this);
+    } catch (err) {
+      this.emit('error', new Error(`WebSocket creation failed: ${err}`));
+    }
   }
 
   public disconnect(): void {
@@ -482,309 +222,171 @@ class MqttConn extends EventEmitter {
       return;
     }
 
-    const packet: Buffer = new Buffer();
-    packet.writeByte((PacketType.DISCONNECT << 4) | 0); // Type: DISCONNECT, no flags
+    const packet = this._createPacket();
+    packet.writeByte((PacketType.DISCONNECT << 4) | 0);
     this._writePacket(packet);
-    // XXX WS / SOCKET Disconnect
-    // this._socket.end();
-        
-    // Our websocket has no "close" method
+    this._ws?.close();
   }
 
-  public publish(options: PublishOptions): void {
+  public publish(topic: string, payload: string | Uint8Array, qos: 0 | 1 = 0): void {
     if (!this._connected) {
       this.emit('error', new Error('Not connected'));
       return;
     }
 
-    const qos = options.qos || 0;
-    const retain = options.retain || false;
-    const packet: Buffer = new Buffer();
-    let flags = 0;
+    const packet = this._createPacket();
+    packet.writeByte((PacketType.PUBLISH << 4) | (qos << 1));
 
-    // Set flags for QoS and retain
-    if (qos > 0) flags |= qos << 1;
-    if (retain) flags |= 1;
+    const topicBytes = this._stringToBytes(topic);
+    packet.writeUInt16(topicBytes.length);
+    packet.append(topicBytes);
 
-    // Write packet type and flags
-    packet.writeByte((PacketType.PUBLISH << 4) | flags);
-
-    // Write topic
-    const topicBuffer = new Buffer();
-    topicBuffer.writeString(options.topic);
-    packet.writeUInt16(topicBuffer.length());
-    packet.append(topicBuffer);
-
-    // Write packet ID for QoS > 0
     if (qos > 0) {
       packet.writeUInt16(this._nextPacketId());
     }
 
-    // Write payload
-    const payload = typeof options.payload === 'string' ? new Buffer() : options.payload;
-    if (typeof options.payload === 'string') {
-      payload.writeString(options.payload);
-    }
-    packet.append(payload);
+    const payloadBytes = typeof payload === 'string' ? this._stringToBytes(payload) : payload;
+    packet.append(payloadBytes);
 
     this._writePacket(packet);
   }
 
-    
-  public subscribe(options: SubscribeOptions | SubscribeOptions[]): void {
+  public subscribe(topic: string, qos: 0 | 1 = 0): void {
     if (!this._connected) {
       this.emit('error', new Error('Not connected'));
       return;
     }
 
-    const subscriptions = Array.isArray(options) ? options : [options];
-    const packet: Buffer = new Buffer();
-    packet.writeByte((PacketType.SUBSCRIBE << 4) | 2); // Type: SUBSCRIBE, flags: 2 (QoS 1)
+    const packet = this._createPacket();
+    packet.writeByte((PacketType.SUBSCRIBE << 4) | 2);
 
     const packetId = this._nextPacketId();
     packet.writeUInt16(packetId);
 
-    for (const sub of subscriptions) {
-      const topicBuffer = new Buffer();
-      topicBuffer.writeString(sub.topic);
-      packet.writeUInt16(topicBuffer.length());
-      packet.append(topicBuffer);
-      packet.writeByte(sub.qos || 0);
-      this._subscriptions.set(sub.topic, sub.qos || 0);
-    }
-
-    this._writePacket(packet);
-  }
-
-  public unsubscribe(topics: string | string[]): void {
-    if (!this._connected) {
-      this.emit('error', new Error('Not connected'));
-      return;
-    }
-
-    const topicList = Array.isArray(topics) ? topics : [topics];
-    const packet: Buffer = new Buffer();
-    packet.writeByte((PacketType.UNSUBSCRIBE << 4) | 2); // Type: UNSUBSCRIBE, flags: 2 (QoS 1)
-
-    const packetId = this._nextPacketId();
-    packet.writeUInt16(packetId);
-
-    for (const topic of topicList) {
-      const topicBuffer = new Buffer();
-      topicBuffer.writeString(topic);
-      packet.writeUInt16(topicBuffer.length());
-      packet.append(topicBuffer);
-      this._subscriptions.delete(topic);
-    }
+    const topicBytes = this._stringToBytes(topic);
+    packet.writeUInt16(topicBytes.length);
+    packet.append(topicBytes);
+    packet.writeByte(qos);
 
     this._writePacket(packet);
   }
 
   private _onConnect(): void {
     this._connected = true;
-    print("_onConnect()");
-    // Send CONNECT packet
-    
-    const packet: Buffer = new Buffer();
 
-    // packet.writeByte((PacketType.CONNECT << 4) | 0); // Type: CONNECT, no flags
-    print("_onConnect(): here");
-        /*
-    // Protocol name and version
-    const protocolBuffer = new Buffer();
-    protocolBuffer.writeString('MQTT');
-    packet.writeUInt16(protocolBuffer.length());
-    packet.append(protocolBuffer);
-    packet.writeByte(4); // Protocol level (MQTT 3.1.1)
-    print("_onConnect(): here");
-    // Connect flags
-    let flags = 0;
-    if (this._options.cleanSession) flags |= 0x02;
-    if (this._options.username) flags |= 0x80;
-    if (this._options.password) flags |= 0x40;
-    if (this._options.will) {
-      flags |= 0x04;
-      flags |= (this._options.will.qos || 0) << 3;
-      if (this._options.will.retain) flags |= 0x20;
-    }
-    packet.writeByte(flags);
-    print("_onConnect(): here");
-    // Keep alive
+    const packet = this._createPacket();
+    packet.writeByte((PacketType.CONNECT << 4) | 0);
+
+    const protocolBytes = this._stringToBytes('MQTT');
+    packet.writeUInt16(protocolBytes.length);
+    packet.append(protocolBytes);
+    packet.writeByte(4); // MQTT 3.1.1
+    packet.writeByte(0x02); // Clean session
     packet.writeUInt16(this._options.keepAlive || 60);
-    print("_onConnect(): here");
-    // Client ID
-    const clientIdBuffer = new Buffer();
-    clientIdBuffer.writeString(this._options.clientId || '');
-    packet.writeUInt16(clientIdBuffer.length());
-    packet.append(clientIdBuffer);
-    print("_onConnect(): here");
-    // Will topic and message
-    print(this._options);
-    if (this._options.will) {
-       
-      const willTopicBuffer = new Buffer();
-      willTopicBuffer.writeString(this._options.will.topic);
-      packet.writeUInt16(willTopicBuffer.length());
-      packet.append(willTopicBuffer);
 
-      const willPayloadBuffer = new Buffer();
-      willPayloadBuffer.writeString(this._options.will.payload);
-      packet.writeUInt16(willPayloadBuffer.length());
-      packet.append(willPayloadBuffer);
-    }
-    
-    // Username
-    if (this._options.username) {
-      const usernameBuffer = new Buffer();
-      usernameBuffer.writeString(this._options.username);
-      packet.writeUInt16(usernameBuffer.length());
-      packet.append(usernameBuffer);
-    }
-
-    // Password
-    if (this._options.password) {
-      const passwordBuffer = new Buffer();
-      passwordBuffer.writeString(this._options.password);
-      packet.writeUInt16(passwordBuffer.length());
-      packet.append(passwordBuffer);
-    }
+    const clientIdBytes = this._stringToBytes(this._options.clientId || '');
+    packet.writeUInt16(clientIdBytes.length);
+    packet.append(clientIdBytes);
 
     this._writePacket(packet);
-    print("_onConnect(): here");
-    // Start keep-alive timer
-    function runKeepAliveInterval() {
-      print("_onConnect(): runKeepAliveInterval");
-      this._keepAliveTimer = this._keepAliveTimer.bind(() => {
-        const pingPacket = new Buffer();
-        pingPacket.writeByte((PacketType.PINGREQ << 4) | 0); // Type: PINGREQ
-        this._writePacket(pingPacket);
-        
-        if (this._connected) {
-            runKeepAliveInterval();            
-        } else {
-            this._keepAliveTimer.cancel();         
-        }
-      });
-      this.runKeepAliveInterval.reset(this._options.keepAlive * 1000); 
-    }
-        
+
     if (this._options.keepAlive && this._options.keepAlive > 0) {
-        // runKeepAliveInterval();
+      const interval = this._options.keepAlive * 1000;
+      /*
+      this._keepAliveTimer = ls.global.scene.createTimer(() => {
+        this._sendPing();
+      }, interval / 1000);
+      */
+      print("ahhhhhhhhhhhh TODO: implement the timer");
     }
 
     this.emit('connect');
-    */
   }
 
-  private _onData(data: Buffer): void {
-    this._buffer.append(data);
+  private _onMessage(event: WebSocketMessageEvent): void {
+    let data: Uint8Array;
+    if (typeof event.data === 'string') {
+      data = this._stringToBytes(event.data);
+    } else if (event.data instanceof ArrayBuffer) {
+      data = new Uint8Array(event.data);
+    } else {
+      this.emit('error', new Error('Unsupported WebSocket message type'));
+      return;
+    }
 
-    while (this._buffer.available() > 0) {
+    this._buffer = this._appendBytes(this._buffer, data);
+    this._offset = 0;
+
+    while (this._buffer.length - this._offset > 0) {
       const packet = this._readPacket();
       if (!packet) break;
 
       switch (packet.type) {
         case PacketType.CONNACK:
-          const returnCode = this._buffer.readByte();
+          const returnCode = this._readByte();
           if (returnCode === 0) {
-            this.emit('connack');
+            this.emit('connect');
           } else {
             this.emit('error', new Error(`Connection refused: ${returnCode}`));
-            // this._socket.end();
-            // XXX TODO implement socket
+            this._ws?.close();
           }
           break;
 
-                    
         case PacketType.PUBLISH:
           const qos = (packet.flags >> 1) & 0x03;
-          const topicLength = this._buffer.readUInt16();
-          const topic = this._buffer.readString(topicLength);
+          const topicLength = this._readUInt16();
+          const topic = this._readString(topicLength);
           let packetId: number | undefined;
           if (qos > 0) {
-            packetId = this._buffer.readUInt16();
+            packetId = this._readUInt16();
           }
-          const payload = this._buffer.getBuffer().slice(this._buffer.getReadOffset());
-          this._buffer.setReadOffset(this._buffer.length());
+          const payload = this._buffer.subarray(this._offset);
+          this._offset = this._buffer.length;
 
-          this.emit('publish', { topic, payload, qos, packetId });
+          this.emit('message', topic, payload);
 
           if (qos === 1) {
-            const puback = new Buffer();
+            const puback = this._createPacket();
             puback.writeByte((PacketType.PUBACK << 4) | 0);
             puback.writeUInt16(packetId!);
             this._writePacket(puback);
-          } else if (qos === 2) {
-            const pubrec = new Buffer();
-            pubrec.writeByte((PacketType.PUBREC << 4) | 0);
-            pubrec.writeUInt16(packetId!);
-            this._writePacket(pubrec);
-          }
-          break;
-
-        case PacketType.PUBACK:
-        case PacketType.PUBREC:
-        case PacketType.PUBREL:
-        case PacketType.PUBCOMP:
-          const ackPacketId = this._buffer.readUInt16();
-          this.emit(packet.type === PacketType.PUBACK ? 'puback' : packet.type === PacketType.PUBREC ? 'pubrec' : packet.type === PacketType.PUBREL ? 'pubrel' : 'pubcomp', ackPacketId);
-          if (packet.type === PacketType.PUBREC) {
-            const pubrel = new Buffer();
-            pubrel.writeByte((PacketType.PUBREL << 4) | 2);
-            pubrel.writeUInt16(ackPacketId);
-            this._writePacket(pubrel);
-          } else if (packet.type === PacketType.PUBREL) {
-            const pubcomp = new Buffer();
-            pubcomp.writeByte((PacketType.PUBCOMP << 4) | 0);
-            pubcomp.writeUInt16(ackPacketId);
-            this._writePacket(pubcomp);
           }
           break;
 
         case PacketType.SUBACK:
-          const subackPacketId = this._buffer.readUInt16();
-          const returnCodes: number[] = [];
-          while (this._buffer.available() > 0) {
-            returnCodes.push(this._buffer.readByte());
-          }
-          this.emit('suback', subackPacketId, returnCodes);
-          break;
-
-        case PacketType.UNSUBACK:
-          const unsubackPacketId = this._buffer.readUInt16();
-          this.emit('unsuback', unsubackPacketId);
+          this._readUInt16(); // Packet ID
+          this._readByte(); // QoS
           break;
 
         case PacketType.PINGRESP:
-          this.emit('pingresp');
           break;
 
         default:
-          this.emit('error', new Error(`Unknown packet type: ${packet.type}`));
+          this.emit('error', new Error(`Unsupported packet type: ${packet.type}`));
       }
     }
   }
 
-  private _onError(err: Error): void {
-    this.emit('error', err);
-    // this._socket.end();
-    // XXX TODO: implement websocket
+  private _onError(event: WebSocketErrorEvent): void {
+    this.emit('error', new Error(`WebSocket error: unknown WS error`));
+    this._ws?.close();
   }
 
   private _onClose(): void {
     this._connected = false;
     if (this._keepAliveTimer) {
-      // clearInterval(this._keepAliveTimer);
-      this._keepAliveTimer.cancel();
-      // XXX ?? DO I NEED THIS?
-      // this._keepAliveTimer = undefined;
+      /*
+      ls.global.scene.removeTimer(this._keepAliveTimer);
+      this._keepAliveTimer = undefined;
+      */
+      // XXX TODO: fix the timer
     }
     this.emit('close');
   }
 
-  private _writePacket(packet: Buffer): void {
-    const length = packet.length();
-    const lengthBuffer = new Buffer();
+  private _writePacket(packet: { bytes: Uint8Array }): void {
+    const length = packet.bytes.length;
+    const lengthBuffer = this._createPacket();
     let remainingLength = length;
 
     do {
@@ -796,20 +398,16 @@ class MqttConn extends EventEmitter {
       lengthBuffer.writeByte(encodedByte);
     } while (remainingLength > 0);
 
-    const finalPacket = new Buffer();
-    finalPacket.append(packet.getBuffer());
-    finalPacket.append(lengthBuffer);
-    // this._socket.write(finalPacket.getBuffer());
-    // TODO handle websocket
-    this.parent._wss_socket.send(finalPacket.getBufferAsUint8Array());
+    const finalPacket = this._appendBytes(packet.bytes, lengthBuffer.bytes);
+    this._ws?.send(finalPacket);
   }
 
-  private _readPacket(): MqttPacket | null {
-    if (this._buffer.available() < 2) {
+  private _readPacket(): { type: number; flags: number; length: number } | null {
+    if (this._buffer.length - this._offset < 2) {
       return null;
     }
 
-    const firstByte = this._buffer.readByte();
+    const firstByte = this._readByte();
     const type = (firstByte >> 4) & 0x0f;
     const flags = firstByte & 0x0f;
 
@@ -818,21 +416,27 @@ class MqttConn extends EventEmitter {
     let byte: number;
 
     do {
-      if (this._buffer.available() < 1) {
-        this._buffer.setReadOffset(this._buffer.getReadOffset() - 1);
+      if (this._buffer.length - this._offset < 1) {
+        this._offset--;
         return null;
       }
-      byte = this._buffer.readByte();
+      byte = this._readByte();
       length += (byte & 0x7f) * multiplier;
       multiplier *= 128;
     } while ((byte & 0x80) !== 0);
 
-    if (this._buffer.available() < length) {
-      this._buffer.setReadOffset(this._buffer.getReadOffset() - (multiplier / 128));
+    if (this._buffer.length - this._offset < length) {
+      this._offset -= multiplier / 128;
       return null;
     }
 
     return { type, flags, length };
+  }
+
+  private _sendPing(): void {
+    const packet = this._createPacket();
+    packet.writeByte((PacketType.PINGREQ << 4) | 0);
+    this._writePacket(packet);
   }
 
   private _nextPacketId(): number {
@@ -842,42 +446,107 @@ class MqttConn extends EventEmitter {
     }
     return packetId;
   }
-}
 
-//
-// these are some mixin experiments, TODO: remove
-// type Constructor<T> = Function & { prototype: T }
-type Constructor<T> = new (...args: any[]) => T;
-function ScriptMixin<T extends Constructor<{}>>(Base: T) {
-  return class extends Base {
-    _tag: string;
-    constructor(...args: any[]) {
-      super(...args);
-      // this._tag = "";
+  // Uint8Array helpers
+  private _createPacket(): { bytes: Uint8Array; writeByte: (value: number) => void; writeUInt16: (value: number) => void; append: (data: Uint8Array) => void } {
+    let bytes = new Uint8Array(0);
+    let capacity = 16;
+    let length = 0;
+
+    const ensureCapacity = (needed: number) => {
+      if (length + needed > capacity) {
+        capacity = Math.max(capacity * 2, length + needed);
+        const newBytes = new Uint8Array(capacity);
+        newBytes.set(bytes);
+        bytes = newBytes;
+      }
+    };
+
+    return {
+      bytes,
+      writeByte: (value: number) => {
+        if (value < 0 || value > 255) throw new Error('Byte value out of range');
+        ensureCapacity(1);
+        bytes[length++] = value;
+        bytes = bytes.subarray(0, length);
+      },
+      writeUInt16: (value: number) => {
+        if (value < 0 || value > 65535) throw new Error('UInt16 value out of range');
+        ensureCapacity(2);
+        const view = new Uint16Array([value]);
+        const bytesView = new Uint8Array(view.buffer);
+        bytes[length++] = bytesView[1]; // Big-endian
+        bytes[length++] = bytesView[0];
+        bytes = bytes.subarray(0, length);
+      },
+      append: (data: Uint8Array) => {
+        ensureCapacity(data.length);
+        bytes.set(data, length);
+        length += data.length;
+        bytes = bytes.subarray(0, length);
+      },
+    };
+  }
+
+  private _readByte(): number {
+    if (this._buffer.length - this._offset < 1) throw new Error('Not enough bytes to read');
+    return this._buffer[this._offset++];
+  }
+
+  private _readUInt16(): number {
+    if (this._buffer.length - this._offset < 2) throw new Error('Not enough bytes to read');
+    const view = new Uint16Array(this._buffer.buffer, this._buffer.byteOffset + this._offset, 1);
+    this._offset += 2;
+    return (view[0] >> 8) | ((view[0] & 0xff) << 8); // Big-endian
+  }
+
+  private _readString(length: number): string {
+    if (this._buffer.length - this._offset < length) throw new Error('Not enough bytes to read');
+    const slice = this._buffer.subarray(this._offset, this._offset + length);
+    this._offset += length;
+    return String.fromCharCode(...slice);
+  }
+
+  private _stringToBytes(str: string): Uint8Array {
+    const bytes = new Uint8Array(str.length);
+    for (let i = 0; i < str.length; i++) {
+      bytes[i] = str.charCodeAt(i);
     }
-  };
+    return bytes;
+  }
+
+  private _appendBytes(a: Uint8Array, b: Uint8Array): Uint8Array {
+    const result = new Uint8Array(a.length + b.length);
+    result.set(a);
+    result.set(b, a.length);
+    return result;
+  }
 }
 
-const MQTTMixin = ScriptMixin(EventEmitter);
+
+
+
+
+
+
 
 // MQTT Client class
 @component
-export class MqttClient extends BaseScriptComponent implements FooMit.BarMit {
+export class MqttClient2 extends BaseScriptComponent implements FooMit.BarMit {
   @input
   remoteServiceModule: RemoteServiceModule;
 // export class MqttClient extends Wolfy87EventEmitter.EventEmitter {
 // export class MqttClient extends events.EventEmitter {
   // private _socket: net.Socket | tls.TLSSocket;
-  _socket: Number;
-  _buffer: Buffer;
+  
   _options: ConnectOptions;// private _options: ConnectOptions;
   _connected: boolean;
   _packetId: number;
   // private _keepAliveTimer?: NodeJS.Timeout;
   _keepAliveTimer?: DelayedCallbackEvent | null = null;
   _subscriptions: Map<string, number>;
-  _wss_socket: WebSocket;
-  _mqtteventhandler? : MqttConn; // Wolfy87EventEmitter.EventEmitter;
+  _ws: WebSocket;
+  _mqtteventhandler? : MqttClientLib2; // Wolfy87EventEmitter.EventEmitter;
   _globaleventemitter : this;
     
     
@@ -894,12 +563,13 @@ export class MqttClient extends BaseScriptComponent implements FooMit.BarMit {
      // See different test server options
      // http://www.steves-internet-guide.com/mqtt-hosting-brokers-and-servers/#list
      var options : ConnectOptions = {
-      host: "test.mosquitto.org",// options.host,
-      port:  1881, // options.port,
-      username: null, // options.username,
-      password: null, // options.password,
+      url: "test.mosquitto.org:1881/mqtt",// options.host,
+      // : 1881, // options.port,
+      // username: null, // options.username,
+      // password: null, // options.password,
       clientId: this._generateClientID(),
       keepAlive: 60, // sec?
+      /*
       cleanSession: true, // what is this?
       will: {
         topic: "presence", // "libMQTTSpecs",
@@ -907,7 +577,7 @@ export class MqttClient extends BaseScriptComponent implements FooMit.BarMit {
         // qos: number;
         // retain?: boolean;
       },
-      ssl: true,
+      ssl: true, */
     };
     this.initConnection(options);
   }
@@ -915,8 +585,9 @@ export class MqttClient extends BaseScriptComponent implements FooMit.BarMit {
   initConnection(options: ConnectOptions) {
     this._keepAliveTimer = this.createEvent("DelayedCallbackEvent");
     // this._options = options;
-    this._wss_socket = this.remoteServiceModule.createWebSocket('wss://rtc.ngrok.io/');
-    this._wss_socket.binaryType = 'blob';
+    // XXX hardcoded value
+    this._ws = this.remoteServiceModule.createWebSocket("wss://test.mosquitto.org:8081/mqtt");
+    this._ws.binaryType = 'blob';
         
     print("initializing mqtt clientId" + options.clientId);
     
@@ -933,25 +604,30 @@ export class MqttClient extends BaseScriptComponent implements FooMit.BarMit {
       ssl: options.ssl || false,
     };
     */
-    this._buffer = new Buffer();
-    this._connected = false;
-    this._packetId = 1;
-    this._subscriptions = new Map<string, number>();
+    // this._buffer = new Buffer();
+    // this._connected = false;
+    // this._packetId = 1;
+    // this._subscriptions = new Map<string, number>();
     
     // this._mqtteventhandler = new this.MQTTEventHandler(options, this);
-    this._mqtteventhandler = new MqttConn(options, this);
+      
+    this._mqtteventhandler = new MqttClientLib2(options, this);
     
+        
     // for now, go ahead and connect, we may want to make this
     // configurable, an autoconnect vs manual
     this._mqtteventhandler.connect();
     this._mqtteventhandler.on('connect', () => {
       print('Connected');
-      this._mqtteventhandler.subscribe({ topic: 'test/topic', qos: 1 });
-      this._mqtteventhandler.publish({ topic: 'test/topic', payload: 'Hello', qos: 1 });
+      this._mqtteventhandler.subscribe('test/topic', 0);
+      // public publish(topic: string, payload: string | Uint8Array, qos: 0 | 1 = 0): void {
+      this._mqtteventhandler.publish('test/topic', 'Hello', 0);
     });
+        
     this._mqtteventhandler.on('error', (err) => {
       print('Error:' + err.message);
     });
+    /*
     if (this._mqtteventhandler._connected) {
        print("Connected to mqtt broker ... maybe?");
        this._mqtteventhandler.publish({
@@ -963,6 +639,8 @@ export class MqttClient extends BaseScriptComponent implements FooMit.BarMit {
     } else {
         print("not connected");
     }
+    */
+        
   }
     
   //
