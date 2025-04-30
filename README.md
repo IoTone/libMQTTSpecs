@@ -10,6 +10,8 @@ Without studying the spec too deeply, porting over a minimalist browser based mq
 
 In progress.  Web stockets must be integrated and then testing.
 
+Currently this crashes.  Lot of vibe coding here.  I will ditch the first effort in favor of a different approach that starts with something written in typescript to start with, or use the ts.d bindings added.  The complication with the use of JS/TS in the Lens environment is a challenge in terms of getting your head around the development of libraries.
+
 ## Testing
 
 There is an example project provided.  It will just ping the test.mosquitto.org when the button toggle is hit.
