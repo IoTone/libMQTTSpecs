@@ -273,7 +273,13 @@ class Buffer {
   public getBuffer(): number[] {
     return this._buffer.slice();
   }
-
+    
+  // XXX Added for Lens Studio Scirpting
+  public getBufferAsUint8Array(): Uint8Array {
+    return new Uint8Array(this.getBuffer());
+  }
+    
+    
   // Sets the read offset
   public setReadOffset(offset: number): void {
     assert.ok(offset >= 0 && offset <= this._buffer.length, "Invalid read offset");
@@ -411,19 +417,62 @@ class MqttConn extends EventEmitter {
     // this._socket.on('error', this._onError.bind(this));
     // this._socket.on('close', this._onClose.bind(this));
     // Listen for the open event
+    this.parent._wss_socket.onopen = this._onConnect.bind(this);
+    /*
     this.parent._wss_socket.onopen = (event: WebSocketEvent) => {
       // Socket has opened, send a message back to the server
       this.parent._wss_socket.send('Hello Spectacles');
-      /*   
+      this._onConnect.bind(this);
+      this._connected = true;
+         
       
 
       // Try sending a binary message
       // (the bytes below spell 'Message 2')
-      const message: number[] = [77, 101, 115, 115, 97, 103, 101, 32, 50];
-      const bytes = new Uint8Array(message);
-      socket.send(bytes);
-      */
+      // const message: number[] = [77, 101, 115, 115, 97, 103, 101, 32, 50];
+      // const bytes = new Uint8Array(message);
+      // socket.send(bytes);
+      
        print("Socket opened");
+    };
+    */
+        
+    this.parent._wss_socket.onclose = (event: WebSocketCloseEvent) => {
+          print("onClose");
+          this._onClose.bind(this)
+          if (event.wasClean) {
+            print('Socket closed cleanly');
+          } else {
+            print('Socket closed with error, code: ' + event.code);
+          }
+        };
+    
+    this.parent._wss_socket.onerror = (event: WebSocketErrorEvent) => {
+        // This crashes on socket error    
+        try {  /* ... */
+            print('WSS websocket error');        
+            this._onError.bind(this);
+        }
+        catch (e: unknown) { // <-- note `e` has explicit `unknown` type
+        }
+        
+    };
+        
+    // Listen for messages
+    this.parent._wss_socket.onmessage = async (event: WebSocketMessageEvent) => {
+      if (event.data instanceof Blob) {
+        // Binary frame, can be retrieved as either Uint8Array or string
+        const bytes = await event.data.bytes();
+        const text = await event.data.text();
+
+        print('Received binary message, printing as text: ' + text);
+        // Ignore these binary messages for now
+      } else {
+        // Text frame
+        const text: string = event.data;
+        print('Received text message: ' + text);
+      }
+      this._onData.bind(this)
     };
   }
 
@@ -481,6 +530,7 @@ class MqttConn extends EventEmitter {
     this._writePacket(packet);
   }
 
+    
   public subscribe(options: SubscribeOptions | SubscribeOptions[]): void {
     if (!this._connected) {
       this.emit('error', new Error('Not connected'));
@@ -532,18 +582,21 @@ class MqttConn extends EventEmitter {
 
   private _onConnect(): void {
     this._connected = true;
-        
+    print("_onConnect()");
     // Send CONNECT packet
+    
     const packet: Buffer = new Buffer();
-    packet.writeByte((PacketType.CONNECT << 4) | 0); // Type: CONNECT, no flags
 
+    // packet.writeByte((PacketType.CONNECT << 4) | 0); // Type: CONNECT, no flags
+    print("_onConnect(): here");
+        /*
     // Protocol name and version
     const protocolBuffer = new Buffer();
     protocolBuffer.writeString('MQTT');
     packet.writeUInt16(protocolBuffer.length());
     packet.append(protocolBuffer);
     packet.writeByte(4); // Protocol level (MQTT 3.1.1)
-
+    print("_onConnect(): here");
     // Connect flags
     let flags = 0;
     if (this._options.cleanSession) flags |= 0x02;
@@ -555,18 +608,20 @@ class MqttConn extends EventEmitter {
       if (this._options.will.retain) flags |= 0x20;
     }
     packet.writeByte(flags);
-
+    print("_onConnect(): here");
     // Keep alive
     packet.writeUInt16(this._options.keepAlive || 60);
-
+    print("_onConnect(): here");
     // Client ID
     const clientIdBuffer = new Buffer();
     clientIdBuffer.writeString(this._options.clientId || '');
     packet.writeUInt16(clientIdBuffer.length());
     packet.append(clientIdBuffer);
-
+    print("_onConnect(): here");
     // Will topic and message
+    print(this._options);
     if (this._options.will) {
+       
       const willTopicBuffer = new Buffer();
       willTopicBuffer.writeString(this._options.will.topic);
       packet.writeUInt16(willTopicBuffer.length());
@@ -577,7 +632,7 @@ class MqttConn extends EventEmitter {
       packet.writeUInt16(willPayloadBuffer.length());
       packet.append(willPayloadBuffer);
     }
-
+    
     // Username
     if (this._options.username) {
       const usernameBuffer = new Buffer();
@@ -595,9 +650,10 @@ class MqttConn extends EventEmitter {
     }
 
     this._writePacket(packet);
-
+    print("_onConnect(): here");
     // Start keep-alive timer
     function runKeepAliveInterval() {
+      print("_onConnect(): runKeepAliveInterval");
       this._keepAliveTimer = this._keepAliveTimer.bind(() => {
         const pingPacket = new Buffer();
         pingPacket.writeByte((PacketType.PINGREQ << 4) | 0); // Type: PINGREQ
@@ -613,10 +669,11 @@ class MqttConn extends EventEmitter {
     }
         
     if (this._options.keepAlive && this._options.keepAlive > 0) {
-        runKeepAliveInterval();
+        // runKeepAliveInterval();
     }
 
     this.emit('connect');
+    */
   }
 
   private _onData(data: Buffer): void {
@@ -744,6 +801,7 @@ class MqttConn extends EventEmitter {
     finalPacket.append(lengthBuffer);
     // this._socket.write(finalPacket.getBuffer());
     // TODO handle websocket
+    this.parent._wss_socket.send(finalPacket.getBufferAsUint8Array());
   }
 
   private _readPacket(): MqttPacket | null {
@@ -785,6 +843,9 @@ class MqttConn extends EventEmitter {
     return packetId;
   }
 }
+
+//
+// these are some mixin experiments, TODO: remove
 // type Constructor<T> = Function & { prototype: T }
 type Constructor<T> = new (...args: any[]) => T;
 function ScriptMixin<T extends Constructor<{}>>(Base: T) {
@@ -841,7 +902,7 @@ export class MqttClient extends BaseScriptComponent implements FooMit.BarMit {
       keepAlive: 60, // sec?
       cleanSession: true, // what is this?
       will: {
-        topic: "libMQTTSpecs",
+        topic: "presence", // "libMQTTSpecs",
         payload: "test"
         // qos: number;
         // retain?: boolean;
@@ -883,7 +944,25 @@ export class MqttClient extends BaseScriptComponent implements FooMit.BarMit {
     // for now, go ahead and connect, we may want to make this
     // configurable, an autoconnect vs manual
     this._mqtteventhandler.connect();
-    
+    this._mqtteventhandler.on('connect', () => {
+      print('Connected');
+      this._mqtteventhandler.subscribe({ topic: 'test/topic', qos: 1 });
+      this._mqtteventhandler.publish({ topic: 'test/topic', payload: 'Hello', qos: 1 });
+    });
+    this._mqtteventhandler.on('error', (err) => {
+      print('Error:' + err.message);
+    });
+    if (this._mqtteventhandler._connected) {
+       print("Connected to mqtt broker ... maybe?");
+       this._mqtteventhandler.publish({
+                              topic: "presence",
+                              payload: "foobar"
+                              // qos?: number;
+                              // retain?: boolean;
+                            });
+    } else {
+        print("not connected");
+    }
   }
     
   //
