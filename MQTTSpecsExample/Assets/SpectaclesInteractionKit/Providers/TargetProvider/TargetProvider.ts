@@ -36,6 +36,8 @@ export default abstract class TargetProvider {
 
   protected _currentInteractableHitInfo: InteractableHitInfo | null = null
 
+  private _currentInteractableSet: Set<Interactable> = new Set()
+
   /**
    * @returns origin position in world space
    */
@@ -58,6 +60,7 @@ export default abstract class TargetProvider {
    */
   clearCurrentInteractableHitInfo(): void {
     this._currentInteractableHitInfo = null
+    this._currentInteractableSet.clear()
   }
 
   /**
@@ -65,6 +68,27 @@ export default abstract class TargetProvider {
    */
   hasTarget(): boolean {
     return this._currentInteractableHitInfo !== null
+  }
+
+  /**
+   * @returns whether the TargetProvider is intersecting with the Interactable
+   */
+  isIntersectingInteractable(interactable: Interactable): boolean {
+    return this._currentInteractableSet.has(interactable)
+  }
+
+  protected updateCurrentInteractableSet(hits: RayCastHit[]): void {
+    this._currentInteractableSet.clear()
+    for (const hit of hits) {
+      const interactable = this.interactionManager.getInteractableByCollider(hit.collider)
+      if (interactable !== null && (interactable.targetingMode & this.targetingMode) !== 0) {
+        this._currentInteractableSet.add(interactable)
+      }
+    }
+  }
+
+  protected deleteFromCurrentInteractableSet(interactable: Interactable | null): void {
+    this._currentInteractableSet.delete(interactable)
   }
 
   /**
@@ -88,29 +112,20 @@ export default abstract class TargetProvider {
   static getInteractableHitFromRayCast(
     hits: RayCastHit[],
     targetingMode: TargetingMode,
-    getInteractableByCollider: (
-      collider: ColliderComponent,
-    ) => Interactable | null,
+    getInteractableByCollider: (collider: ColliderComponent) => Interactable | null,
     offset = 0,
     camera: CameraProvider | null = null,
-    allowOutOfFovInteraction = false,
+    allowOutOfFovInteraction = false
   ): InteractableHitInfo | null {
     const hitInfos: InteractableHitInfo[] = []
     for (const hit of hits) {
-      if (
-        !allowOutOfFovInteraction &&
-        camera !== null &&
-        !camera.inFoV(hit.position)
-      ) {
+      if (!allowOutOfFovInteraction && camera !== null && !camera.inFoV(hit.position)) {
         continue
       }
 
       const interactable = getInteractableByCollider(hit.collider)
 
-      if (
-        interactable !== null &&
-        (interactable.targetingMode & targetingMode) !== 0
-      ) {
+      if (interactable !== null && (interactable.targetingMode & targetingMode) !== 0) {
         hit.skipRemaining = false
 
         hitInfos.push({
@@ -129,9 +144,9 @@ export default abstract class TargetProvider {
             triangle: hit.triangle,
             getTypeName: hit.getTypeName,
             isOfType: hit.isOfType,
-            isSame: hit.isSame,
+            isSame: hit.isSame
           },
-          targetMode: targetingMode,
+          targetMode: targetingMode
         })
       }
     }
@@ -145,9 +160,7 @@ export default abstract class TargetProvider {
    * @param hitInfos - list of hits
    * @returns - the most deeply nested interactable of the nearest interactable
    */
-  static getNearestDeeplyNestedInteractable(
-    hitInfos: InteractableHitInfo[],
-  ): InteractableHitInfo | null {
+  static getNearestDeeplyNestedInteractable(hitInfos: InteractableHitInfo[]): InteractableHitInfo | null {
     hitInfos.sort((hitA, hitB) => {
       return hitA.hit.distance - hitB.hit.distance
     })
@@ -157,10 +170,7 @@ export default abstract class TargetProvider {
     for (const currentHitInfo of hitInfos) {
       if (
         targetHitInfo === null ||
-        isDescendantOf(
-          currentHitInfo.interactable.sceneObject,
-          targetHitInfo.interactable.sceneObject,
-        )
+        isDescendantOf(currentHitInfo.interactable.sceneObject, targetHitInfo.interactable.sceneObject)
       ) {
         targetHitInfo = currentHitInfo
       }
@@ -172,17 +182,15 @@ export default abstract class TargetProvider {
   protected getInteractableHitFromRayCast(
     hits: RayCastHit[],
     offset = 0,
-    allowOutOfFovInteraction = false,
+    allowOutOfFovInteraction = false
   ): InteractableHitInfo | null {
     return TargetProvider.getInteractableHitFromRayCast(
       hits,
       this.targetingMode,
-      this.interactionManager.getInteractableByCollider.bind(
-        this.interactionManager,
-      ),
+      this.interactionManager.getInteractableByCollider.bind(this.interactionManager),
       offset,
       this.camera,
-      allowOutOfFovInteraction,
+      allowOutOfFovInteraction
     )
   }
 }

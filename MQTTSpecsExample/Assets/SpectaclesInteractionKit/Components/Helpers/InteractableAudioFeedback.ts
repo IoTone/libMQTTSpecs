@@ -1,31 +1,54 @@
 import {validate} from "../../Utils/validate"
 import {Interactable} from "../Interaction/Interactable/Interactable"
 /**
- * This class provides audio feedback for interactable objects. It allows configuration of audio tracks for hover, trigger start, and trigger end events. The class also provides access to the audio component for further customization.
+ * This class provides audio feedback for interactable objects. It allows configuration of audio tracks for hover,
+ * trigger start, and trigger end events. The class also provides access to the audio component for further
+ * customization.
  */
 @component
 export class InteractableAudioFeedback extends BaseScriptComponent {
+  /**
+   * Controls whether sound feedback plays when a user's hand hovers over this Interactable.
+   */
   @input
+  @hint("Controls whether sound feedback plays when a user's hand hovers over this Interactable.")
   private _playAudioOnHover: boolean = true
+  /**
+   * The sound that plays when the Interactable is hovered.
+   */
   @input("Asset.AudioTrackAsset")
   @showIf("_playAudioOnHover", true)
-  @hint("This sound will play when the Interactable is hovered")
+  @hint("The sound that plays when the Interactable is hovered.")
   @allowUndefined
   private _hoverAudioTrack: AudioTrackAsset | undefined
 
+  /**
+   * Controls whether sound feedback plays when a user starts interacting with this Interactable.
+   */
   @input
+  @hint("Controls whether sound feedback plays when a user starts interacting with this Interactable.")
   private _playAudioOnTriggerStart: boolean = true
+  /**
+   * The sound that plays when interaction with this Interactable begins.
+   */
   @input("Asset.AudioTrackAsset")
   @showIf("_playAudioOnTriggerStart", true)
-  @hint("This sound will play when starting the trigger the Interactable")
+  @hint("The sound that plays when interaction with this Interactable begins.")
   @allowUndefined
   private _triggerStartAudioTrack: AudioTrackAsset | undefined
 
+  /**
+   * Controls whether sound feedback plays when a user stops interacting with this Interactable.
+   */
   @input
+  @hint("Controls whether sound feedback plays when a user stops interacting with this Interactable.")
   private _playAudioOnTriggerEnd: boolean = true
+  /**
+   * The sound that plays when interaction with this Interactable ends.
+   */
   @input("Asset.AudioTrackAsset")
   @showIf("_playAudioOnTriggerEnd", true)
-  @hint("This sound will play when ending the trigger of the Interactable")
+  @hint("The sound that plays when interaction with this Interactable ends.")
   @allowUndefined
   private _triggerEndAudioTrack: AudioTrackAsset | undefined
 
@@ -105,19 +128,12 @@ export class InteractableAudioFeedback extends BaseScriptComponent {
     this._playAudioOnHover = enabled
 
     if (this.hoverAudioComponent === undefined) {
-      this._hoverAudioComponent = this.getSceneObject().createComponent(
-        "Component.AudioComponent",
-      ) as AudioComponent
+      this._hoverAudioComponent = this.getSceneObject().createComponent("Component.AudioComponent") as AudioComponent
 
-      this.setPlaybackMode(
-        this._hoverAudioComponent,
-        Audio.PlaybackMode?.LowLatency,
-      )
+      this.setPlaybackMode(this._hoverAudioComponent, Audio.PlaybackMode?.LowLatency)
 
       if (this.hoverAudioTrack === undefined) {
-        this.hoverAudioTrack = requireAsset(
-          "../../Assets/Audio/HoverAudioTrack.wav",
-        ) as AudioTrackAsset
+        this.hoverAudioTrack = requireAsset("../../Assets/Audio/HoverAudioTrack.wav") as AudioTrackAsset
       }
       this._hoverAudioComponent.audioTrack = this.hoverAudioTrack
     }
@@ -138,18 +154,13 @@ export class InteractableAudioFeedback extends BaseScriptComponent {
 
     if (this.triggerStartAudioComponent === undefined) {
       this._triggerStartAudioComponent = this.getSceneObject().createComponent(
-        "Component.AudioComponent",
+        "Component.AudioComponent"
       ) as AudioComponent
 
-      this.setPlaybackMode(
-        this._triggerStartAudioComponent,
-        Audio.PlaybackMode?.LowLatency,
-      )
+      this.setPlaybackMode(this._triggerStartAudioComponent, Audio.PlaybackMode?.LowLatency)
 
       if (this.triggerStartAudioTrack === undefined) {
-        this.triggerStartAudioTrack = requireAsset(
-          "../../Assets/Audio/TriggerStartAudioTrack.wav",
-        ) as AudioTrackAsset
+        this.triggerStartAudioTrack = requireAsset("../../Assets/Audio/TriggerStartAudioTrack.wav") as AudioTrackAsset
       }
       this.triggerStartAudioComponent.audioTrack = this.triggerStartAudioTrack
     }
@@ -170,18 +181,13 @@ export class InteractableAudioFeedback extends BaseScriptComponent {
 
     if (this.triggerEndAudioComponent === undefined) {
       this._triggerEndAudioComponent = this.getSceneObject().createComponent(
-        "Component.AudioComponent",
+        "Component.AudioComponent"
       ) as AudioComponent
 
-      this.setPlaybackMode(
-        this._triggerEndAudioComponent,
-        Audio.PlaybackMode?.LowLatency,
-      )
+      this.setPlaybackMode(this._triggerEndAudioComponent, Audio.PlaybackMode?.LowLatency)
 
       if (this.triggerEndAudioTrack === undefined) {
-        this.triggerEndAudioTrack = requireAsset(
-          "../../Assets/Audio/TriggerEndAudioTrack.wav",
-        ) as AudioTrackAsset
+        this.triggerEndAudioTrack = requireAsset("../../Assets/Audio/TriggerEndAudioTrack.wav") as AudioTrackAsset
       }
       this._triggerEndAudioComponent.audioTrack = this.triggerEndAudioTrack
     }
@@ -251,76 +257,52 @@ export class InteractableAudioFeedback extends BaseScriptComponent {
 
   private init() {
     if (this.playAudioOnHover) {
-      this._hoverAudioComponent = this.getSceneObject().createComponent(
-        "Component.AudioComponent",
-      ) as AudioComponent
+      this._hoverAudioComponent = this.getSceneObject().createComponent("Component.AudioComponent") as AudioComponent
 
-      this.setPlaybackMode(
-        this._hoverAudioComponent,
-        Audio.PlaybackMode?.LowLatency,
-      )
+      this.setPlaybackMode(this._hoverAudioComponent, Audio.PlaybackMode?.LowLatency)
 
       if (this.hoverAudioTrack === undefined) {
-        this.hoverAudioTrack = requireAsset(
-          "../../Assets/Audio/HoverAudioTrack.wav",
-        ) as AudioTrackAsset
+        this.hoverAudioTrack = requireAsset("../../Assets/Audio/HoverAudioTrack.wav") as AudioTrackAsset
       }
       this._hoverAudioComponent.audioTrack = this.hoverAudioTrack
     }
 
     if (this.playAudioOnTriggerStart) {
       this._triggerStartAudioComponent = this.getSceneObject().createComponent(
-        "Component.AudioComponent",
+        "Component.AudioComponent"
       ) as AudioComponent
 
-      this.setPlaybackMode(
-        this._triggerStartAudioComponent,
-        Audio.PlaybackMode?.LowLatency,
-      )
+      this.setPlaybackMode(this._triggerStartAudioComponent, Audio.PlaybackMode?.LowLatency)
 
       if (this.triggerStartAudioTrack === undefined) {
-        this.triggerStartAudioTrack = requireAsset(
-          "../../Assets/Audio/TriggerStartAudioTrack.wav",
-        ) as AudioTrackAsset
+        this.triggerStartAudioTrack = requireAsset("../../Assets/Audio/TriggerStartAudioTrack.wav") as AudioTrackAsset
       }
       this._triggerStartAudioComponent.audioTrack = this.triggerStartAudioTrack
     }
 
     if (this.playAudioOnTriggerEnd) {
       this._triggerEndAudioComponent = this.getSceneObject().createComponent(
-        "Component.AudioComponent",
+        "Component.AudioComponent"
       ) as AudioComponent
 
-      this.setPlaybackMode(
-        this._triggerEndAudioComponent,
-        Audio.PlaybackMode?.LowLatency,
-      )
+      this.setPlaybackMode(this._triggerEndAudioComponent, Audio.PlaybackMode?.LowLatency)
 
       if (this.triggerEndAudioTrack === undefined) {
-        this.triggerEndAudioTrack = requireAsset(
-          "../../Assets/Audio/TriggerEndAudioTrack.wav",
-        ) as AudioTrackAsset
+        this.triggerEndAudioTrack = requireAsset("../../Assets/Audio/TriggerEndAudioTrack.wav") as AudioTrackAsset
       }
       this._triggerEndAudioComponent.audioTrack = this.triggerEndAudioTrack
     }
 
-    this.interactable = this.getSceneObject().getComponent(
-      Interactable.getTypeName(),
-    )
+    this.interactable = this.getSceneObject().getComponent(Interactable.getTypeName())
 
     if (!this.interactable) {
-      throw new Error(
-        "Could not find Interactable component on this SceneObject.",
-      )
+      throw new Error("Could not find Interactable component on this SceneObject.")
     }
 
     this.setupInteractableCallbacks()
   }
 
-  private setPlaybackMode(
-    target: AudioComponent,
-    playbackMode: Audio.PlaybackMode | undefined,
-  ) {
+  private setPlaybackMode(target: AudioComponent, playbackMode: Audio.PlaybackMode | undefined) {
     if (playbackMode !== undefined) {
       target.playbackMode = playbackMode
     }

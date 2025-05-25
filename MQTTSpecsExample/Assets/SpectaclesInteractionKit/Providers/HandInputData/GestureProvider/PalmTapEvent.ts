@@ -3,5 +3,5 @@
  */
 export enum PalmTapEventType {
   Down = "Down",
-  Up = "Up",
+  Up = "Up"
 }

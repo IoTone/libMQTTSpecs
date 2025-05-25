@@ -10,7 +10,7 @@ export default class AxisAngle {
    */
   constructor(
     public axis: vec3,
-    public angle: number,
+    public angle: number
   ) {}
 
   /**

@@ -18,9 +18,7 @@ export default class Event<Arg = void> {
   private subscribers: callback<Arg>[]
 
   constructor(...callbacks: (callback<Arg> | undefined)[]) {
-    this.subscribers = callbacks.filter(
-      (cb) => cb !== undefined,
-    ) as callback<Arg>[]
+    this.subscribers = callbacks.filter((cb) => cb !== undefined) as callback<Arg>[]
   }
 
   /**

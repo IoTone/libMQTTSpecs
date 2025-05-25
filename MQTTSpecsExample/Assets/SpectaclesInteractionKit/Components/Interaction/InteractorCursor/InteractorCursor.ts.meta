@@ -1,4 +1,4 @@
-- !<AssetImportMetadata/197cceed-cdc2-4cc3-8a2e-f85c54a1585b>
+- !<AssetImportMetadata/37a3e80e-1d62-a7e4-8b11-8e4c2f969afc>
   ImporterSettings: !<AssetImporterSettings>
     {}
   ImportedAssetIds:
@@ -32,15 +32,18 @@
   ScriptTypesHidden:
     {}
   DefaultScriptInputs:
-    - enableFilter: false
-      _interactor: !<reference.BaseInteractor> 00000000-0000-0000-0000-000000000000
-      enableCursorHolding: true
+    - enableCursorHolding: true
+      enableFilter: false
+      _interactor: !<reference.ScriptComponent> 00000000-0000-0000-0000-000000000000
   ScriptTypes:
     -
       {}
   InputLines:
-    - // @input bool enableCursorHolding = true
-    - // @input bool enableFilter
-    - // @input Component.ScriptComponent _interactor
+    - '// @input bool enableCursorHolding = true {"hint":"Controls the \"stickiness\" of the cursor when hovering over interactable objects. When enabled, the cursor maintains its position on the target object, even when the hand moves slightly, making interaction with small targets easier. Only applies to hand-based interactions, not other input types like mouse. Disable for immediate 1:1 cursor movement that follows the hand position exactly."}'
+    - '// @input bool enableFilter {"hint":"Applies smoothing to cursor movement for hand-based interactions. When enabled, reduces jitter and makes cursor motion appear more stable, improving precision when interacting with small targets. Only applies to hand-based interactions."}'
+    - "// @input Component.ScriptComponent _interactor {\"hint\":\"Reference to the component that this cursor will visualize. The cursor will update its position and appearance based on the interactor's state.\"}"
   SvgIcon: ""
   DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  SetupScript:
+    code: ""
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000

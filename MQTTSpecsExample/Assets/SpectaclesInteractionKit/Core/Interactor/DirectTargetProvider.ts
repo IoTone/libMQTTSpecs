@@ -1,10 +1,7 @@
 import {HandInputData} from "../../Providers/HandInputData/HandInputData"
 import {HandType} from "../../Providers/HandInputData/HandType"
 import BaseInteractor from "./BaseInteractor"
-import {
-  ColliderTargetProvider,
-  ColliderTargetProviderConfig,
-} from "./ColliderTargetProvider"
+import {ColliderTargetProvider, ColliderTargetProviderConfig} from "./ColliderTargetProvider"
 import {TargetingMode} from "./Interactor"
 
 export type DirectTargetProviderConfig = ColliderTargetProviderConfig & {
@@ -33,7 +30,7 @@ export class DirectTargetProvider extends ColliderTargetProvider {
 
   constructor(
     interactor: BaseInteractor,
-    protected config: DirectTargetProviderConfig,
+    protected config: DirectTargetProviderConfig
   ) {
     super(interactor, config)
 
@@ -45,8 +42,8 @@ export class DirectTargetProvider extends ColliderTargetProvider {
         config.colliderEnterRadius,
         this.onColliderOverlapStay.bind(this),
         null,
-        config.debugEnabled,
-      ),
+        config.debugEnabled
+      )
     )
 
     this.colliders.push(
@@ -55,8 +52,8 @@ export class DirectTargetProvider extends ColliderTargetProvider {
         config.colliderExitRadius,
         null,
         this.onColliderOverlapExit.bind(this),
-        config.debugEnabled,
-      ),
+        config.debugEnabled
+      )
     )
 
     this.ownerSceneObject.enabled = false
@@ -110,15 +107,15 @@ export class DirectTargetProvider extends ColliderTargetProvider {
     }
   }
 
-  protected override onColliderOverlapStay(
-    event: OverlapEnterEventArgs,
-    allowOutOfFovInteraction = false,
-  ): void {
+  protected override onColliderOverlapStay(event: OverlapEnterEventArgs, allowOutOfFovInteraction = false): void {
     this.overlapEvent = event
     super.onColliderOverlapStay(event, allowOutOfFovInteraction)
   }
 
   protected override onColliderOverlapExit(event: OverlapEnterEventArgs): void {
+    const interactable = this.interactionManager.getInteractableByCollider(event.overlap.collider)
+    this.deleteFromCurrentInteractableSet(interactable)
+
     if (this.config.shouldPreventTargetUpdate?.()) {
       return
     }

@@ -5,7 +5,7 @@ import HeadlockTranslationCalculator from "./HeadlockTranslationCalculator"
 
 export enum RotationAxis {
   Pitch,
-  Yaw,
+  Yaw
 }
 
 export type DefaultHeadlockConfig = {
@@ -80,7 +80,7 @@ export default class DefaultHeadlockController {
       xzEasing: config.xzEasing ?? 1,
       yEnabled: config.yEnabled ?? true,
       yEasing: config.yEasing ?? 1,
-      translationBuffer: config.translationBuffer ?? 0,
+      translationBuffer: config.translationBuffer ?? 0
     })
 
     // Set up the rotation calculators to rotate the target along the sphere about the axes with configurable behavior.
@@ -91,7 +91,7 @@ export default class DefaultHeadlockController {
       axisEnabled: config.lockedPitch ?? true,
       axisEasing: config.pitchEasing ?? 1,
       axisOffsetRadians: MathUtils.DegToRad * (config.pitchOffsetDegrees ?? 0),
-      axisBufferRadians: MathUtils.DegToRad * (config.pitchBufferDegrees ?? 0),
+      axisBufferRadians: MathUtils.DegToRad * (config.pitchBufferDegrees ?? 0)
     })
 
     this.yawCalculator = new HeadlockRotationCalculator({
@@ -101,7 +101,7 @@ export default class DefaultHeadlockController {
       axisEnabled: config.lockedYaw ?? true,
       axisEasing: config.yawEasing ?? 1,
       axisOffsetRadians: MathUtils.DegToRad * (config.yawOffsetDegrees ?? 0),
-      axisBufferRadians: MathUtils.DegToRad * (config.yawBufferDegrees ?? 0),
+      axisBufferRadians: MathUtils.DegToRad * (config.yawBufferDegrees ?? 0)
     })
     this.updateEvent = config.script.createEvent("UpdateEvent")
     this.enableEvent = config.script.createEvent("OnEnableEvent")
@@ -217,9 +217,7 @@ export default class DefaultHeadlockController {
 
   // Returns a NON-NORMALIZED unit vector aligned with the line to the target from the sphere's center for rotation along the sphere.
   private getCenterToTargetVector() {
-    return this.targetTransform
-      .getWorldPosition()
-      .sub(this.translationCalculator.getCenter())
+    return this.targetTransform.getWorldPosition().sub(this.translationCalculator.getCenter())
   }
 
   // Gets the direction in which the user is facing.
@@ -235,12 +233,8 @@ export default class DefaultHeadlockController {
     }
 
     // Move the sphere around the user's head and updates the target to maintain the same angle.
-    const translationOffset = this.translationCalculator.updateCenter(
-      this.cameraTransform.getWorldPosition(),
-    )
-    this.targetTransform.setWorldPosition(
-      translationOffset.add(this.targetTransform.getWorldPosition()),
-    )
+    const translationOffset = this.translationCalculator.updateCenter(this.cameraTransform.getWorldPosition())
+    this.targetTransform.setWorldPosition(translationOffset.add(this.targetTransform.getWorldPosition()))
 
     // Rotate the target along the sphere to reach the desired offsets.
     for (const axis of rotationAxes) {
@@ -257,7 +251,7 @@ export default class DefaultHeadlockController {
             this.getCenterToTargetVector(),
             vec3.up(),
             this.getFaceForwardVector(),
-            this.cameraTransform.up,
+            this.cameraTransform.up
           )
           break
         case RotationAxis.Yaw:
@@ -265,25 +259,19 @@ export default class DefaultHeadlockController {
             // The yaw axis is the user's Y-axis projected onto a plane to prevent head-tilt from affecting positions if pitch is enabled, otherwise use the world's Y-axis.
             this.headlockComponent.lockedPitch
               ? this.cameraTransform.up.projectOnPlane(
-                  new vec3(
-                    this.cameraTransform.left.x,
-                    0,
-                    this.cameraTransform.left.z,
-                  ),
+                  new vec3(this.cameraTransform.left.x, 0, this.cameraTransform.left.z)
                 )
               : vec3.up(),
             this.getCenterToTargetVector(),
             this.cameraTransform.right.projectOnPlane(vec3.up()),
-            this.getFaceForwardVector(),
+            this.getFaceForwardVector()
           )
           break
         default:
           throw new Error(`Invalid axis: ${axis}`)
       }
 
-      this.targetTransform.setWorldPosition(
-        rotationOffset.add(this.targetTransform.getWorldPosition()),
-      )
+      this.targetTransform.setWorldPosition(rotationOffset.add(this.targetTransform.getWorldPosition()))
     }
   }
 
@@ -300,16 +288,11 @@ export default class DefaultHeadlockController {
     let offset = this.getFaceForwardVector().uniformScale(this.distance)
     let pitchQuaternion = quat.angleAxis(
       MathUtils.DegToRad * (this.headlockComponent.pitchOffsetDegrees ?? 0),
-      vec3.left(),
+      vec3.left()
     )
     offset = pitchQuaternion.multiplyVec3(offset)
-    let yawQuaternion = quat.angleAxis(
-      MathUtils.DegToRad * (this.headlockComponent.yawOffsetDegrees ?? 0),
-      vec3.up(),
-    )
+    let yawQuaternion = quat.angleAxis(MathUtils.DegToRad * (this.headlockComponent.yawOffsetDegrees ?? 0), vec3.up())
     offset = yawQuaternion.multiplyVec3(offset)
-    this.targetTransform.setWorldPosition(
-      this.cameraTransform.getWorldPosition().add(offset),
-    )
+    this.targetTransform.setWorldPosition(this.cameraTransform.getWorldPosition().add(offset))
   }
 }

@@ -32,7 +32,7 @@ export class LabeledPinchButton {
   private colors: {[index: string]: vec4[]} = {
     default: [this.defaultColor],
     hover: [this.hoverColor],
-    trigger: [this.triggerColor],
+    trigger: [this.triggerColor]
   }
 
   transform: Transform

@@ -1,33 +1,44 @@
 /**
- * This class customizes a mesh visual to create an extendable capsule shape. It allows configuration of the capsule's length, radius, and poly-count through various input properties.
+ * This class customizes a mesh visual to create an extendable capsule shape. It allows configuration of the capsule's
+ * length, radius, and poly-count through various input properties.
  */
 @component
 export class CapsuleMeshCustomizer extends BaseScriptComponent {
+  /**
+   * The mesh visual to modify into an extendable capsule.
+   */
   @input
   @hint("The mesh visual to modify into an extendable capsule.")
   private meshVisual!: RenderMeshVisual
+  /**
+   * The length of the capsule, excluding the end caps.
+   */
   @input
-  @hint(
-    "The length of the cylindric section of the capsule (not including the end caps).",
-  )
+  @hint("The length of the cylindric section of the capsule (not including the end caps).")
   private capsuleLength: number = 10.0
+  /**
+   * The radius of the end caps and the radius of the cylindric section.
+   */
   @input
   @hint("The radius of the end caps and the radius of the cylindric section.")
   private radius: number = 1.0
+  /**
+   * The number of points per circle in the mesh. Increase for a higher poly-count mesh.
+   */
   @input("int")
-  @hint(
-    "The number of points per circle in the mesh. Increase for a higher poly-count mesh.",
-  )
+  @hint("The number of points per circle in the mesh. Increase for a higher poly-count mesh.")
   private radianStepCount: number = 16
+  /**
+   * The number of circles in the cylinder of the mesh. Increase for a higher poly-count mesh.
+   */
   @input("int")
-  @hint(
-    "The number of circles in the cylinder of the mesh. Increase for a higher poly-count mesh.",
-  )
+  @hint("The number of circles in the cylinder of the mesh. Increase for a higher poly-count mesh.")
   private cylinderStepCount: number = 16
+  /**
+   * The number of circles in the end cap of the capsule mesh. Increase for a higher poly-count mesh.
+   */
   @input("int")
-  @hint(
-    "The number of circles in the end cap of the capsule of the mesh. Increase for a higher poly-count mesh.",
-  )
+  @hint("The number of circles in the end cap of the capsule mesh. Increase for a higher poly-count mesh.")
   private endXStepCount: number = 32
 
   private uLength: number = Math.PI * this.radius * this.radius
@@ -37,7 +48,7 @@ export class CapsuleMeshCustomizer extends BaseScriptComponent {
   private builder: MeshBuilder = new MeshBuilder([
     {name: "position", components: 3},
     {name: "normal", components: 3, normalized: true},
-    {name: "texture0", components: 2},
+    {name: "texture0", components: 2}
   ])
 
   onAwake(): void {
@@ -67,28 +78,17 @@ export class CapsuleMeshCustomizer extends BaseScriptComponent {
     if (isEnd) {
       let arcLength: number
       if (originX < 0) {
-        arcLength =
-          (((this.radius + this.capsuleLength / 2 + originX) / this.radius) *
-            this.uLength) /
-          4
+        arcLength = (((this.radius + this.capsuleLength / 2 + originX) / this.radius) * this.uLength) / 4
       } else {
         arcLength =
-          ((1 -
-            (this.radius + this.capsuleLength / 2 - originX) / this.radius) *
-            this.uLength) /
-            4 +
-          this.uLength / 4
+          ((1 - (this.radius + this.capsuleLength / 2 - originX) / this.radius) * this.uLength) / 4 + this.uLength / 4
       }
       uProportion = arcLength
     } else {
       uProportion = this.uLength / 4
     }
 
-    for (
-      let i = -Math.PI / 2;
-      i < 1.5 * Math.PI;
-      i += Math.PI / this.radianStepCount
-    ) {
+    for (let i = -Math.PI / 2; i < 1.5 * Math.PI; i += Math.PI / this.radianStepCount) {
       const point = [originX, radius * Math.sin(i), radius * Math.cos(i)]
       const normal = [0, -radius * Math.sin(i), -radius * Math.cos(i)]
 
@@ -114,11 +114,7 @@ export class CapsuleMeshCustomizer extends BaseScriptComponent {
     let normals: number[] = []
     let uvs: number[] = []
 
-    for (
-      let circleCount = 0;
-      circleCount < this.cylinderStepCount;
-      circleCount++
-    ) {
+    for (let circleCount = 0; circleCount < this.cylinderStepCount; circleCount++) {
       const i = -length / 2 + (circleCount * length) / this.cylinderStepCount
       const circleData = this.buildCircle(i, radius, false)
 
@@ -135,11 +131,7 @@ export class CapsuleMeshCustomizer extends BaseScriptComponent {
     let uvs: number[] = []
 
     const step = radius / this.endXStepCount
-    for (
-      let i = isRight ? step : -radius + step;
-      i < (isRight ? radius : 0);
-      i += step
-    ) {
+    for (let i = isRight ? step : -radius + step; i < (isRight ? radius : 0); i += step) {
       const crossSectionRadius = Math.sqrt(radius ** 2 - i ** 2)
       const circleData = this.buildCircle(i + originX, crossSectionRadius, true)
 
@@ -172,7 +164,7 @@ export class CapsuleMeshCustomizer extends BaseScriptComponent {
       lastIndex,
       firstIndex,
       firstIndex + numPoints,
-      lastIndex + numPoints,
+      lastIndex + numPoints
     ])
 
     return indices
@@ -189,11 +181,7 @@ export class CapsuleMeshCustomizer extends BaseScriptComponent {
     return indices
   }
 
-  private linkEndIndices(
-    endIndex: number,
-    circleIndex: number,
-    isRight: boolean,
-  ) {
+  private linkEndIndices(endIndex: number, circleIndex: number, isRight: boolean) {
     let indices: number[] = []
     const numPoints = this.radianStepCount * 2
 
@@ -216,12 +204,7 @@ export class CapsuleMeshCustomizer extends BaseScriptComponent {
   }
 
   private checkValid() {
-    return (
-      this.radius === 0 ||
-      this.radianStepCount === 0 ||
-      this.cylinderStepCount === 0 ||
-      this.endXStepCount === 0
-    )
+    return this.radius === 0 || this.radianStepCount === 0 || this.cylinderStepCount === 0 || this.endXStepCount === 0
   }
 
   private buildCapsule() {
@@ -236,29 +219,14 @@ export class CapsuleMeshCustomizer extends BaseScriptComponent {
       this.builder.eraseVertices(0, this.builder.getVerticesCount())
     }
 
-    const leftEndCap = this.buildEndCap(
-      -this.capsuleLength / 2,
-      this.radius,
-      false,
-    )
+    const leftEndCap = this.buildEndCap(-this.capsuleLength / 2, this.radius, false)
     const cylinder = this.buildCylinder(this.capsuleLength, this.radius)
-    const rightEndCap = this.buildEndCap(
-      this.capsuleLength / 2,
-      this.radius,
-      true,
-    )
+    const rightEndCap = this.buildEndCap(this.capsuleLength / 2, this.radius, true)
 
     const endPoints = [
-      [
-        -this.capsuleLength / 2 - this.radius,
-        0,
-        0,
-        this.capsuleLength / 2 + this.radius,
-        0,
-        0,
-      ],
+      [-this.capsuleLength / 2 - this.radius, 0, 0, this.capsuleLength / 2 + this.radius, 0, 0],
       this.endPointNormals,
-      this.endPointUVs,
+      this.endPointUVs
     ]
 
     this.builder.appendVertices(leftEndCap)
@@ -273,20 +241,16 @@ export class CapsuleMeshCustomizer extends BaseScriptComponent {
       this.linkEndIndices(
         this.builder.getVerticesCount() - 1,
         (this.endXStepCount - 1) * 2 + this.cylinderStepCount - 1,
-        true,
-      ),
+        true
+      )
     )
-    this.builder.appendIndices(
-      this.linkEndIndices(this.builder.getVerticesCount() - 2, 0, false),
-    )
+    this.builder.appendIndices(this.linkEndIndices(this.builder.getVerticesCount() - 2, 0, false))
 
     if (this.builder.isValid()) {
       this.meshVisual.mesh = this.builder.getMesh()
       this.builder.updateMesh()
     } else {
-      throw new Error(
-        "Invalid mesh, check parameters to ensure positive whole numbers for vertex counts!",
-      )
+      throw new Error("Invalid mesh, check parameters to ensure positive whole numbers for vertex counts!")
     }
   }
 

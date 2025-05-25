@@ -17,12 +17,7 @@ export class VisualBoundariesProvider extends SceneObjectBoundariesProvider {
   private getNodeBoundaries(node: SceneObject): Rect {
     if (!node.enabled) {
       // Infinity doesn't work, but MAX_VALUE === Infinity
-      return Rect.create(
-        Number.MAX_VALUE,
-        -Number.MAX_VALUE,
-        Number.MAX_VALUE,
-        -Number.MAX_VALUE,
-      )
+      return Rect.create(Number.MAX_VALUE, -Number.MAX_VALUE, Number.MAX_VALUE, -Number.MAX_VALUE)
     }
 
     const rect = this.createNodeRectBoundaries(node)
@@ -39,9 +34,7 @@ export class VisualBoundariesProvider extends SceneObjectBoundariesProvider {
   }
 
   private createNodeRectBoundaries(sceneObject: SceneObject): Rect {
-    const screenTransform = sceneObject.getComponent(
-      "Component.ScreenTransform",
-    )
+    const screenTransform = sceneObject.getComponent("Component.ScreenTransform")
     if (!screenTransform) {
       throw new Error(`Missing ScreenTransform attached to ${sceneObject.name}`)
     }
@@ -49,12 +42,7 @@ export class VisualBoundariesProvider extends SceneObjectBoundariesProvider {
     const baseMeshVisual = sceneObject.getComponent("Component.BaseMeshVisual")
     if (!baseMeshVisual) {
       // Infinity doesn't work, but MAX_VALUE === Infinity
-      return Rect.create(
-        Number.MAX_VALUE,
-        -Number.MAX_VALUE,
-        Number.MAX_VALUE,
-        -Number.MAX_VALUE,
-      )
+      return Rect.create(Number.MAX_VALUE, -Number.MAX_VALUE, Number.MAX_VALUE, -Number.MAX_VALUE)
     }
 
     return this.createScreenTransformRectBoundaries(screenTransform)

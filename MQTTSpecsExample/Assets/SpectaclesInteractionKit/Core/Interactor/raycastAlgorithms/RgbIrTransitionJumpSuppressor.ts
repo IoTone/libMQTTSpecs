@@ -69,23 +69,21 @@ export type DeltaConfig = {
   multiplier: number
 }
 
-const RgbIrTransitionJumpSuppressorConfigDefault: RgbIrTransitionJumpSuppressorConfig =
-  {
-    boneRatioChangeLimit: 0.1,
-    boneLengthAverageWindowFrames: 5,
-    maxCapacity: 50,
-    decayDurationSec: 3,
-    maxTimespentWithoutDecaying: -1,
-    enableDecayImmediately: false,
-    registerOnlySignedPairs: true,
-  }
+const RgbIrTransitionJumpSuppressorConfigDefault: RgbIrTransitionJumpSuppressorConfig = {
+  boneRatioChangeLimit: 0.1,
+  boneLengthAverageWindowFrames: 5,
+  maxCapacity: 50,
+  decayDurationSec: 3,
+  maxTimespentWithoutDecaying: -1,
+  enableDecayImmediately: false,
+  registerOnlySignedPairs: true
+}
 
 export class Delta {
   static nextId = 0
   readonly id = Delta.nextId++
   private decayDurationSec: number
-  private _canDecay =
-    RgbIrTransitionJumpSuppressorConfigDefault.enableDecayImmediately
+  private _canDecay = RgbIrTransitionJumpSuppressorConfigDefault.enableDecayImmediately
   private decayStartTime: number | undefined = undefined
   private decayStopTime: number | undefined = undefined
   private creationTime = getTime()
@@ -103,18 +101,12 @@ export class Delta {
    * @param modifiedValues - targeting directin and locus (origin) on the previous and current frame to measure delta between them
    * @returns the created delta instance
    */
-  static createDelta(
-    detection: HandOverDetection,
-    modifiedValues: ModifiedValues,
-  ): Delta {
+  static createDelta(detection: HandOverDetection, modifiedValues: ModifiedValues): Delta {
     return new Delta({
-      direction: AxisAngle.getRotationBetween(
-        modifiedValues.currentDirection,
-        modifiedValues.previousDirection,
-      ),
+      direction: AxisAngle.getRotationBetween(modifiedValues.currentDirection, modifiedValues.previousDirection),
       locus: modifiedValues.previousLocus.sub(modifiedValues.currentLocus),
       sign: detection.sign,
-      multiplier: 1,
+      multiplier: 1
     })
   }
 
@@ -193,10 +185,7 @@ export class Delta {
       return direction
     }
 
-    return AxisAngle.applyRotation(
-      this.config.direction.multipliedBy(this.config.multiplier),
-      direction,
-    )
+    return AxisAngle.applyRotation(this.config.direction.multipliedBy(this.config.multiplier), direction)
   }
 
   /**
@@ -243,7 +232,7 @@ export default class RgbIrTransitionJumpSuppressor {
      */
     const jointPairs = [
       [this.hand.indexKnuckle, this.hand.indexMidJoint],
-      [this.hand.pinkyUpperJoint, this.hand.pinkyTip],
+      [this.hand.pinkyUpperJoint, this.hand.pinkyTip]
     ]
 
     for (const pair of jointPairs) {
@@ -257,9 +246,9 @@ export default class RgbIrTransitionJumpSuppressor {
         end: end,
         smoothedLength: new TimedScalarContainer(
           WindowMode.FRAME,
-          RgbIrTransitionJumpSuppressorConfigDefault.boneLengthAverageWindowFrames,
+          RgbIrTransitionJumpSuppressorConfigDefault.boneLengthAverageWindowFrames
         ),
-        currentLength: undefined,
+        currentLength: undefined
       })
     }
   }
@@ -268,19 +257,15 @@ export default class RgbIrTransitionJumpSuppressor {
     const acceptBasedOnSign =
       this.deltas.length === 0 ||
       this.deltas[this.deltas.length - 1].sign !== sign ||
-      RgbIrTransitionJumpSuppressorConfigDefault.registerOnlySignedPairs ===
-        false
+      RgbIrTransitionJumpSuppressorConfigDefault.registerOnlySignedPairs === false
     const withinCapacity =
       RgbIrTransitionJumpSuppressorConfigDefault.maxCapacity < 1 ||
-      this.deltas.length <
-        RgbIrTransitionJumpSuppressorConfigDefault.maxCapacity
+      this.deltas.length < RgbIrTransitionJumpSuppressorConfigDefault.maxCapacity
 
     if (acceptBasedOnSign && withinCapacity) {
       return true
     }
-    this.log.d(
-      "Handover is not registered either because of wrong transition parity or delta capacity overflow",
-    )
+    this.log.d("Handover is not registered either because of wrong transition parity or delta capacity overflow")
     this.log.d(`Parity check: ${acceptBasedOnSign}`)
     this.log.d(`Capacity check: ${withinCapacity}`)
     return false
@@ -311,7 +296,7 @@ export default class RgbIrTransitionJumpSuppressor {
         this.log.v(
           `${bone.begin.getAttachmentPoint().name} - ${
             bone.end.getAttachmentPoint().name
-          }: ${((ratio - 1) * 100).toFixed(1)} %`,
+          }: ${((ratio - 1) * 100).toFixed(1)} %`
         )
         avgRatio += ratio
         count++
@@ -327,10 +312,7 @@ export default class RgbIrTransitionJumpSuppressor {
     }
 
     const ratioDifference = avgRatio - 1
-    if (
-      Math.abs(ratioDifference) >=
-      RgbIrTransitionJumpSuppressorConfigDefault.boneRatioChangeLimit
-    ) {
+    if (Math.abs(ratioDifference) >= RgbIrTransitionJumpSuppressorConfigDefault.boneRatioChangeLimit) {
       sign = Math.sign(ratioDifference)
       registerAsHandOver = this.isHandOverToRegister(sign)
       for (const bone of this.bones) {
@@ -338,9 +320,9 @@ export default class RgbIrTransitionJumpSuppressor {
       }
 
       this.log.d(
-        `Model swich detected: ${sign === 1 ? "HLMT" : "UL"}, diff: ${(
-          ratioDifference * 100
-        ).toFixed(1)} %, Register: ${registerAsHandOver}`,
+        `Model swich detected: ${sign === 1 ? "HLMT" : "UL"}, diff: ${(ratioDifference * 100).toFixed(
+          1
+        )} %, Register: ${registerAsHandOver}`
       )
     }
 
@@ -354,7 +336,7 @@ export default class RgbIrTransitionJumpSuppressor {
 
     return {
       isHandOver: registerAsHandOver,
-      sign: sign,
+      sign: sign
     }
   }
 
@@ -373,19 +355,15 @@ export default class RgbIrTransitionJumpSuppressor {
     currentDirection: vec3,
     previousDirection: vec3,
     currentLocus: vec3,
-    previousLocus: vec3,
+    previousLocus: vec3
   ): ModifiedValues {
     let modifiedCurrentDirection = currentDirection
     let modifiedPreviousDirection = previousDirection
     let modifiedCurrentLocus = currentLocus
     let modifiedPreviousLocus = previousLocus
     for (const delta of this.deltas) {
-      modifiedCurrentDirection = delta.applyDirectionDelta(
-        modifiedCurrentDirection,
-      )
-      modifiedPreviousDirection = delta.applyDirectionDelta(
-        modifiedPreviousDirection,
-      )
+      modifiedCurrentDirection = delta.applyDirectionDelta(modifiedCurrentDirection)
+      modifiedPreviousDirection = delta.applyDirectionDelta(modifiedPreviousDirection)
       modifiedCurrentLocus = delta.applyLocusDelta(modifiedCurrentLocus)
       modifiedPreviousLocus = delta.applyLocusDelta(modifiedPreviousLocus)
     }
@@ -394,7 +372,7 @@ export default class RgbIrTransitionJumpSuppressor {
       currentDirection: modifiedCurrentDirection,
       previousDirection: modifiedPreviousDirection,
       currentLocus: modifiedCurrentLocus,
-      previousLocus: modifiedPreviousLocus,
+      previousLocus: modifiedPreviousLocus
     }
   }
 
@@ -437,27 +415,14 @@ export default class RgbIrTransitionJumpSuppressor {
 
     this.decayAndRemoveInvalidDeltas()
 
-    if (
-      RgbIrTransitionJumpSuppressorConfigDefault.maxTimespentWithoutDecaying > 0
-    ) {
-      this.startDecayOldLastDelta(
-        RgbIrTransitionJumpSuppressorConfigDefault.maxTimespentWithoutDecaying,
-      )
+    if (RgbIrTransitionJumpSuppressorConfigDefault.maxTimespentWithoutDecaying > 0) {
+      this.startDecayOldLastDelta(RgbIrTransitionJumpSuppressorConfigDefault.maxTimespentWithoutDecaying)
     }
 
-    if (
-      detection.isHandOver === true &&
-      this.previousDirection !== undefined &&
-      this.previousLocus !== undefined
-    ) {
+    if (detection.isHandOver === true && this.previousDirection !== undefined && this.previousLocus !== undefined) {
       const delta = Delta.createDelta(
         detection,
-        this.computeModifiedValues(
-          currentDirection,
-          this.previousDirection,
-          currentLocus,
-          this.previousLocus,
-        ),
+        this.computeModifiedValues(currentDirection, this.previousDirection, currentLocus, this.previousLocus)
       )
       this.storeDelta(delta)
 
@@ -466,13 +431,11 @@ export default class RgbIrTransitionJumpSuppressor {
         this.log.d(
           `decay: ${delta.canDecay}, id: ${delta.id}, to model: ${
             delta.sign === 1 ? "HLMT" : "UL"
-          }, isValid: ${delta.isValid()}`,
+          }, isValid: ${delta.isValid()}`
         )
       }
     } else if (detection.isHandOver === true) {
-      this.log.d(
-        `Cannot register because previous data is undefined: ${this.previousDirection}, ${this.previousLocus}`,
-      )
+      this.log.d(`Cannot register because previous data is undefined: ${this.previousDirection}, ${this.previousLocus}`)
     }
 
     this.previousLocus = currentLocus

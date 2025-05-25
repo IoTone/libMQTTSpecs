@@ -31,9 +31,7 @@ export default class StateMachine {
     this.updateEvent.bind(() => {
       this.update()
     })
-    this.lateUpdateEvent = updateDispatcher.createLateUpdateEvent(
-      "StateMachineLateUpdate",
-    )
+    this.lateUpdateEvent = updateDispatcher.createLateUpdateEvent("StateMachineLateUpdate")
     this.lateUpdateEvent.bind(() => {
       this.lateUpdate()
     })
@@ -129,8 +127,7 @@ export default class StateMachine {
       return
     }
 
-    this._currentState.stateElapsedTime =
-      getTime() - this._currentState.stateStartTime
+    this._currentState.stateElapsedTime = getTime() - this._currentState.stateStartTime
 
     let transition = this._currentState.checkUpdate()
     if (transition !== null) {
@@ -145,8 +142,7 @@ export default class StateMachine {
       return
     }
 
-    this._currentState.stateElapsedTime =
-      getTime() - this._currentState.stateStartTime
+    this._currentState.stateElapsedTime = getTime() - this._currentState.stateStartTime
 
     this._currentState.onLateUpdate()
   }

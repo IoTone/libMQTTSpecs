@@ -1,4 +1,4 @@
-- !<AssetImportMetadata/2cdc0a34-149c-49c6-841c-98deb78f8e98>
+- !<AssetImportMetadata/2458ef6a-0cac-ce4d-9309-804cd1522680>
   ImportedAssetIds:
     ObjectPrefab: !<reference> f99407ce-416a-43f3-baf8-668a42712de9
   ImporterName: ObjectPrefabImporter
@@ -88,21 +88,6 @@
     hasSegmentScaleCompensation: false
   Children:
     []
-  Components:
-    []
-- !<SceneObject/0cf67e39-3ab5-4388-bbf9-d8ec334dd4bc>
-  PrefabRemaps:
-    []
-  Name: "[LEGACY] InteractorLineVisual"
-  Enabled: true
-  Layers: 1
-  LocalTransform:
-    position: {x: 0.000000, y: 0.000000, z: 0.000000}
-    rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
-    scale: {x: 1.000000, y: 1.000000, z: 1.000000}
-    hasSegmentScaleCompensation: false
-  Children:
-    - !<own> c9a94448-3982-4fa4-99e7-709ac0d33cf2
   Components:
     []
 - !<Skin/0ec9ca4a-5334-4393-836c-9bb22661fff0>
@@ -320,10 +305,8 @@
     - c0fbe2e8-b696-42bd-aa0d-28c8c92aca11: d232456c-f620-47bc-8d00-b399b62a04bd
     - c34bc6ff-bcac-4506-988c-488a03a3fd02: dfb837c3-06b0-4452-821c-045e2eb90511
     - c6ca57a4-4187-47c4-9817-27f2853e83c5: d025fa6e-6edb-4d47-baba-e4f3d80092b4
-    - c6d77d83-ee46-4487-a43f-d23b0ae9de25: 0cf67e39-3ab5-4388-bbf9-d8ec334dd4bc
     - c7fc765f-3e34-42ed-b79c-d0d0f19dfd37: d11d0ed0-245a-45bd-8110-2af226de585f
     - c99ee9c2-c940-4c10-9c00-6df31f99c027: 9589c40a-ef77-4876-9661-4b4dc66c068d
-    - ca180b07-36ad-49ea-a5f9-c22e23697d15: c9a94448-3982-4fa4-99e7-709ac0d33cf2
     - d2fbbe47-d72e-4471-a1f1-02ffbcbe9212: 201e5deb-bc00-4256-98fa-b2f8f97eaea7
     - d4da8107-4c33-4f45-b961-1df209595381: 4755c937-5623-453e-a4ad-69f248d76224
     - d54c61ff-e215-476a-95ec-82e3ddc2bb53: d0992ac9-fc75-4edc-89f6-60c73c10f3ee
@@ -342,7 +325,6 @@
     - ecb433df-f587-40a4-8dee-5b1879ca1550: 7fee1a0c-03e7-408a-bded-cf2f1a2589e6
     - ed26aed2-3168-4335-8f84-4fe70d0a1333: a092a374-bfce-46a4-8d84-3fd333e33d52
     - f05448db-5a08-4d04-9b55-ec8dc072831d: e663c4d6-4ae8-4c25-8193-2133cd535208
-    - f0e07390-6185-4a35-9a7b-632bf9d48126: 44415fc7-6947-441f-99e7-9450e0ccf1a1
     - f1e10bfb-c13f-486f-9058-a205aa2a22a5: 1da5369a-0a57-44fd-b95e-19f783d821ce
     - f24eade7-4784-4f7b-8f89-10cd7e47127e: 48249f39-6d5a-41d8-83cc-0409b5f8692b
     - f99407ce-416a-43f3-baf8-668a42712de9: adb4d8be-05e0-4326-a57f-a784fbcac7e8
@@ -473,6 +455,8 @@
     indirectTargetingVolumeMultiplier: true
     indirectDragThreshold: true
     mouseTargetingMode: true
+    moveInDepth: true
+    moveInDepthAmount: true
   ScriptTypesDefault:
     {}
   ScriptInputs:
@@ -491,6 +475,8 @@
       indirectTargetingVolumeMultiplier: !<float> 1.000000
       indirectDragThreshold: !<float> 3.000000
       mouseTargetingMode: !<float> 2.000000
+      moveInDepth: false
+      moveInDepthAmount: !<float> 5.000000
   ScriptTypes:
     "":
       {}
@@ -603,7 +589,6 @@
     indirectTargetingVolumeMultiplier: true
     indirectDragThreshold: true
     handType: true
-    raycastAlgorithm: true
     forcePokeOnNonDominantPalmProximity: true
     directColliderEnterRadius: true
     directColliderExitRadius: true
@@ -626,7 +611,6 @@
       indirectTargetingVolumeMultiplier: !<float> 1.000000
       indirectDragThreshold: !<float> 40.000000
       handType: right
-      raycastAlgorithm: Proxy
       forcePokeOnNonDominantPalmProximity: false
       directColliderEnterRadius: !<float> 1.000000
       directColliderExitRadius: 1.500000
@@ -709,35 +693,6 @@
     []
   Components:
     - !<own> d6f39fd9-8555-4349-8e7b-440ab4882279
-- !<ScriptComponent/44415fc7-6947-441f-99e7-9450e0ccf1a1>
-  PrefabRemaps:
-    []
-  Name: InteractorLineVisual
-  Enabled: true
-  ScriptAsset: !<reference> 772760e3-b59e-4284-a8b3-60a0f4dfbbcb
-  ScriptInputsDefault:
-    _beginColor: true
-    _endColor: true
-    lineWidth: true
-    lineLength: true
-    lineStyle: true
-    shouldStick: true
-    _interactor: true
-  ScriptTypesDefault:
-    {}
-  ScriptInputs:
-    "":
-      lineMaterial: !<reference.Material> 515adedb-808a-4b69-af91-2565a9dc2a21
-      _beginColor: !<Vec3> {x: 1.000000, y: 1.000000, z: 0.000000}
-      _endColor: !<Vec3> {x: 1.000000, y: 1.000000, z: 0.000000}
-      lineWidth: 0.500000
-      lineLength: !<float> 160.000000
-      lineStyle: !<float> 2.000000
-      shouldStick: true
-      _interactor: !<reference.ScriptComponent> 00000000-0000-0000-0000-000000000000
-  ScriptTypes:
-    "":
-      {}
 - !<SceneObject/466b875f-b230-4736-a8c7-1a66b2e07fbd>
   PrefabRemaps:
     []
@@ -789,14 +744,13 @@
     pinkyUpperJoint: true
     pinkyTip: true
     shouldThumbPokeGlow: true
-    occluderEnabled: true
   ScriptTypesDefault:
     {}
   ScriptInputs:
     "":
       handType: right
       selectVisual: Default
-      handInteractor: !<MappingBased.HandInteractor> 3b4499e2-4660-4970-804b-bf357efc077e
+      handInteractor: !<MappingBased.AssignableType> 3b4499e2-4660-4970-804b-bf357efc077e
       handMesh: !<reference.RenderMeshVisual> ba88cf3f-f114-480e-b50c-16d2e5c7aee6
       root: !<reference.SceneObject> 81735e6e-4177-45a5-92d7-5b1b50dffc7b
       autoJointMapping: true
@@ -835,9 +789,6 @@
       tapProximityThreshold: !<float> 8.000000
       pinchTexture: !<reference.Texture> 3391429c-5c74-4b5c-b9fc-4ad3ba30bda4
       tapTexture: !<reference.Texture> e33d2c7f-1d12-4250-92fb-433c25ce1923
-      occluderEnabled: false
-      occluderUnitPlaneMesh: !<reference.RenderMesh> a453f19f-0832-419f-bd8f-b3296b433b23
-      radialGradientOcclusionMaterial: !<reference.Material> af45ff34-c96f-42c2-8446-8282edf6dece
       handOutlineMaterial: !<reference.Material> 7ac80b6c-979a-4a00-a694-099f296be161
       handOccluderMaterial: !<reference.Material> bb8479b9-021e-4c42-809a-60edf99cbeac
   ScriptTypes:
@@ -1453,7 +1404,6 @@
     _maxRaycastDistance: true
     indirectTargetingVolumeMultiplier: true
     indirectDragThreshold: true
-    raycastAlgorithm: true
     forcePokeOnNonDominantPalmProximity: true
     directColliderEnterRadius: true
     directColliderExitRadius: true
@@ -1476,7 +1426,6 @@
       indirectTargetingVolumeMultiplier: !<float> 1.000000
       indirectDragThreshold: !<float> 40.000000
       handType: left
-      raycastAlgorithm: Proxy
       forcePokeOnNonDominantPalmProximity: false
       directColliderEnterRadius: !<float> 1.000000
       directColliderExitRadius: 1.500000
@@ -1543,7 +1492,6 @@
   Children:
     - !<own> 13dd4dc9-fa9e-406a-ac42-4267ec6f9484
     - !<own> 345b3aef-edda-4b4a-a83d-07030c11535d
-    - !<own> 0cf67e39-3ab5-4388-bbf9-d8ec334dd4bc
   Components:
     []
 - !<SceneObject/9dbb9b45-786a-421a-8d51-8befa9a310e8>
@@ -1902,21 +1850,6 @@
     - !<own> c6a34feb-2eeb-4afc-ac81-46724e7355b3
   Components:
     []
-- !<SceneObject/c9a94448-3982-4fa4-99e7-709ac0d33cf2>
-  PrefabRemaps:
-    []
-  Name: InteractorLineVisual
-  Enabled: false
-  Layers: 1
-  LocalTransform:
-    position: {x: 0.000000, y: 0.000000, z: 0.000000}
-    rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
-    scale: {x: 1.000000, y: 1.000000, z: 1.000000}
-    hasSegmentScaleCompensation: false
-  Children:
-    []
-  Components:
-    - !<own> 44415fc7-6947-441f-99e7-9450e0ccf1a1
 - !<SceneObject/cdc219c1-142e-434c-ab39-58b25422ed83>
   PrefabRemaps:
     []
@@ -2214,14 +2147,13 @@
     pinkyUpperJoint: true
     pinkyTip: true
     shouldThumbPokeGlow: true
-    occluderEnabled: true
   ScriptTypesDefault:
     {}
   ScriptInputs:
     "":
       handType: left
       selectVisual: Default
-      handInteractor: !<MappingBased.HandInteractor> 9355ccc3-323a-44ae-91a7-60b502ddfdde
+      handInteractor: !<MappingBased.AssignableType> 9355ccc3-323a-44ae-91a7-60b502ddfdde
       handMesh: !<reference.RenderMeshVisual> 53c9b92b-eb2e-443f-8fef-61fc991884d0
       root: !<reference.SceneObject> 1bd8ab64-7fb1-4a85-9796-25bc7abd6d2c
       autoJointMapping: true
@@ -2260,9 +2192,6 @@
       tapProximityThreshold: !<float> 8.000000
       pinchTexture: !<reference.Texture> 3391429c-5c74-4b5c-b9fc-4ad3ba30bda4
       tapTexture: !<reference.Texture> e33d2c7f-1d12-4250-92fb-433c25ce1923
-      occluderEnabled: false
-      occluderUnitPlaneMesh: !<reference.RenderMesh> a453f19f-0832-419f-bd8f-b3296b433b23
-      radialGradientOcclusionMaterial: !<reference.Material> af45ff34-c96f-42c2-8446-8282edf6dece
       handOutlineMaterial: !<reference.Material> 7ac80b6c-979a-4a00-a694-099f296be161
       handOccluderMaterial: !<reference.Material> 5d5c762b-f0dd-4c06-b76f-bcb8f8fb525f
   ScriptTypes:

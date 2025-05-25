@@ -1,4 +1,4 @@
-- !<AssetImportMetadata/6fc8b7e9-d9a1-469c-8cd1-94e37d6036ea>
+- !<AssetImportMetadata/e43dd41c-9543-5da0-677b-c5a2e515dd20>
   ImporterSettings: !<AssetImporterSettings>
     {}
   ImportedAssetIds:
@@ -39,3 +39,6 @@
     []
   SvgIcon: ""
   DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  SetupScript:
+    code: ""
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000

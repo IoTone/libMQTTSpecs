@@ -1,7 +1,4 @@
-import {
-  CursorMode,
-  InteractorCursor,
-} from "../../../../Components/Interaction/InteractorCursor/InteractorCursor"
+import {CursorMode, InteractorCursor} from "../../../../Components/Interaction/InteractorCursor/InteractorCursor"
 import NativeLogger from "../../../../Utils/NativeLogger"
 import {validate} from "../../../../Utils/validate"
 import {ContainerFrame, InputState} from "../ContainerFrame"
@@ -20,7 +17,7 @@ export enum CursorModes {
   auto = 0,
   scaleTlBr = 1,
   scaleTrBl = 2,
-  translate = 3,
+  translate = 3
 }
 
 export class CursorHandler {
@@ -42,8 +39,7 @@ export class CursorHandler {
   private target: SceneObject = this.options.target
   private targetTransform: Transform = this.target.getTransform()
   private frame: ContainerFrame = this.options.frame
-  private parentTransform: Transform | undefined =
-    this.frame.object?.getTransform()
+  private parentTransform: Transform | undefined = this.frame.object?.getTransform()
   private lockMode: boolean = false
   private lockPosition: vec3 = vec3.zero()
   private margin: number = this.options.margin
@@ -85,13 +81,9 @@ export class CursorHandler {
     if (this.lockMode) {
       const ogScale = this.parentTransform.getWorldScale()
       const tempScale = new vec3(
-        this.frame.innerSize.x +
-          this.frame.constantPadding.x +
-          this.frame.border * 2,
-        this.frame.innerSize.y +
-          this.frame.constantPadding.y +
-          this.frame.border * 2,
-        1,
+        this.frame.innerSize.x + this.frame.constantPadding.x + this.frame.border * 2,
+        this.frame.innerSize.y + this.frame.constantPadding.y + this.frame.border * 2,
+        1
       )
       this.parentTransform.setWorldScale(tempScale)
       const tempWorld = this.parentTransform.getWorldTransform()

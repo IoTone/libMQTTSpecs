@@ -19,8 +19,7 @@ export type NullableBoolean = null | boolean
  */
 export default class BistableThreshold {
   private state: NullableBoolean = null
-  private direction =
-    this.config.edgeActivate > this.config.edgeDeactivate ? 1 : -1
+  private direction = this.config.edgeActivate > this.config.edgeDeactivate ? 1 : -1
 
   constructor(private config: BistableThresholdConfig) {}
 
@@ -33,34 +32,22 @@ export default class BistableThreshold {
   update(newVal: number): NullableBoolean {
     switch (this.state) {
       case null:
-        if (
-          this.direction * newVal >
-          this.direction * this.config.edgeActivate
-        ) {
+        if (this.direction * newVal > this.direction * this.config.edgeActivate) {
           this.state = true
           return true
-        } else if (
-          this.direction * newVal <
-          this.direction * this.config.edgeDeactivate
-        ) {
+        } else if (this.direction * newVal < this.direction * this.config.edgeDeactivate) {
           this.state = false
           return false
         }
         return null
       case true:
-        if (
-          this.direction * newVal <
-          this.direction * this.config.edgeDeactivate
-        ) {
+        if (this.direction * newVal < this.direction * this.config.edgeDeactivate) {
           this.state = false
           return false
         }
         return null
       case false:
-        if (
-          this.direction * newVal >
-          this.direction * this.config.edgeActivate
-        ) {
+        if (this.direction * newVal > this.direction * this.config.edgeActivate) {
           this.state = true
           return true
         }
@@ -74,9 +61,7 @@ export default class BistableThreshold {
    *
    * @param {...any} system
    */
-  static updateSystem(
-    ...system: [threshold: BistableThreshold, value: number][]
-  ): NullableBoolean {
+  static updateSystem(...system: [threshold: BistableThreshold, value: number][]): NullableBoolean {
     // check the first state, if it's null, the system hasn't updated
     const [firstThreshold, firstValue] = system[0]
     const firstUpdated = firstThreshold.update(firstValue)

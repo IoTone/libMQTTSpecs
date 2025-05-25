@@ -17,6 +17,7 @@ export function averageVec3(values: vec3[]): vec3 {
 
 export const DegToRad = Math.PI / 180
 export const RadToDeg = 180 / Math.PI
+export const NANOSECONDS_PER_MILLISECOND = 1_000_000
 
 /**
  * Compute the average vector of a list of values
@@ -49,11 +50,7 @@ export function inverseLerp(start: number, end: number, value: number) {
  * @param ratio Proportion of vectorB in the resulting linear combination.
  * @returns Interpolated vector between vectorA and vectorB.
  */
-export function interpolateVec3(
-  vectorA: vec3,
-  vectorB: vec3,
-  ratio: number,
-): vec3 {
+export function interpolateVec3(vectorA: vec3, vectorB: vec3, ratio: number): vec3 {
   return vectorA.uniformScale(1 - ratio).add(vectorB.uniformScale(ratio))
 }
 
@@ -79,13 +76,7 @@ export function clamp(value: number, min: number, max: number) {
  * @param outMin the minimum of the incoming range
  * @returns the mapped value
  */
-export function mapValue(
-  val: number,
-  inMax: number,
-  inMin: number,
-  outMax: number,
-  outMin: number,
-): number {
+export function mapValue(val: number, inMax: number, inMin: number, outMax: number, outMin: number): number {
   return ((val - inMax) / (inMin - inMax)) * (outMin - outMax) + outMax
 }
 
@@ -109,7 +100,7 @@ export function smoothDamp(
   target: number,
   velocity: number,
   smoothTime: number,
-  deltaTime: number,
+  deltaTime: number
 ): [number, number] {
   // https://en.wikipedia.org/wiki/Mass-spring-damper_model
   // m * x''(t) + c * x'(t) + k * x(t) = 0
@@ -150,7 +141,7 @@ export function smoothDampAngle(
   target: number,
   velocity: number,
   smoothTime: number,
-  deltaTime: number,
+  deltaTime: number
 ): [number, number] {
   if (target - current > Math.PI) current += 2 * Math.PI
   if (target - current < -Math.PI) current -= 2 * Math.PI
@@ -169,7 +160,7 @@ export function smoothSlide(
   current: number,
   velocity: number,
   smoothTime: number,
-  deltaTime: number,
+  deltaTime: number
 ): [number, number] {
   // smooth slide equation (k = 0)
   // c * x'(t) + x''(t) = 0

@@ -10,9 +10,7 @@ export class TouchRayProvider implements RayProvider {
   private camera = WorldCameraFinderProvider.getInstance()
 
   constructor(script: ScriptComponent, maxRayDistance: number) {
-    script
-      .createEvent("TouchStartEvent")
-      .bind(this.onTouchStartEvent.bind(this))
+    script.createEvent("TouchStartEvent").bind(this.onTouchStartEvent.bind(this))
 
     script.createEvent("TouchMoveEvent").bind(this.onTouchMoveEvent.bind(this))
 
@@ -24,21 +22,13 @@ export class TouchRayProvider implements RayProvider {
       if (this.cursorPosition === null) {
         this.raycastInfo = null
       } else {
-        const locus = this.camera.screenSpaceToWorldSpace(
-          this.cursorPosition.x,
-          this.cursorPosition.y,
-          0,
-        )
+        const locus = this.camera.screenSpaceToWorldSpace(this.cursorPosition.x, this.cursorPosition.y, 0)
         this.raycastInfo = {
           locus: locus,
           direction: this.camera
-            .screenSpaceToWorldSpace(
-              this.cursorPosition.x,
-              this.cursorPosition.y,
-              maxRayDistance,
-            )
+            .screenSpaceToWorldSpace(this.cursorPosition.x, this.cursorPosition.y, maxRayDistance)
             .sub(locus)
-            .normalize(),
+            .normalize()
         }
       }
     })
@@ -49,7 +39,7 @@ export class TouchRayProvider implements RayProvider {
     return (
       this.raycastInfo ?? {
         direction: vec3.zero(),
-        locus: vec3.zero(),
+        locus: vec3.zero()
       }
     )
   }

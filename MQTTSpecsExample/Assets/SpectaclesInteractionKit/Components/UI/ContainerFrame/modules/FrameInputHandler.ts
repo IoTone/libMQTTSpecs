@@ -52,7 +52,7 @@ export enum Modes {
   ScaleBottomRight = "scaleBottomRight",
   ScaleTopRight = "scaleTopRight",
   ScaleBottomLeft = "scaleBottomLeft",
-  Translating = "translating",
+  Translating = "translating"
 }
 
 // affects speed of scaling
@@ -90,7 +90,7 @@ export class FrameInputHandler {
     translating: false,
     ignoring: false,
     hoveringInteractable: false,
-    interacting: false,
+    interacting: false
   }
 
   private onTranslationStartEvent = new Event()
@@ -112,25 +112,13 @@ export class FrameInputHandler {
 
   minimumSize: vec2 =
     this.targetWorldScaleCache.x > this.targetWorldScaleCache.y
-      ? new vec2(
-          3,
-          (3 * this.targetWorldScaleCache.y) / this.targetWorldScaleCache.x,
-        )
-      : new vec2(
-          (3 * this.targetWorldScaleCache.x) / this.targetWorldScaleCache.y,
-          3,
-        )
+      ? new vec2(3, (3 * this.targetWorldScaleCache.y) / this.targetWorldScaleCache.x)
+      : new vec2((3 * this.targetWorldScaleCache.x) / this.targetWorldScaleCache.y, 3)
 
   maximumSize: vec2 =
     this.targetWorldScaleCache.x > this.targetWorldScaleCache.y
-      ? new vec2(
-          400,
-          (400 * this.targetWorldScaleCache.y) / this.targetWorldScaleCache.x,
-        )
-      : new vec2(
-          (400 * this.targetWorldScaleCache.x) / this.targetWorldScaleCache.y,
-          400,
-        )
+      ? new vec2(400, (400 * this.targetWorldScaleCache.y) / this.targetWorldScaleCache.x)
+      : new vec2((400 * this.targetWorldScaleCache.x) / this.targetWorldScaleCache.y, 400)
 
   constructor(private options: FrameInputOptions) {
     if (this.options.minimumSize) {
@@ -155,11 +143,7 @@ export class FrameInputHandler {
   update = (inputState: InputState) => {
     const touch = inputState.position
     this.state.hoveringInteractable = false
-    if (
-      touch.x < -this.edge + this.gutterSize.x &&
-      touch.y < -this.edge + this.gutterSize.y &&
-      this.allowScaling
-    ) {
+    if (touch.x < -this.edge + this.gutterSize.x && touch.y < -this.edge + this.gutterSize.y && this.allowScaling) {
       this.mode = Modes.ScaleBottomLeft
     } else if (
       touch.x < -this.edge + this.gutterSize.x &&
@@ -204,11 +188,7 @@ export class FrameInputHandler {
 
       if (this.isInteractable === false) {
         this.mode = Modes.Translating
-      } else if (
-        !this.state.ignoring &&
-        !this.state.scaling &&
-        !this.state.translating
-      ) {
+      } else if (!this.state.ignoring && !this.state.scaling && !this.state.translating) {
         // hovering interactable
         this.mode = Modes.Auto
 
@@ -277,10 +257,7 @@ export class FrameInputHandler {
       this.setStateTranslating(true)
     }
 
-    if (
-      (this.frame.allowTranslation && this.state.translating) ||
-      this.frame.forceTranslate
-    ) {
+    if ((this.frame.allowTranslation && this.state.translating) || this.frame.forceTranslate) {
       this.manipulate.setCanTranslate(true)
     } else if (this.manipulate.canTranslate()) {
       this.manipulate.setCanTranslate(false)
@@ -290,20 +267,11 @@ export class FrameInputHandler {
     // handle cursor swaps
     if (!this.state.scaling || !this.state.translating) {
       if (!this.state.interacting) {
-        if (
-          this.mode === Modes.ScaleBottomLeft ||
-          this.mode === Modes.ScaleTopRight
-        ) {
+        if (this.mode === Modes.ScaleBottomLeft || this.mode === Modes.ScaleTopRight) {
           this.cursorHandler.mode = CursorMode.ScaleTopRight
-        } else if (
-          this.mode === Modes.ScaleBottomRight ||
-          this.mode === Modes.ScaleTopLeft
-        ) {
+        } else if (this.mode === Modes.ScaleBottomRight || this.mode === Modes.ScaleTopLeft) {
           this.cursorHandler.mode = CursorMode.ScaleTopLeft
-        } else if (
-          this.mode === Modes.Translating &&
-          (this.frame.allowTranslation || this.frame.forceTranslate)
-        ) {
+        } else if (this.mode === Modes.Translating && (this.frame.allowTranslation || this.frame.forceTranslate)) {
           this.cursorHandler.mode = CursorMode.Translate
         } else {
           this.cursorHandler.mode = CursorMode.Auto
@@ -340,8 +308,6 @@ export class FrameInputHandler {
 
     this.state.translating = isTranslating
 
-    this.state.translating
-      ? this.onTranslationStartEvent.invoke()
-      : this.onTranslationEndEvent.invoke()
+    this.state.translating ? this.onTranslationStartEvent.invoke() : this.onTranslationEndEvent.invoke()
   }
 }

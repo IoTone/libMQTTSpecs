@@ -3,9 +3,7 @@ import CameraProvider from "./CameraProvider"
 /**
  * Base class that provides camera related apis
  */
-export default abstract class BaseWorldCameraProvider
-  implements CameraProvider
-{
+export default abstract class BaseWorldCameraProvider implements CameraProvider {
   protected cameraTransform!: Transform
   protected cameraComponent!: Camera
 
@@ -71,10 +69,7 @@ export default abstract class BaseWorldCameraProvider
 
   /** @inheritDoc */
   screenSpaceToWorldSpace(x: number, y: number, absoluteDepth: number): vec3 {
-    return this.cameraComponent.screenSpaceToWorldSpace(
-      new vec2(x, y),
-      absoluteDepth,
-    )
+    return this.cameraComponent.screenSpaceToWorldSpace(new vec2(x, y), absoluteDepth)
   }
 
   /** @inheritDoc */
@@ -95,18 +90,9 @@ export default abstract class BaseWorldCameraProvider
 
   /** @inheritdoc */
   inFoV(worldPosition: vec3): boolean {
-    const screenSpace = this.worldSpaceToScreenSpace(
-      worldPosition.x,
-      worldPosition.y,
-      worldPosition.z,
-    )
+    const screenSpace = this.worldSpaceToScreenSpace(worldPosition.x, worldPosition.y, worldPosition.z)
 
-    return (
-      screenSpace.x <= 1 &&
-      screenSpace.x >= 0 &&
-      screenSpace.y <= 1 &&
-      screenSpace.y >= 0
-    )
+    return screenSpace.x <= 1 && screenSpace.x >= 0 && screenSpace.y <= 1 && screenSpace.y >= 0
   }
 
   /** @inheritdoc */
@@ -118,10 +104,7 @@ export default abstract class BaseWorldCameraProvider
       forwardDir = forwardDir.normalize()
     }
 
-    return this.cameraComponent
-      .getTransform()
-      .getWorldPosition()
-      .add(forwardDir.uniformScale(-x))
+    return this.cameraComponent.getTransform().getWorldPosition().add(forwardDir.uniformScale(-x))
   }
 
   /** @inheritdoc */

@@ -71,7 +71,7 @@ export default class MeshView extends View<MeshViewConfig> implements Spatial {
   getWorldAABB(): aabb {
     return {
       min: this.component.worldAabbMin(),
-      max: this.component.worldAabbMax(),
+      max: this.component.worldAabbMax()
     }
   }
 
@@ -80,23 +80,15 @@ export default class MeshView extends View<MeshViewConfig> implements Spatial {
    */
   override setAlpha(a: number) {
     super.setAlpha(a)
-    if (
-      this.component.mainPass !== undefined &&
-      this.component.mainPass.baseColor !== undefined
-    ) {
+    if (this.component.mainPass !== undefined && this.component.mainPass.baseColor !== undefined) {
       // otherwise, set the alpha directly
-      this.component.mainPass.baseColor = color.withAlpha(
-        this.component.mainPass.baseColor,
-        a,
-      )
+      this.component.mainPass.baseColor = color.withAlpha(this.component.mainPass.baseColor, a)
     }
   }
 
   constructor(config: MeshViewConfig) {
     super(config)
-    this.component = this.container.createComponent(
-      "Component.RenderMeshVisual",
-    )
+    this.component = this.container.createComponent("Component.RenderMeshVisual")
 
     let material
     if (this.config.material) {
@@ -108,8 +100,7 @@ export default class MeshView extends View<MeshViewConfig> implements Spatial {
     this.component.mesh = config.mesh
     this.component.mainMaterial = material
 
-    this.component.mainMaterial.mainPass.blendMode =
-      this.config.material?.mainPass.blendMode ?? 0
+    this.component.mainMaterial.mainPass.blendMode = this.config.material?.mainPass.blendMode ?? 0
 
     if (this.config.renderOrder) {
       this.component.setRenderOrder(this.config.renderOrder)

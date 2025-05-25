@@ -1,7 +1,4 @@
-import {
-  FieldTargetingMode,
-  HandInteractor,
-} from "../../../Core/HandInteractor/HandInteractor"
+import {FieldTargetingMode, HandInteractor} from "../../../Core/HandInteractor/HandInteractor"
 import {InteractorTriggerType} from "../../../Core/Interactor/Interactor"
 import WorldCameraFinderProvider from "../../../Providers/CameraProvider/WorldCameraFinderProvider"
 import {BaseHand} from "../../../Providers/HandInputData/BaseHand"
@@ -85,24 +82,17 @@ export class GlowEffectView {
   private updateDispatcher = LensConfig.getInstance().updateDispatcher
   private handProvider: HandInputData = HandInputData.getInstance()
 
-  private tapGlowEnabled: boolean =
-    this.handProvider.getDominantHand().handType === this.config.handType
-  private hand: TrackedHand = this.handProvider.getHand(
-    this.config.handType as HandType,
-  )
+  private tapGlowEnabled: boolean = this.handProvider.getDominantHand().handType === this.config.handType
+  private hand: TrackedHand = this.handProvider.getHand(this.config.handType as HandType)
   private handVisuals: HandVisuals | null = this.hand.getHandVisuals()
-  private indexTipSceneObject: SceneObject | undefined =
-    this.handVisuals?.indexTip
-  private thumbTipSceneObject: SceneObject | undefined =
-    this.handVisuals?.thumbTip
+  private indexTipSceneObject: SceneObject | undefined = this.handVisuals?.indexTip
+  private thumbTipSceneObject: SceneObject | undefined = this.handVisuals?.thumbTip
   private hoverColor = this.config.hoverColor
   private triggerColor = this.config.triggerColor
   private behindColor = this.config.behindColor
 
   // handToTap is the hand NOT passed to this class
-  private handToTap: TrackedHand = this.handProvider.getHand(
-    this.config.handType === "left" ? "right" : "left",
-  )
+  private handToTap: TrackedHand = this.handProvider.getHand(this.config.handType === "left" ? "right" : "left")
 
   private camera = WorldCameraFinderProvider.getInstance()
 
@@ -112,26 +102,22 @@ export class GlowEffectView {
    */
   private indexQuadSceneObject: SceneObject = this.setupTipQuadSceneObject(
     this.indexTipSceneObject,
-    "indexTipQuadSceneObject",
+    "indexTipQuadSceneObject"
   )
-  private indexQuadTransform: Transform =
-    this.indexQuadSceneObject.getTransform()
+  private indexQuadTransform: Transform = this.indexQuadSceneObject.getTransform()
   private thumbQuadSceneObject: SceneObject = this.setupTipQuadSceneObject(
     this.thumbTipSceneObject,
-    "thumbTipQuadSceneObject",
+    "thumbTipQuadSceneObject"
   )
-  private thumbQuadTransform: Transform =
-    this.thumbQuadSceneObject.getTransform()
+  private thumbQuadTransform: Transform = this.thumbQuadSceneObject.getTransform()
 
   /**
    * Pinch glow effect manipulates these materials to create the "glow"
    */
   private tipGlowMaterialIndexTip: Material =
-    this.indexQuadSceneObject.getComponent("Component.RenderMeshVisual")
-      .mainMaterial
+    this.indexQuadSceneObject.getComponent("Component.RenderMeshVisual").mainMaterial
   private tipGlowMaterialThumbTip: Material =
-    this.thumbQuadSceneObject.getComponent("Component.RenderMeshVisual")
-      .mainMaterial
+    this.thumbQuadSceneObject.getComponent("Component.RenderMeshVisual").mainMaterial
   private handInteractor: HandInteractor = this.config.handInteractor
 
   private indexGlowBonusCancelSet = new CancelSet()
@@ -170,7 +156,7 @@ export class GlowEffectView {
 
   private glowEffectViewModel: GlowEffectViewModel = new GlowEffectViewModel({
     handType: this.config.handType as HandType,
-    logLevel: this.sikLogLevelProvider.logLevel,
+    logLevel: this.sikLogLevelProvider.logLevel
   })
 
   // Cached value from API .enabled calls
@@ -179,48 +165,36 @@ export class GlowEffectView {
 
   constructor(private config: GlowEffectViewConfig) {
     // Connect to ViewModel events. This is how the glow effect will be driven
-    this.glowEffectViewModel.animateIndexGlowBase.add(
-      (animateGlowBaseUp: boolean) => {
-        this.animateIndexGlowBase(animateGlowBaseUp)
-      },
-    )
-    this.glowEffectViewModel.animateIndexGlowBonus.add(
-      (animateGlowBonusUp: boolean) => {
-        this.animateIndexGlowBonus(animateGlowBonusUp)
-      },
-    )
-    this.glowEffectViewModel.animateThumbGlowBase.add(
-      (animateGlowBaseUp: boolean) => {
-        this.animateThumbGlowBase(animateGlowBaseUp)
-      },
-    )
-    this.glowEffectViewModel.animateThumbGlowBonus.add(
-      (animateGlowBonusUp: boolean) => {
-        this.animateThumbGlowBonus(animateGlowBonusUp)
-      },
-    )
+    this.glowEffectViewModel.animateIndexGlowBase.add((animateGlowBaseUp: boolean) => {
+      this.animateIndexGlowBase(animateGlowBaseUp)
+    })
+    this.glowEffectViewModel.animateIndexGlowBonus.add((animateGlowBonusUp: boolean) => {
+      this.animateIndexGlowBonus(animateGlowBonusUp)
+    })
+    this.glowEffectViewModel.animateThumbGlowBase.add((animateGlowBaseUp: boolean) => {
+      this.animateThumbGlowBase(animateGlowBaseUp)
+    })
+    this.glowEffectViewModel.animateThumbGlowBonus.add((animateGlowBonusUp: boolean) => {
+      this.animateThumbGlowBonus(animateGlowBonusUp)
+    })
     this.glowEffectViewModel.tapModeChanged((tapModeEntered: boolean) => {
       validate(this.handVisuals?.handMesh)
 
       if (tapModeEntered === true) {
-        this.handVisuals.handMesh.mainPass["indexBrightness"] =
-          HAND_MESH_MATERIAL_BRIGHTNESS_TRIGGERED
+        this.handVisuals.handMesh.mainPass["indexBrightness"] = HAND_MESH_MATERIAL_BRIGHTNESS_TRIGGERED
         this.handVisuals.handMesh.mainPass["thumbBrightness"] = 0
         this.handVisuals.handMesh.mainPass["indexGlowColor"] = this.triggerColor
         this.handVisuals.handMesh.mainPass["thumbGlowColor"] = this.triggerColor
-        this.tipGlowMaterialIndexTip.mainPass["pinchBrightness"] =
-          GLOW_MATERIAL_BRIGHTNESS_TRIGGERED
+        this.tipGlowMaterialIndexTip.mainPass["pinchBrightness"] = GLOW_MATERIAL_BRIGHTNESS_TRIGGERED
         this.tipGlowMaterialThumbTip.mainPass["pinchBrightness"] = 0
         this.tipGlowMaterialIndexTip.mainPass["glowColor"] = this.triggerColor
         this.tipGlowMaterialThumbTip.mainPass["glowColor"] = this.triggerColor
       } else {
-        this.handVisuals.handMesh.mainPass["indexBrightness"] =
-          HAND_MESH_MATERIAL_BRIGHTNESS_TRIGGERED
+        this.handVisuals.handMesh.mainPass["indexBrightness"] = HAND_MESH_MATERIAL_BRIGHTNESS_TRIGGERED
         this.handVisuals.handMesh.mainPass["thumbBrightness"] = 0
         this.handVisuals.handMesh.mainPass["indexGlowColor"] = this.hoverColor
         this.handVisuals.handMesh.mainPass["thumbGlowColor"] = this.hoverColor
-        this.tipGlowMaterialIndexTip.mainPass["pinchBrightness"] =
-          GLOW_MATERIAL_BRIGHTNESS_TRIGGERED
+        this.tipGlowMaterialIndexTip.mainPass["pinchBrightness"] = GLOW_MATERIAL_BRIGHTNESS_TRIGGERED
         this.tipGlowMaterialThumbTip.mainPass["pinchBrightness"] = 0
         this.tipGlowMaterialIndexTip.mainPass["glowColor"] = this.hoverColor
         this.tipGlowMaterialThumbTip.mainPass["glowColor"] = this.hoverColor
@@ -238,47 +212,31 @@ export class GlowEffectView {
     this.setIsInTargetingMode(this.calculateIsInTargetingMode())
 
     this.setupPinchEvents()
-    this.updateDispatcher
-      .createUpdateEvent("GlowEffectViewUpdateEvent")
-      .bind(() => {
-        // If disabled via API, do not update the glow.
-        if (
-          !this._enabled ||
-          this.visualSelection === HandVisualSelection.Occluder
-        ) {
-          return
-        }
+    this.updateDispatcher.createUpdateEvent("GlowEffectViewUpdateEvent").bind(() => {
+      // If disabled via API, do not update the glow.
+      if (!this._enabled || this.visualSelection === HandVisualSelection.Occluder) {
+        return
+      }
 
-        const cameraPosition = this.camera.getWorldPosition()
-        this.indexQuadTransform.setWorldRotation(
-          quat.lookAt(
-            cameraPosition.sub(this.indexQuadTransform.getWorldPosition()),
-            VEC3_UP,
-          ),
-        )
-        this.thumbQuadTransform.setWorldRotation(
-          quat.lookAt(
-            cameraPosition.sub(this.thumbQuadTransform.getWorldPosition()),
-            VEC3_UP,
-          ),
-        )
+      const cameraPosition = this.camera.getWorldPosition()
+      this.indexQuadTransform.setWorldRotation(
+        quat.lookAt(cameraPosition.sub(this.indexQuadTransform.getWorldPosition()), VEC3_UP)
+      )
+      this.thumbQuadTransform.setWorldRotation(
+        quat.lookAt(cameraPosition.sub(this.thumbQuadTransform.getWorldPosition()), VEC3_UP)
+      )
 
-        this.setIsInPalmUiMode(this.calculateIsInPalmUIMode())
-        this.setIsInTargetingMode(this.calculateIsInTargetingMode())
-        this.setIsInNearPinchMode(this.calculateIsInNearPinchMode())
-      })
-    this.updateDispatcher
-      .createLateUpdateEvent("GlowEffectViewLateUpdateEvent")
-      .bind(() => {
-        // If disabled via API, do not update the glow.
-        if (
-          !this._enabled ||
-          this.visualSelection === HandVisualSelection.Occluder
-        ) {
-          return
-        }
-        this.updateMaterial()
-      })
+      this.setIsInPalmUiMode(this.calculateIsInPalmUIMode())
+      this.setIsInTargetingMode(this.calculateIsInTargetingMode())
+      this.setIsInNearPinchMode(this.calculateIsInNearPinchMode())
+    })
+    this.updateDispatcher.createLateUpdateEvent("GlowEffectViewLateUpdateEvent").bind(() => {
+      // If disabled via API, do not update the glow.
+      if (!this._enabled || this.visualSelection === HandVisualSelection.Occluder) {
+        return
+      }
+      this.updateMaterial()
+    })
   }
 
   /**
@@ -301,10 +259,8 @@ export class GlowEffectView {
       this.handVisuals.handMesh.mainMaterial = this.handOccluderMaterial
     } else {
       this.handVisuals.handMesh.mainMaterial = this.handOutlineMaterial
-      this.tipGlowMaterialIndexTip.mainPass["brightness"] =
-        GLOW_MATERIAL_DEFAULT_BRIGHTNESS
-      this.tipGlowMaterialThumbTip.mainPass["brightness"] =
-        GLOW_MATERIAL_DEFAULT_BRIGHTNESS
+      this.tipGlowMaterialIndexTip.mainPass["brightness"] = GLOW_MATERIAL_DEFAULT_BRIGHTNESS
+      this.tipGlowMaterialThumbTip.mainPass["brightness"] = GLOW_MATERIAL_DEFAULT_BRIGHTNESS
       this.handVisuals.handMesh.mainPass["indexBrightness"] = 0
       this.handVisuals.handMesh.mainPass["thumbBrightness"] = 0
     }
@@ -318,10 +274,7 @@ export class GlowEffectView {
     this.thumbQuadSceneObject.destroy()
   }
 
-  private setupTipQuadSceneObject(
-    parentSceneObject: SceneObject | undefined,
-    sceneObjectName: string,
-  ): SceneObject {
+  private setupTipQuadSceneObject(parentSceneObject: SceneObject | undefined, sceneObjectName: string): SceneObject {
     validate(parentSceneObject)
 
     // Create the quad SceneObject to hold glow material and texture
@@ -329,9 +282,7 @@ export class GlowEffectView {
     quadSceneObject.setParent(parentSceneObject)
     quadSceneObject.getTransform().setWorldScale(GLOW_QUAD_WORLD_SCALE)
 
-    const quadComponent = quadSceneObject.createComponent(
-      "Component.RenderMeshVisual",
-    )
+    const quadComponent = quadSceneObject.createComponent("Component.RenderMeshVisual")
     quadComponent.mesh = this.config.unitPlaneMesh
     quadComponent.setRenderOrder(this.config.tipGlowRenderOrder)
 
@@ -351,69 +302,53 @@ export class GlowEffectView {
     validate(this.handVisuals?.handMesh)
     const pinchStrength = this.hand.getPinchStrength() ?? 0
     const scaledIndexGlowBase = this.indexGlowBase * PINCH_BASE_BONUS_RATIO
-    const scaledIndexGlowBonus =
-      this.indexGlowBonus * (1 - PINCH_BASE_BONUS_RATIO)
+    const scaledIndexGlowBonus = this.indexGlowBonus * (1 - PINCH_BASE_BONUS_RATIO)
     const combinedIndexGlowFactor = scaledIndexGlowBase + scaledIndexGlowBonus
 
     const scaledThumbGlowBase = this.thumbGlowBase * PINCH_BASE_BONUS_RATIO
-    const scaledThumbGlowBonus =
-      this.indexGlowBonus * (1 - PINCH_BASE_BONUS_RATIO)
+    const scaledThumbGlowBonus = this.indexGlowBonus * (1 - PINCH_BASE_BONUS_RATIO)
     const combinedThumbGlowFactor = scaledThumbGlowBase + scaledThumbGlowBonus
 
     switch (this.handInteractor.fieldTargetingMode) {
       case FieldTargetingMode.FarField:
         if (
           this.lastFrameField !== FieldTargetingMode.FarField &&
-          getTime() - this.timeSinceLastTransition >
-            WAIT_BETWEEN_FIELD_TRANSITIONS
+          getTime() - this.timeSinceLastTransition > WAIT_BETWEEN_FIELD_TRANSITIONS
         ) {
           this.timeSinceLastTransition = getTime()
           this.farFieldStartTime = getTime()
-          this.lastFingerBrightness =
-            this.currentFingerBrightness * FIELD_TRANSITION_BRIGHTNESS_LOWERING
-          this.lastGlowBrightness =
-            this.currentGlowBrightness * FIELD_TRANSITION_BRIGHTNESS_LOWERING
+          this.lastFingerBrightness = this.currentFingerBrightness * FIELD_TRANSITION_BRIGHTNESS_LOWERING
+          this.lastGlowBrightness = this.currentGlowBrightness * FIELD_TRANSITION_BRIGHTNESS_LOWERING
         }
         this.fieldTransitionLerp = MathUtils.clamp(
-          (getTime() - this.farFieldStartTime) /
-            HAND_MESH_MATERIAL_FADEDOWN_FARFIELD,
+          (getTime() - this.farFieldStartTime) / HAND_MESH_MATERIAL_FADEDOWN_FARFIELD,
           0,
-          1,
+          1
         )
         this.handVisuals.handMesh.mainPass["blend_coef"] = 0
 
         switch (this.handInteractor.currentTrigger) {
           case InteractorTriggerType.None:
-            this.pinchGlowBrightness =
-              combinedIndexGlowFactor *
-              GLOW_MATERIAL_BRIGHTNESS_NEARFIELD *
-              pinchStrength
-            this.pinchFingerBrightness =
-              this.pinchGlowBrightness * HAND_MESH_MATERIAL_BRIGHTNESS_INCREASE
+            this.pinchGlowBrightness = combinedIndexGlowFactor * GLOW_MATERIAL_BRIGHTNESS_NEARFIELD * pinchStrength
+            this.pinchFingerBrightness = this.pinchGlowBrightness * HAND_MESH_MATERIAL_BRIGHTNESS_INCREASE
             this.currentFingerBrightness = MathUtils.lerp(
               this.lastFingerBrightness,
               this.pinchFingerBrightness,
-              this.fieldTransitionLerp,
+              this.fieldTransitionLerp
             )
             this.currentGlowBrightness = MathUtils.lerp(
               this.lastGlowBrightness,
               this.pinchGlowBrightness,
-              this.fieldTransitionLerp,
+              this.fieldTransitionLerp
             )
-            this.handVisuals.handMesh.mainPass["indexBrightness"] =
-              this.currentFingerBrightness
-            this.handVisuals.handMesh.mainPass["thumbBrightness"] =
-              this.pinchFingerBrightness
-            this.tipGlowMaterialIndexTip.mainPass["pinchBrightness"] =
-              this.currentGlowBrightness
-            this.tipGlowMaterialThumbTip.mainPass["pinchBrightness"] =
-              this.pinchGlowBrightness
+            this.handVisuals.handMesh.mainPass["indexBrightness"] = this.currentFingerBrightness
+            this.handVisuals.handMesh.mainPass["thumbBrightness"] = this.pinchFingerBrightness
+            this.tipGlowMaterialIndexTip.mainPass["pinchBrightness"] = this.currentGlowBrightness
+            this.tipGlowMaterialThumbTip.mainPass["pinchBrightness"] = this.pinchGlowBrightness
             this.tipGlowMaterialIndexTip.mainPass["pokeBrightness"] = 0
             this.tipGlowMaterialThumbTip.mainPass["pokeBrightness"] = 0
-            this.handVisuals.handMesh.mainPass["indexGlowColor"] =
-              this.hoverColor
-            this.handVisuals.handMesh.mainPass["thumbGlowColor"] =
-              this.hoverColor
+            this.handVisuals.handMesh.mainPass["indexGlowColor"] = this.hoverColor
+            this.handVisuals.handMesh.mainPass["thumbGlowColor"] = this.hoverColor
             this.tipGlowMaterialIndexTip.mainPass["glowColor"] = this.hoverColor
             this.tipGlowMaterialThumbTip.mainPass["glowColor"] = this.hoverColor
             break
@@ -421,31 +356,23 @@ export class GlowEffectView {
             this.currentFingerBrightness = MathUtils.lerp(
               this.lastFingerBrightness,
               HAND_MESH_MATERIAL_BRIGHTNESS_TRIGGERED,
-              this.fieldTransitionLerp,
+              this.fieldTransitionLerp
             )
             this.currentGlowBrightness = MathUtils.lerp(
               this.lastGlowBrightness,
               GLOW_MATERIAL_BRIGHTNESS_TRIGGERED,
-              this.fieldTransitionLerp,
+              this.fieldTransitionLerp
             )
-            this.handVisuals.handMesh.mainPass["indexBrightness"] =
-              this.currentFingerBrightness
-            this.handVisuals.handMesh.mainPass["thumbBrightness"] =
-              this.currentFingerBrightness
-            this.tipGlowMaterialIndexTip.mainPass["pinchBrightness"] =
-              this.currentGlowBrightness
-            this.tipGlowMaterialThumbTip.mainPass["pinchBrightness"] =
-              this.currentGlowBrightness
+            this.handVisuals.handMesh.mainPass["indexBrightness"] = this.currentFingerBrightness
+            this.handVisuals.handMesh.mainPass["thumbBrightness"] = this.currentFingerBrightness
+            this.tipGlowMaterialIndexTip.mainPass["pinchBrightness"] = this.currentGlowBrightness
+            this.tipGlowMaterialThumbTip.mainPass["pinchBrightness"] = this.currentGlowBrightness
             this.tipGlowMaterialIndexTip.mainPass["pokeBrightness"] = 0
             this.tipGlowMaterialThumbTip.mainPass["pokeBrightness"] = 0
-            this.handVisuals.handMesh.mainPass["indexGlowColor"] =
-              this.triggerColor
-            this.handVisuals.handMesh.mainPass["thumbGlowColor"] =
-              this.triggerColor
-            this.tipGlowMaterialIndexTip.mainPass["glowColor"] =
-              this.triggerColor
-            this.tipGlowMaterialThumbTip.mainPass["glowColor"] =
-              this.triggerColor
+            this.handVisuals.handMesh.mainPass["indexGlowColor"] = this.triggerColor
+            this.handVisuals.handMesh.mainPass["thumbGlowColor"] = this.triggerColor
+            this.tipGlowMaterialIndexTip.mainPass["glowColor"] = this.triggerColor
+            this.tipGlowMaterialThumbTip.mainPass["glowColor"] = this.triggerColor
             break
           default:
             break
@@ -455,8 +382,7 @@ export class GlowEffectView {
       case FieldTargetingMode.Direct:
         if (
           this.lastFrameField === FieldTargetingMode.FarField &&
-          getTime() - this.timeSinceLastTransition >
-            WAIT_BETWEEN_FIELD_TRANSITIONS
+          getTime() - this.timeSinceLastTransition > WAIT_BETWEEN_FIELD_TRANSITIONS
         ) {
           this.timeSinceLastTransition = getTime()
           this.nearFieldStartTime = getTime()
@@ -464,10 +390,9 @@ export class GlowEffectView {
           this.lastGlowBrightness = this.currentGlowBrightness
         }
         this.fieldTransitionLerp = MathUtils.clamp(
-          (getTime() - this.nearFieldStartTime) /
-            HAND_MESH_MATERIAL_FADEUP_NEARFIELD,
+          (getTime() - this.nearFieldStartTime) / HAND_MESH_MATERIAL_FADEUP_NEARFIELD,
           0,
-          1,
+          1
         )
         switch (this.handInteractor.currentTrigger) {
           case InteractorTriggerType.None:
@@ -478,112 +403,81 @@ export class GlowEffectView {
                 0,
                 HAND_MESH_MATERIAL_FULL_BRIGHTNESS_DISTANCE_NEARFIELD,
                 0,
-                HAND_MESH_MATERIAL_BRIGHTNESS_REMAPPED_NEARFIELD,
+                HAND_MESH_MATERIAL_BRIGHTNESS_REMAPPED_NEARFIELD
               ),
               0,
-              HAND_MESH_MATERIAL_BRIGHTNESS_REMAPPED_NEARFIELD,
+              HAND_MESH_MATERIAL_BRIGHTNESS_REMAPPED_NEARFIELD
             )
             this.pokeGlowBrightness = MathUtils.remap(
               this.handInteractor.nearFieldProximity,
               GLOW_MATERIAL_START_BRIGHTNESS_DISTANCE_NEARFIELD,
               GLOW_MATERIAL_FULL_BRIGHTNESS_DISTANCE_NEARFIELD,
               0,
-              GLOW_MATERIAL_BRIGHTNESS_NEARFIELD,
+              GLOW_MATERIAL_BRIGHTNESS_NEARFIELD
             )
-            this.pinchGlowBrightness =
-              combinedIndexGlowFactor *
-              GLOW_MATERIAL_BRIGHTNESS_NEARFIELD *
-              pinchStrength
-            this.pinchFingerBrightness =
-              this.pinchGlowBrightness * HAND_MESH_MATERIAL_BRIGHTNESS_INCREASE
+            this.pinchGlowBrightness = combinedIndexGlowFactor * GLOW_MATERIAL_BRIGHTNESS_NEARFIELD * pinchStrength
+            this.pinchFingerBrightness = this.pinchGlowBrightness * HAND_MESH_MATERIAL_BRIGHTNESS_INCREASE
             this.currentFingerBrightness =
               this.pokeFingerBrightness > this.pinchFingerBrightness
                 ? this.pokeFingerBrightness
                 : this.pinchFingerBrightness
             this.currentGlowBrightness =
-              this.pokeGlowBrightness > this.pinchGlowBrightness
-                ? this.pokeGlowBrightness
-                : this.pinchGlowBrightness
+              this.pokeGlowBrightness > this.pinchGlowBrightness ? this.pokeGlowBrightness : this.pinchGlowBrightness
             this.currentFingerBrightness = MathUtils.lerp(
               this.lastFingerBrightness,
               this.currentFingerBrightness,
-              this.fieldTransitionLerp,
+              this.fieldTransitionLerp
             )
             this.currentGlowBrightness = MathUtils.lerp(
               this.lastGlowBrightness,
               this.currentFingerBrightness,
-              this.fieldTransitionLerp,
+              this.fieldTransitionLerp
             )
 
-            this.handVisuals.handMesh.mainPass["indexBrightness"] =
-              this.currentFingerBrightness
-            this.tipGlowMaterialIndexTip.mainPass["pinchBrightness"] =
-              this.pinchGlowBrightness
-            this.tipGlowMaterialIndexTip.mainPass["pokeBrightness"] =
-              this.pokeGlowBrightness
+            this.handVisuals.handMesh.mainPass["indexBrightness"] = this.currentFingerBrightness
+            this.tipGlowMaterialIndexTip.mainPass["pinchBrightness"] = this.pinchGlowBrightness
+            this.tipGlowMaterialIndexTip.mainPass["pokeBrightness"] = this.pokeGlowBrightness
             if (this.shouldThumbPokeGlow) {
-              this.handVisuals.handMesh.mainPass["thumbBrightness"] =
-                this.currentFingerBrightness
-              this.tipGlowMaterialThumbTip.mainPass["pokeBrightness"] =
-                this.pokeGlowBrightness
-              this.tipGlowMaterialThumbTip.mainPass["pokeBrightness"] =
-                this.pinchFingerBrightness
+              this.handVisuals.handMesh.mainPass["thumbBrightness"] = this.currentFingerBrightness
+              this.tipGlowMaterialThumbTip.mainPass["pokeBrightness"] = this.pokeGlowBrightness
+              this.tipGlowMaterialThumbTip.mainPass["pokeBrightness"] = this.pinchFingerBrightness
             } else {
-              this.handVisuals.handMesh.mainPass["thumbBrightness"] =
-                this.pinchFingerBrightness
+              this.handVisuals.handMesh.mainPass["thumbBrightness"] = this.pinchFingerBrightness
               this.tipGlowMaterialThumbTip.mainPass["pokeBrightness"] = 0
-              this.tipGlowMaterialThumbTip.mainPass["pinchBrightness"] =
-                this.pinchGlowBrightness
+              this.tipGlowMaterialThumbTip.mainPass["pinchBrightness"] = this.pinchGlowBrightness
             }
 
-            this.handVisuals.handMesh.mainPass["indexGlowColor"] =
-              this.hoverColor
-            this.handVisuals.handMesh.mainPass["thumbGlowColor"] =
-              this.hoverColor
+            this.handVisuals.handMesh.mainPass["indexGlowColor"] = this.hoverColor
+            this.handVisuals.handMesh.mainPass["thumbGlowColor"] = this.hoverColor
             this.tipGlowMaterialIndexTip.mainPass["glowColor"] = this.hoverColor
             this.tipGlowMaterialThumbTip.mainPass["glowColor"] = this.hoverColor
             break
           case InteractorTriggerType.Pinch:
           case InteractorTriggerType.Poke:
           case InteractorTriggerType.Select:
-            if (
-              this.handInteractor.nearFieldProximity >
-              GLOW_MATERIAL_DISTANCE_BEHIND_MIN
-            ) {
-              this.currentFingerBrightness =
-                HAND_MESH_MATERIAL_BRIGHTNESS_NEARFIELD
+            if (this.handInteractor.nearFieldProximity > GLOW_MATERIAL_DISTANCE_BEHIND_MIN) {
+              this.currentFingerBrightness = HAND_MESH_MATERIAL_BRIGHTNESS_NEARFIELD
               this.currentGlowBrightness = MathUtils.remap(
                 this.handInteractor.nearFieldProximity,
                 GLOW_MATERIAL_DISTANCE_BEHIND_MIN,
                 GLOW_MATERIAL_DISTANCE_BEHIND_MAX,
                 GLOW_MATERIAL_BRIGHTNESS_BEHIND_MIN,
-                GLOW_MATERIAL_BRIGHTNESS_BEHIND_MAX,
+                GLOW_MATERIAL_BRIGHTNESS_BEHIND_MAX
               )
-              this.handVisuals.handMesh.mainPass["indexGlowColor"] =
-                this.behindColor
-              this.tipGlowMaterialIndexTip.mainPass["glowColor"] =
-                this.behindColor
-              this.handVisuals.handMesh.mainPass["thumbGlowColor"] =
-                this.behindColor
-              this.tipGlowMaterialThumbTip.mainPass["glowColor"] =
-                this.behindColor
+              this.handVisuals.handMesh.mainPass["indexGlowColor"] = this.behindColor
+              this.tipGlowMaterialIndexTip.mainPass["glowColor"] = this.behindColor
+              this.handVisuals.handMesh.mainPass["thumbGlowColor"] = this.behindColor
+              this.tipGlowMaterialThumbTip.mainPass["glowColor"] = this.behindColor
             } else {
-              this.currentFingerBrightness =
-                HAND_MESH_MATERIAL_BRIGHTNESS_TRIGGERED
+              this.currentFingerBrightness = HAND_MESH_MATERIAL_BRIGHTNESS_TRIGGERED
               this.currentGlowBrightness = GLOW_MATERIAL_BRIGHTNESS_TRIGGERED
 
-              this.handVisuals.handMesh.mainPass["indexGlowColor"] =
-                this.triggerColor
-              this.handVisuals.handMesh.mainPass["thumbGlowColor"] =
-                this.triggerColor
-              this.tipGlowMaterialIndexTip.mainPass["glowColor"] =
-                this.triggerColor
-              this.tipGlowMaterialThumbTip.mainPass["glowColor"] =
-                this.triggerColor
+              this.handVisuals.handMesh.mainPass["indexGlowColor"] = this.triggerColor
+              this.handVisuals.handMesh.mainPass["thumbGlowColor"] = this.triggerColor
+              this.tipGlowMaterialIndexTip.mainPass["glowColor"] = this.triggerColor
+              this.tipGlowMaterialThumbTip.mainPass["glowColor"] = this.triggerColor
             }
-            if (
-              this.handInteractor.currentTrigger === InteractorTriggerType.Poke
-            ) {
+            if (this.handInteractor.currentTrigger === InteractorTriggerType.Poke) {
               this.handVisuals.handMesh.mainPass["blend_coef"] = 1
             } else {
               this.handVisuals.handMesh.mainPass["blend_coef"] = 0
@@ -591,30 +485,22 @@ export class GlowEffectView {
             this.currentFingerBrightness = MathUtils.lerp(
               this.lastFingerBrightness,
               this.currentFingerBrightness,
-              this.fieldTransitionLerp,
+              this.fieldTransitionLerp
             )
             this.currentGlowBrightness = MathUtils.lerp(
               this.lastGlowBrightness,
               this.currentGlowBrightness,
-              this.fieldTransitionLerp,
+              this.fieldTransitionLerp
             )
-            this.handVisuals.handMesh.mainPass["indexBrightness"] =
-              this.currentFingerBrightness
-            this.tipGlowMaterialIndexTip.mainPass["pinchBrightness"] =
-              this.currentGlowBrightness
+            this.handVisuals.handMesh.mainPass["indexBrightness"] = this.currentFingerBrightness
+            this.tipGlowMaterialIndexTip.mainPass["pinchBrightness"] = this.currentGlowBrightness
             this.tipGlowMaterialThumbTip.mainPass["pokeBrightness"] = 0
-            if (
-              this.handInteractor.currentTrigger ===
-                InteractorTriggerType.Poke &&
-              !this.shouldThumbPokeGlow
-            ) {
+            if (this.handInteractor.currentTrigger === InteractorTriggerType.Poke && !this.shouldThumbPokeGlow) {
               this.handVisuals.handMesh.mainPass["thumbBrightness"] = 0
               this.tipGlowMaterialThumbTip.mainPass["pinchBrightness"] = 0
             } else {
-              this.handVisuals.handMesh.mainPass["thumbBrightness"] =
-                this.currentFingerBrightness
-              this.tipGlowMaterialThumbTip.mainPass["pinchBrightness"] =
-                this.currentGlowBrightness
+              this.handVisuals.handMesh.mainPass["thumbBrightness"] = this.currentFingerBrightness
+              this.tipGlowMaterialThumbTip.mainPass["pinchBrightness"] = this.currentGlowBrightness
             }
             break
           default:
@@ -674,15 +560,9 @@ export class GlowEffectView {
   private calculateIsInNearPinchMode(): boolean {
     const pinchStrength = this.hand.getPinchStrength() ?? 0
 
-    if (
-      pinchStrength > PINCH_STRENGTH_NEAR_PINCH_ENTER_THRESHOLD &&
-      this.isInNearPinchMode === false
-    ) {
+    if (pinchStrength > PINCH_STRENGTH_NEAR_PINCH_ENTER_THRESHOLD && this.isInNearPinchMode === false) {
       return true
-    } else if (
-      pinchStrength < PINCH_STRENGTH_NEAR_PINCH_EXIT_THRESHOLD &&
-      this.hand.isPinching() === false
-    ) {
+    } else if (pinchStrength < PINCH_STRENGTH_NEAR_PINCH_EXIT_THRESHOLD && this.hand.isPinching() === false) {
       return false
     }
 
@@ -705,10 +585,7 @@ export class GlowEffectView {
    */
   private isHandFacingCamera(hand: BaseHand): boolean {
     const handAngle = hand.getFacingCameraAngle()
-    if (
-      handAngle === null ||
-      handAngle > HAND_FACING_CAMERA_THRESHOLD_DEGREES
-    ) {
+    if (handAngle === null || handAngle > HAND_FACING_CAMERA_THRESHOLD_DEGREES) {
       return false
     }
 
@@ -737,17 +614,11 @@ export class GlowEffectView {
     const handToTapPinkyKnucklePos = handToTapPinkyKnuckle.position
     const tappingHandIndexTipPos = tappingHandIndexTip.position
 
-    if (
-      !this.camera.inFoV(handToTapPinkyKnucklePos) ||
-      !this.camera.inFoV(tappingHandIndexTipPos)
-    ) {
+    if (!this.camera.inFoV(handToTapPinkyKnucklePos) || !this.camera.inFoV(tappingHandIndexTipPos)) {
       return false
     }
 
-    if (
-      !this.isHandFacingCamera(this.handToTap) ||
-      this.isHandFacingCamera(this.hand)
-    ) {
+    if (!this.isHandFacingCamera(this.handToTap) || this.isHandFacingCamera(this.hand)) {
       return false
     }
 
@@ -757,9 +628,7 @@ export class GlowEffectView {
       return false
     }
 
-    const distanceToPalmCenter = tappingHandIndexTipPos.distance(
-      handToTapPalmCenterPos,
-    )
+    const distanceToPalmCenter = tappingHandIndexTipPos.distance(handToTapPalmCenterPos)
 
     if (distanceToPalmCenter >= this.config.tapProximityThreshold) {
       return false
@@ -769,10 +638,7 @@ export class GlowEffectView {
   }
 
   private bothHandsTracked(): boolean {
-    return (
-      this.handProvider.getDominantHand().isTracked() &&
-      this.handProvider.getNonDominantHand().isTracked()
-    )
+    return this.handProvider.getDominantHand().isTracked() && this.handProvider.getNonDominantHand().isTracked()
   }
 
   private animateIndexGlowBase(animateUp: boolean) {
@@ -785,7 +651,7 @@ export class GlowEffectView {
       end: animateUp ? 1 : 0,
       update: (t) => {
         this.indexGlowBase = t
-      },
+      }
     })
   }
 
@@ -799,7 +665,7 @@ export class GlowEffectView {
       end: animateUp ? 1 : 0,
       update: (t) => {
         this.indexGlowBonus = t
-      },
+      }
     })
   }
 
@@ -813,7 +679,7 @@ export class GlowEffectView {
       end: animateUp ? 1 : 0,
       update: (t) => {
         this.thumbGlowBase = t
-      },
+      }
     })
   }
 
@@ -827,7 +693,7 @@ export class GlowEffectView {
       end: animateUp ? 1 : 0,
       update: (t) => {
         this.thumbGlowBonus = t
-      },
+      }
     })
   }
 }

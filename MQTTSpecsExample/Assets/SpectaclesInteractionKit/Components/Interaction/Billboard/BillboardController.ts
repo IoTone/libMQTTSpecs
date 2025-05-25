@@ -1,7 +1,5 @@
 import WorldCameraFinderProvider from "../../../Providers/CameraProvider/WorldCameraFinderProvider"
-import BillboardRotationCalculator, {
-  ALMOST_ONE,
-} from "./BillboardRotationCalculator"
+import BillboardRotationCalculator, {ALMOST_ONE} from "./BillboardRotationCalculator"
 
 export type BillboardConfig = {
   script: ScriptComponent
@@ -21,7 +19,7 @@ export type BillboardConfig = {
 export enum RotationAxis {
   X,
   Y,
-  Z,
+  Z
 }
 const rotationAxes = [RotationAxis.X, RotationAxis.Y, RotationAxis.Z]
 const VEC_UP = vec3.up()
@@ -57,23 +55,20 @@ export default class BillboardController {
     this.xAxisCalculator = new BillboardRotationCalculator({
       axis: RotationAxis.X,
       axisEnabled: config.xAxisEnabled,
-      axisBufferRadians:
-        MathUtils.DegToRad * (config.axisBufferDegrees?.x ?? 0),
-      axisEasing: config.axisEasing?.x ?? 1,
+      axisBufferRadians: MathUtils.DegToRad * (config.axisBufferDegrees?.x ?? 0),
+      axisEasing: config.axisEasing?.x ?? 1
     })
     this.yAxisCalculator = new BillboardRotationCalculator({
       axis: RotationAxis.Y,
       axisEnabled: config.yAxisEnabled,
-      axisBufferRadians:
-        MathUtils.DegToRad * (config.axisBufferDegrees?.y ?? 0),
-      axisEasing: config.axisEasing?.y ?? 1,
+      axisBufferRadians: MathUtils.DegToRad * (config.axisBufferDegrees?.y ?? 0),
+      axisEasing: config.axisEasing?.y ?? 1
     })
     this.zAxisCalculator = new BillboardRotationCalculator({
       axis: RotationAxis.Z,
       axisEnabled: config.zAxisEnabled,
-      axisBufferRadians:
-        MathUtils.DegToRad * (config.axisBufferDegrees?.z ?? 0),
-      axisEasing: config.axisEasing?.z ?? 1,
+      axisBufferRadians: MathUtils.DegToRad * (config.axisBufferDegrees?.z ?? 0),
+      axisEasing: config.axisEasing?.z ?? 1
     })
     this.updateEvent = config.script.createEvent("UpdateEvent")
     this.updateEvent.bind(this.onUpdate.bind(this))
@@ -98,11 +93,7 @@ export default class BillboardController {
   }
 
   public get axisEasing(): vec3 {
-    return new vec3(
-      this.xAxisCalculator.axisEasing,
-      this.yAxisCalculator.axisEasing,
-      this.zAxisCalculator.axisEasing,
-    )
+    return new vec3(this.xAxisCalculator.axisEasing, this.yAxisCalculator.axisEasing, this.zAxisCalculator.axisEasing)
   }
   public set axisEasing(easing: vec3) {
     this.xAxisCalculator.axisEasing = easing.x
@@ -114,16 +105,13 @@ export default class BillboardController {
     return new vec3(
       MathUtils.RadToDeg * this.xAxisCalculator.axisBufferRadians,
       MathUtils.RadToDeg * this.yAxisCalculator.axisBufferRadians,
-      MathUtils.RadToDeg * this.zAxisCalculator.axisBufferRadians,
+      MathUtils.RadToDeg * this.zAxisCalculator.axisBufferRadians
     )
   }
   public set axisBufferDegrees(bufferDegrees: vec3) {
-    this.xAxisCalculator.axisBufferRadians =
-      MathUtils.DegToRad * bufferDegrees.x
-    this.yAxisCalculator.axisBufferRadians =
-      MathUtils.DegToRad * bufferDegrees.y
-    this.zAxisCalculator.axisBufferRadians =
-      MathUtils.DegToRad * bufferDegrees.z
+    this.xAxisCalculator.axisBufferRadians = MathUtils.DegToRad * bufferDegrees.x
+    this.yAxisCalculator.axisBufferRadians = MathUtils.DegToRad * bufferDegrees.y
+    this.zAxisCalculator.axisBufferRadians = MathUtils.DegToRad * bufferDegrees.z
   }
 
   // The following functions aid with getting unit vectors relative to the target's current rotation.
@@ -141,10 +129,7 @@ export default class BillboardController {
 
   // Returns a unit vector aligned with the line from the target's center to the camera for X/Y-axes rotation.
   private getTargetToCameraVector() {
-    return this.cameraTransform
-      .getWorldPosition()
-      .sub(this.targetTransform.getWorldPosition())
-      .normalize()
+    return this.cameraTransform.getWorldPosition().sub(this.targetTransform.getWorldPosition()).normalize()
   }
 
   // Returns the up vector of a camera for Z-axis rotation.
@@ -169,7 +154,7 @@ export default class BillboardController {
             this.getRightVector(),
             this.getForwardVector(),
             this.getTargetToCameraVector(),
-            this.getUpVector(),
+            this.getUpVector()
           )
           break
         case RotationAxis.Y:
@@ -184,7 +169,7 @@ export default class BillboardController {
               upVector,
               this.getForwardVector(),
               this.getTargetToCameraVector(),
-              this.getRightVector().uniformScale(-1),
+              this.getRightVector().uniformScale(-1)
             )
           }
           break
@@ -193,16 +178,14 @@ export default class BillboardController {
             this.getForwardVector(),
             this.getUpVector(),
             this.getCameraUpVector(),
-            this.getRightVector(),
+            this.getRightVector()
           )
           break
         default:
           throw new Error(`Invalid axis: ${axis}`)
       }
 
-      this.targetTransform.setWorldRotation(
-        rotationQuaternion.multiply(this.targetTransform.getWorldRotation()),
-      )
+      this.targetTransform.setWorldRotation(rotationQuaternion.multiply(this.targetTransform.getWorldRotation()))
     }
   }
 
@@ -215,7 +198,7 @@ export default class BillboardController {
             this.getRightVector(),
             this.getForwardVector(),
             this.getTargetToCameraVector(),
-            this.getUpVector(),
+            this.getUpVector()
           )
           break
         case RotationAxis.Y:
@@ -230,7 +213,7 @@ export default class BillboardController {
               upVector,
               this.getForwardVector(),
               this.getTargetToCameraVector(),
-              this.getRightVector().uniformScale(-1),
+              this.getRightVector().uniformScale(-1)
             )
           }
           break
@@ -239,16 +222,14 @@ export default class BillboardController {
             this.getForwardVector(),
             this.getUpVector(),
             this.getCameraUpVector(),
-            this.getRightVector(),
+            this.getRightVector()
           )
           break
         default:
           throw new Error(`Invalid axis: ${axis}`)
       }
 
-      this.targetTransform.setWorldRotation(
-        rotationQuaternion.multiply(this.targetTransform.getWorldRotation()),
-      )
+      this.targetTransform.setWorldRotation(rotationQuaternion.multiply(this.targetTransform.getWorldRotation()))
     }
   }
 }

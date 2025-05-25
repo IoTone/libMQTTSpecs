@@ -49,10 +49,7 @@ export class TimedVec3Container extends TimedDataContainer<vec3> {
   }
 
   pushWithoutDuplicate(timestamp: number, data: vec3): void {
-    if (
-      this.data.length === 0 ||
-      this.data[this.data.length - 1].data !== data
-    ) {
+    if (this.data.length === 0 || this.data[this.data.length - 1].data !== data) {
       this.pushData(timestamp, data)
     }
   }

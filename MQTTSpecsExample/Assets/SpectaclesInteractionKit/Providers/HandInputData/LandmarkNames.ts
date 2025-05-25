@@ -33,7 +33,7 @@ export enum LandmarkName {
   WRIST_TO_INDEX = "wrist_to_index",
   WRIST_TO_MIDDLE = "wrist_to_mid",
   WRIST_TO_RING = "wrist_to_ring",
-  WRIST_TO_PINKY = "wrist_to_pinky",
+  WRIST_TO_PINKY = "wrist_to_pinky"
 }
 
 export const INDEX_BASE = LandmarkName.INDEX_0
@@ -57,45 +57,14 @@ export const wristLandmarks = [
   LandmarkName.WRIST_TO_MIDDLE,
   LandmarkName.WRIST_TO_PINKY,
   LandmarkName.WRIST_TO_RING,
-  LandmarkName.WRIST_TO_THUMB,
+  LandmarkName.WRIST_TO_THUMB
 ]
-export const thumbLandmarks = [
-  LandmarkName.THUMB_3,
-  LandmarkName.THUMB_2,
-  LandmarkName.THUMB_1,
-  LandmarkName.THUMB_0,
-]
-export const indexLandmarks = [
-  LandmarkName.INDEX_3,
-  LandmarkName.INDEX_2,
-  LandmarkName.INDEX_1,
-  LandmarkName.INDEX_0,
-]
-export const midLandmarks = [
-  LandmarkName.MIDDLE_3,
-  LandmarkName.MIDDLE_2,
-  LandmarkName.MIDDLE_1,
-  LandmarkName.MIDDLE_0,
-]
-export const ringLandmarks = [
-  LandmarkName.RING_3,
-  LandmarkName.RING_2,
-  LandmarkName.RING_1,
-  LandmarkName.RING_0,
-]
-export const pinkyLandmarks = [
-  LandmarkName.PINKY_3,
-  LandmarkName.PINKY_2,
-  LandmarkName.PINKY_1,
-  LandmarkName.PINKY_0,
-]
-export const allLandmarks = [
-  thumbLandmarks,
-  indexLandmarks,
-  midLandmarks,
-  ringLandmarks,
-  pinkyLandmarks,
-]
+export const thumbLandmarks = [LandmarkName.THUMB_3, LandmarkName.THUMB_2, LandmarkName.THUMB_1, LandmarkName.THUMB_0]
+export const indexLandmarks = [LandmarkName.INDEX_3, LandmarkName.INDEX_2, LandmarkName.INDEX_1, LandmarkName.INDEX_0]
+export const midLandmarks = [LandmarkName.MIDDLE_3, LandmarkName.MIDDLE_2, LandmarkName.MIDDLE_1, LandmarkName.MIDDLE_0]
+export const ringLandmarks = [LandmarkName.RING_3, LandmarkName.RING_2, LandmarkName.RING_1, LandmarkName.RING_0]
+export const pinkyLandmarks = [LandmarkName.PINKY_3, LandmarkName.PINKY_2, LandmarkName.PINKY_1, LandmarkName.PINKY_0]
+export const allLandmarks = [thumbLandmarks, indexLandmarks, midLandmarks, ringLandmarks, pinkyLandmarks]
 
 export const stubLandmarks = [
   LandmarkName.INDEX_0,
@@ -103,7 +72,7 @@ export const stubLandmarks = [
   LandmarkName.RING_0,
   LandmarkName.PINKY_0,
   LandmarkName.THUMB_0,
-  LandmarkName.WRIST,
+  LandmarkName.WRIST
 ]
 
 export enum Fingers {
@@ -111,12 +80,12 @@ export enum Fingers {
   THUMB = "THUMB",
   MIDDLE = "MIDDLE",
   PINKY = "PINKY",
-  RING = "RING",
+  RING = "RING"
 }
 
 export enum Hands {
   RIGHT = "RIGHT",
-  LEFT = "LEFT",
+  LEFT = "LEFT"
 }
 
 export const mapLandmarkToFinger: any = {}

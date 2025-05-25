@@ -3,9 +3,17 @@
  */
 @component
 export class GridContentCreator extends BaseScriptComponent {
+  /**
+   * The prefab object that will be instantiated for each grid item.
+   */
   @input
+  @hint("The prefab object that will be instantiated for each grid item.")
   itemPrefab!: ObjectPrefab
+  /**
+   * Number of grid items to instantiate and display.
+   */
   @input
+  @hint("Number of grid items to instantiate and display.")
   itemsCount: number = 10
 
   onAwake(): void {

@@ -6,14 +6,33 @@ const SLIDER_LEVEL_MIN: number = 0.1
 const SLIDER_LEVEL_MAX: number = 0.9
 
 /**
- * This class provides visual feedback for a slider component. It manages the appearance of the slider's knob and track based on interaction events and the slider's value.
+ * This class provides visual feedback for a slider component. It manages the appearance of the slider's knob and track
+ * based on interaction events and the slider's value.
  */
 @component
 export class SliderFeedback extends BaseScriptComponent {
+  /**
+   * The RenderMeshVisual component of the slider track that visualizes the slider's value. This mesh will have its
+   * material's level property updated to reflect the current slider position, and its pinch property modified during
+   * interaction events to provide additional visual feedback.
+   */
   @input
+  @hint(
+    "The RenderMeshVisual component of the slider track that visualizes the slider's value. This mesh will have its \
+material's level property updated to reflect the current slider position, and its pinch property modified during \
+interaction events to provide additional visual feedback."
+  )
   renderMeshVisual!: RenderMeshVisual
 
+  /**
+   * Reference to the SceneObject containing the slider's interactive knob. This object must have an Interactable
+   * component attached to allow user interaction.
+   */
   @input
+  @hint(
+    "Reference to the SceneObject containing the slider's interactive knob. This object must have an Interactable \
+component attached to allow user interaction."
+  )
   knobObject!: SceneObject
 
   private interactable: Interactable | null = null
@@ -33,9 +52,7 @@ export class SliderFeedback extends BaseScriptComponent {
       throw new Error("No knobObject attached to this entity!")
     }
 
-    this.renderMeshVisual.mainMaterial = this.renderMeshVisual
-      .getMaterial(0)
-      .clone()
+    this.renderMeshVisual.mainMaterial = this.renderMeshVisual.getMaterial(0).clone()
 
     this.interactable = this.knobObject.getComponent(Interactable.getTypeName())
 
@@ -54,9 +71,7 @@ export class SliderFeedback extends BaseScriptComponent {
       validate(this.renderMeshVisual)
       this.currentValue = this.slider.startValue
 
-      this.renderMeshVisual.mainPass.level = this.getSliderLevelFromValue(
-        this.slider.currentValue ?? 0,
-      )
+      this.renderMeshVisual.mainPass.level = this.getSliderLevelFromValue(this.slider.currentValue ?? 0)
 
       this.setupSliderCallbacks()
     })
@@ -69,9 +84,7 @@ export class SliderFeedback extends BaseScriptComponent {
     } else if (value >= this.slider.maxValue) {
       return 1
     } else {
-      const progress =
-        (value - this.slider.minValue) /
-        (this.slider.maxValue - this.slider.minValue)
+      const progress = (value - this.slider.minValue) / (this.slider.maxValue - this.slider.minValue)
       return SLIDER_LEVEL_MIN + (SLIDER_LEVEL_MAX - SLIDER_LEVEL_MIN) * progress
     }
   }

@@ -1,8 +1,4 @@
-import {
-  OneEuroFilterConfig,
-  OneEuroFilterQuat,
-  OneEuroFilterVec3,
-} from "../../Utils/OneEuroFilter"
+import {OneEuroFilterConfig, OneEuroFilterQuat, OneEuroFilterVec3} from "../../Utils/OneEuroFilter"
 
 import {Singleton} from "../../Decorators/Singleton"
 import {AnimationManager} from "../../Utils/animate"
@@ -16,13 +12,13 @@ const TRANSLATE_FILTER_CONFIG: OneEuroFilterConfig = {
   frequency: 60,
   minCutoff: 3.5,
   beta: 0.5,
-  dcutoff: 1,
+  dcutoff: 1
 }
 const ROTATION_FILTER_CONFIG: OneEuroFilterConfig = {
   frequency: 60,
   minCutoff: 1,
   beta: 2,
-  dcutoff: 1,
+  dcutoff: 1
 }
 
 /**
@@ -44,10 +40,8 @@ export class MobileInputData {
   private _position = vec3.zero()
   private _rotation = quat.quatIdentity()
 
-  private _trackingQuality: MotionController.TrackingQuality =
-    MotionController.TrackingQuality?.Unknown
-  private onTrackingQualityChangeEvent =
-    new Event<MotionController.TrackingQuality>()
+  private _trackingQuality: MotionController.TrackingQuality = MotionController.TrackingQuality?.Unknown
+  private onTrackingQualityChangeEvent = new Event<MotionController.TrackingQuality>()
 
   /**
    * Public API to subscribe to controller state change events.
@@ -61,8 +55,7 @@ export class MobileInputData {
    *
    * @returns The public api
    */
-  readonly onTrackingQualityChange =
-    this.onTrackingQualityChangeEvent.publicApi()
+  readonly onTrackingQualityChange = this.onTrackingQualityChangeEvent.publicApi()
 
   /** Enables filtering of position and rotation */
   filterPositionAndRotation: boolean = true
@@ -73,8 +66,7 @@ export class MobileInputData {
       return
     }
 
-    this.onControllerStateChange =
-      this._motionController?.onControllerStateChange
+    this.onControllerStateChange = this._motionController?.onControllerStateChange
 
     this.onControllerStateChange?.add((state) => {
       this.log.d("Controller state changed to : " + state)
@@ -84,64 +76,45 @@ export class MobileInputData {
   }
 
   private initializeMotionController(): void {
-    this._motionControllerModule =
-      MotionControllerProvider.getInstance().getModule()
+    this._motionControllerModule = MotionControllerProvider.getInstance().getModule()
 
     if (this._motionControllerModule === undefined) {
       return
     }
 
-    let options = MotionController.Options.create()
+    let options = MotionController.MotionControllerOptions.create()
     options.motionType = MotionController.MotionType.SixDoF
 
-    this._motionController = this._motionControllerModule.getController(
-      options,
-    ) as MotionController
+    this._motionController = this._motionControllerModule.getController(options) as MotionController
 
     this._trackingQuality = this._motionController.getTrackingQuality()
   }
 
   private update(useFilter: boolean = true): void {
-    if (
-      this._motionControllerModule === undefined ||
-      this._motionController === undefined
-    ) {
+    if (this._motionControllerModule === undefined || this._motionController === undefined) {
       return
     }
 
     if (this._motionController?.isControllerAvailable()) {
       this._position = useFilter
-        ? this.translateFilter.filter(
-            this._motionController.getWorldPosition(),
-            getTime(),
-          )
+        ? this.translateFilter.filter(this._motionController.getWorldPosition(), getTime())
         : this._motionController.getWorldPosition()
 
       this._rotation = useFilter
-        ? this.rotationFilter.filter(
-            this._motionController.getWorldRotation(),
-            getTime(),
-          )
+        ? this.rotationFilter.filter(this._motionController.getWorldRotation(), getTime())
         : this._motionController.getWorldRotation()
     }
 
     if (this._trackingQuality !== this._motionController.getTrackingQuality()) {
-      this.onTrackingQualityChangeEvent.invoke(
-        this._motionController.getTrackingQuality(),
-      )
-      this.log.v(
-        "Motion Controller Tracking Quality has changed to : " +
-          this._motionController.getTrackingQuality(),
-      )
+      this.onTrackingQualityChangeEvent.invoke(this._motionController.getTrackingQuality())
+      this.log.v("Motion Controller Tracking Quality has changed to : " + this._motionController.getTrackingQuality())
       this.translateFilter.reset()
       this.rotationFilter.reset()
     }
 
     this._trackingQuality = this._motionController.getTrackingQuality()
 
-    this.animationManager.requestAnimationFrame(() =>
-      this.update(this.filterPositionAndRotation),
-    )
+    this.animationManager.requestAnimationFrame(() => this.update(this.filterPositionAndRotation))
   }
 
   /**

@@ -27,8 +27,7 @@ export class SimpleLODRenderMeshVisual extends BaseScriptComponent {
   private distances: number[] = []
   private object: SceneObject | undefined
   private transform: Transform | undefined
-  private worldCamera: WorldCameraFinderProvider =
-    WorldCameraFinderProvider.getInstance()
+  private worldCamera: WorldCameraFinderProvider = WorldCameraFinderProvider.getInstance()
   private cameraTransform: Transform = this.worldCamera.getTransform()
   private currentIndex: number = 0
 

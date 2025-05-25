@@ -17,12 +17,12 @@ export class CursorControllerProvider {
   registerCursor(cursor: InteractorCursor): void {
     validate(
       cursor.interactor,
-      "InteractorCursor must have a set Interactor before registering to SIK.CursorController.",
+      "InteractorCursor must have a set Interactor before registering to SIK.CursorController."
     )
 
     if (this.cursors.has(cursor.interactor)) {
       throw Error(
-        `Multiple cursors for a single Interactor have been registered.\nThe CursorController and InteractorCursor components cannot both be present in the scene hierarchy before runtime, use one or the other.`,
+        `Multiple cursors for a single Interactor have been registered.\nThe CursorController and InteractorCursor components cannot both be present in the scene hierarchy before runtime, use one or the other.`
       )
     }
 
@@ -53,9 +53,7 @@ export class CursorControllerProvider {
    * @param inputType The InteractorInputType to get the cursor for
    * @returns the InteractorCursor for the requested InteractorInputType, or null if it doesn't exist
    */
-  getCursorByInputType(
-    inputType: InteractorInputType,
-  ): InteractorCursor | null {
+  getCursorByInputType(inputType: InteractorInputType): InteractorCursor | null {
     let interactor: Interactor | undefined
 
     for (const mapInteractor of this.cursors.keys()) {
@@ -65,9 +63,7 @@ export class CursorControllerProvider {
       }
     }
 
-    return interactor !== undefined
-      ? this.getCursorByInteractor(interactor)
-      : null
+    return interactor !== undefined ? this.getCursorByInteractor(interactor) : null
   }
 
   /**

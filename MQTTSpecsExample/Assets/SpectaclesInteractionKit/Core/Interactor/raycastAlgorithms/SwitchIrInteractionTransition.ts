@@ -50,60 +50,38 @@ const SwitchIrInteractionTransitionConfigDefault = {
   gazePitchDegreesToDefault: 25,
   transitionSeconds: 0.2,
   debounceToIrSeconds: 0.2,
-  debounceToDefaultSeconds: 0.1,
+  debounceToDefaultSeconds: 0.1
 }
 
 /**
  * Class to implement Switch-like IR Transition Strategy
  */
-export default class SwitchIrInteractionTransition
-  implements IrInteractionTransition
-{
+export default class SwitchIrInteractionTransition implements IrInteractionTransition {
   private inIrMode = false
   private irModeSaturationProgress = 0
   private debounceProgress = 0
 
-  private config: SwitchIrInteractionTransitionConfig =
-    SwitchIrInteractionTransitionConfigDefault
+  private config: SwitchIrInteractionTransitionConfig = SwitchIrInteractionTransitionConfigDefault
 
-  private transitionSeconds =
-    this.config.transitionSeconds > 0 ? this.config.transitionSeconds : 0.2
-  private debounceToIrSeconds =
-    this.config.debounceToIrSeconds > 0 ? this.config.debounceToIrSeconds : 0.2
+  private transitionSeconds = this.config.transitionSeconds > 0 ? this.config.transitionSeconds : 0.2
+  private debounceToIrSeconds = this.config.debounceToIrSeconds > 0 ? this.config.debounceToIrSeconds : 0.2
   private debounceToDefaultSeconds =
-    this.config.debounceToDefaultSeconds > 0
-      ? this.config.debounceToDefaultSeconds
-      : 0.1
+    this.config.debounceToDefaultSeconds > 0 ? this.config.debounceToDefaultSeconds : 0.1
 
   /** @inheritdoc */
-  computeXRotationInDegrees(
-    gazePitchInDegrees: number,
-    toWorldFromSituationSpace: mat4,
-    handPoint: vec3,
-  ): number {
-    const transformedHandPoint = toWorldFromSituationSpace
-      .inverse()
-      .multiplyPoint(handPoint)
+  computeXRotationInDegrees(gazePitchInDegrees: number, toWorldFromSituationSpace: mat4, handPoint: vec3): number {
+    const transformedHandPoint = toWorldFromSituationSpace.inverse().multiplyPoint(handPoint)
 
     const rotationInDegrees =
-      this.computeMultiplier(transformedHandPoint, gazePitchInDegrees) *
-      this.config.rotationXDegrees
+      this.computeMultiplier(transformedHandPoint, gazePitchInDegrees) * this.config.rotationXDegrees
     return rotationInDegrees
   }
 
   /** @inheritdoc */
-  computeXRotationInRadians(
-    gazePitchInRadians: number,
-    toWorldFromSituationSpace: mat4,
-    handPoint: vec3,
-  ): number {
+  computeXRotationInRadians(gazePitchInRadians: number, toWorldFromSituationSpace: mat4, handPoint: vec3): number {
     return (
       MathUtils.DegToRad *
-      this.computeXRotationInDegrees(
-        MathUtils.RadToDeg * gazePitchInRadians,
-        toWorldFromSituationSpace,
-        handPoint,
-      )
+      this.computeXRotationInDegrees(MathUtils.RadToDeg * gazePitchInRadians, toWorldFromSituationSpace, handPoint)
     )
   }
 
@@ -113,10 +91,7 @@ export default class SwitchIrInteractionTransition
    * @param gazePitchInDegrees - gaze pitch given in degrees
    * @returns multiplier for the Ir interaction interaction rotation
    */
-  private computeMultiplier(
-    handPoint: vec3,
-    gazePitchInDegrees: number,
-  ): number {
+  private computeMultiplier(handPoint: vec3, gazePitchInDegrees: number): number {
     if (this.inIrMode === false) {
       this.switchTransitionStrategyInDefaultMode(handPoint, gazePitchInDegrees)
     } else {
@@ -130,10 +105,7 @@ export default class SwitchIrInteractionTransition
    * @param handPoint - hand point used for height estimation
    * @param gazePitchInDegrees - gaze pitch given in degrees
    */
-  private switchTransitionStrategyInDefaultMode(
-    handPoint: vec3,
-    gazePitchInDegrees: number,
-  ): void {
+  private switchTransitionStrategyInDefaultMode(handPoint: vec3, gazePitchInDegrees: number): void {
     if (
       handPoint.y < -this.config.neckHandHeightDifferenceToIr &&
       gazePitchInDegrees > -this.config.gazePitchDegreesToIr
@@ -146,11 +118,7 @@ export default class SwitchIrInteractionTransition
       }
     } else {
       this.irModeSaturationProgress -= getDeltaTime() / this.transitionSeconds
-      this.irModeSaturationProgress = MathUtils.clamp(
-        this.irModeSaturationProgress,
-        0,
-        1,
-      )
+      this.irModeSaturationProgress = MathUtils.clamp(this.irModeSaturationProgress, 0, 1)
       this.debounceProgress -= getDeltaTime() / this.debounceToIrSeconds
       this.debounceProgress = MathUtils.clamp(this.debounceProgress, 0, 1)
     }
@@ -161,10 +129,7 @@ export default class SwitchIrInteractionTransition
    * @param handPoint - hand point used for height estimation
    * @param gazePitchInDegrees - gaze pitch given in degrees
    */
-  private switchTransitionStrategyInIrMode(
-    handPoint: vec3,
-    gazePitchInDegrees: number,
-  ): void {
+  private switchTransitionStrategyInIrMode(handPoint: vec3, gazePitchInDegrees: number): void {
     if (
       handPoint.y >= -this.config.neckHandHeightDifferenceToDefault ||
       gazePitchInDegrees <= -this.config.gazePitchDegreesToDefault
@@ -177,11 +142,7 @@ export default class SwitchIrInteractionTransition
       }
     } else {
       this.irModeSaturationProgress += getDeltaTime() / this.transitionSeconds
-      this.irModeSaturationProgress = MathUtils.clamp(
-        this.irModeSaturationProgress,
-        0,
-        1,
-      )
+      this.irModeSaturationProgress = MathUtils.clamp(this.irModeSaturationProgress, 0, 1)
       this.debounceProgress -= getDeltaTime() / this.debounceToDefaultSeconds
       this.debounceProgress = MathUtils.clamp(this.debounceProgress, 0, 1)
     }

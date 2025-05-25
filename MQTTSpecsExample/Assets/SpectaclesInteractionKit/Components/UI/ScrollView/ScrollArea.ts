@@ -1,7 +1,4 @@
-import {
-  DragInteractorEvent,
-  InteractorEvent,
-} from "../../../Core/Interactor/InteractorEvent"
+import {DragInteractorEvent, InteractorEvent} from "../../../Core/Interactor/InteractorEvent"
 import NativeLogger from "../../../Utils/NativeLogger"
 
 import {InteractionManager} from "../../../Core/InteractionManager/InteractionManager"
@@ -21,8 +18,7 @@ const TAG = "ScrollArea"
  * an {@link Interactor}. The dragging events are exposed to be consumed in {@link ScrollView}
  */
 export class ScrollArea extends View {
-  private interactionManager: InteractionManager =
-    InteractionManager.getInstance()
+  private interactionManager: InteractionManager = InteractionManager.getInstance()
 
   private interactionConfigurationProvider: InteractionConfigurationProvider =
     InteractionConfigurationProvider.getInstance()
@@ -72,7 +68,7 @@ export class ScrollArea extends View {
   constructor({
     debugDrawEnabled,
     parentSceneObject,
-    scrollAreaBounds,
+    scrollAreaBounds
   }: {
     debugDrawEnabled: boolean
     parentSceneObject: SceneObject
@@ -80,16 +76,12 @@ export class ScrollArea extends View {
   }) {
     super({name: TAG})
     this.attachToScene(parentSceneObject)
-    this.parentScreenTransform = parentSceneObject.getComponent(
-      "Component.ScreenTransform",
-    )
+    this.parentScreenTransform = parentSceneObject.getComponent("Component.ScreenTransform")
 
     this.screenTransform = this.createScreenTransform(debugDrawEnabled)
     this.collider = this.createCollider(debugDrawEnabled, scrollAreaBounds)
     this.interactable = this.createInteractable()
-    this._boundariesProvider = new ScreenTransformBoundariesProvider(
-      this.container,
-    )
+    this._boundariesProvider = new ScreenTransformBoundariesProvider(this.container)
 
     this.onTriggerStart = this.interactable.onTriggerStart
     this.onTriggerEnd = this.interactable.onTriggerEnd
@@ -111,12 +103,8 @@ export class ScrollArea extends View {
     this.screenTransform.enableDebugRendering = debugDrawEnabled
   }
 
-  private createScreenTransform(
-    enableDebugRendering: boolean,
-  ): ScreenTransform {
-    const screenTransform = this.container.createComponent(
-      "Component.ScreenTransform",
-    )
+  private createScreenTransform(enableDebugRendering: boolean): ScreenTransform {
+    const screenTransform = this.container.createComponent("Component.ScreenTransform")
 
     screenTransform.enableDebugRendering = enableDebugRendering
     screenTransform.anchors = Rect.create(-1, 1, -1, 1)
@@ -128,18 +116,10 @@ export class ScrollArea extends View {
   private createColliderShape(scrollAreaBounds: vec2): BoxShape {
     const shape = Shape.createBoxShape()
 
-    const topLeftCorner = this.convertLocalUnitsToParentUnits(
-      new vec2(-scrollAreaBounds.x, scrollAreaBounds.y),
-    )
-    const bottomRightCorner = this.convertLocalUnitsToParentUnits(
-      new vec2(scrollAreaBounds.x, -scrollAreaBounds.y),
-    )
+    const topLeftCorner = this.convertLocalUnitsToParentUnits(new vec2(-scrollAreaBounds.x, scrollAreaBounds.y))
+    const bottomRightCorner = this.convertLocalUnitsToParentUnits(new vec2(scrollAreaBounds.x, -scrollAreaBounds.y))
 
-    shape.size = new vec3(
-      bottomRightCorner.x - topLeftCorner.x,
-      topLeftCorner.y - bottomRightCorner.y,
-      1,
-    )
+    shape.size = new vec3(bottomRightCorner.x - topLeftCorner.x, topLeftCorner.y - bottomRightCorner.y, 1)
 
     return shape
   }
@@ -160,10 +140,7 @@ export class ScrollArea extends View {
     this.collider.shape = this.createColliderShape(scrollColliderBounds)
   }
 
-  private createCollider(
-    debugDrawEnabled: boolean,
-    scrollAreaBounds: vec2,
-  ): ColliderComponent {
+  private createCollider(debugDrawEnabled: boolean, scrollAreaBounds: vec2): ColliderComponent {
     const collider = this.container.createComponent("Physics.ColliderComponent")
     collider.debugDrawEnabled = debugDrawEnabled
     collider.fitVisual = false
@@ -181,46 +158,36 @@ export class ScrollArea extends View {
   private stopEventPropagationOutsideScrollArea(event: InteractorEvent) {
     if (
       event.interactor.targetHitPosition !== null &&
-      !this.screenTransform.containsWorldPoint(
-        event.interactor.targetHitPosition,
-      )
+      !this.screenTransform.containsWorldPoint(event.interactor.targetHitPosition)
     ) {
       event.stopPropagation()
     }
   }
 
   private createInteractable(): Interactable {
-    const interactable = this.parentScreenTransform
-      .getSceneObject()
-      .createComponent(Interactable.getTypeName())
+    const interactable = this.parentScreenTransform.getSceneObject().createComponent(Interactable.getTypeName())
 
-    validate(
-      interactable,
-      "Couldn't create an Interactable. Interactable typename is undefined.",
-    )
+    validate(interactable, "Couldn't create an Interactable. Interactable typename is undefined.")
 
     // Hover
     interactable.onHoverEnter.add((event) => {
       validate(this.interactable)
 
-      const planeIntersection = event.interactor.raycastPlaneIntersection(
-        this.interactable,
-      )
+      const planeIntersection = event.interactor.raycastPlaneIntersection(this.interactable)
 
       const outsideScrollCanvas =
-        planeIntersection === null ||
-        !this.screenTransform.containsWorldPoint(planeIntersection)
+        planeIntersection === null || !this.screenTransform.containsWorldPoint(planeIntersection)
 
       if (!this.isFocused && !outsideScrollCanvas) {
         this.isFocused = true
         this.onFocusEnterEvent.invoke({
-          position: planeIntersection,
+          position: planeIntersection
         })
       } else if (this.isFocused && outsideScrollCanvas) {
         if (interactable.hoveringInteractor === InteractorInputType.None) {
           this.isFocused = false
           this.onFocusExitEvent.invoke({
-            position: planeIntersection,
+            position: planeIntersection
           })
         }
       }
@@ -229,25 +196,22 @@ export class ScrollArea extends View {
     interactable.onHoverUpdate.add((event) => {
       validate(this.interactable)
 
-      const planeIntersection = event.interactor.raycastPlaneIntersection(
-        this.interactable,
-      )
+      const planeIntersection = event.interactor.raycastPlaneIntersection(this.interactable)
 
       const outsideScrollCanvas =
-        planeIntersection === null ||
-        !this.screenTransform.containsWorldPoint(planeIntersection)
+        planeIntersection === null || !this.screenTransform.containsWorldPoint(planeIntersection)
 
       if (this.isFocused && outsideScrollCanvas) {
         if (interactable.hoveringInteractor === InteractorInputType.None) {
           this.isFocused = false
           this.onFocusExitEvent.invoke({
-            position: planeIntersection,
+            position: planeIntersection
           })
         }
       } else if (!this.isFocused && !outsideScrollCanvas) {
         this.isFocused = true
         this.onFocusEnterEvent.invoke({
-          position: planeIntersection,
+          position: planeIntersection
         })
       }
     })
@@ -255,19 +219,16 @@ export class ScrollArea extends View {
     interactable.onHoverExit.add((event) => {
       validate(this.interactable)
 
-      const planeIntersection = event.interactor.raycastPlaneIntersection(
-        this.interactable,
-      )
+      const planeIntersection = event.interactor.raycastPlaneIntersection(this.interactable)
 
       const outsideScrollCanvas =
-        planeIntersection === null ||
-        !this.screenTransform.containsWorldPoint(planeIntersection)
+        planeIntersection === null || !this.screenTransform.containsWorldPoint(planeIntersection)
 
       if (this.isFocused && outsideScrollCanvas) {
         if (interactable.hoveringInteractor === InteractorInputType.None) {
           this.isFocused = false
           this.onFocusExitEvent.invoke({
-            position: planeIntersection,
+            position: planeIntersection
           })
         }
       }
@@ -279,48 +240,69 @@ export class ScrollArea extends View {
     })
     interactable.onTriggerUpdate.add((event) => {
       this.stopEventPropagationOutsideScrollArea(event)
-      this.stopEventPropagationOnDragging(event)
     })
     interactable.onTriggerEnd.add((event) => {
       this.stopEventPropagationOutsideScrollArea(event)
       this.stopEventPropagationOnDragging(event)
     })
-    interactable.onTriggerCanceled.add((event) => {
-      this.stopEventPropagationOnDragging(event)
-    })
 
     // Drag
     interactable.onDragStart.add((event) => {
-      if (
-        event.propagationPhase === "BubbleUp" ||
-        event.propagationPhase === "Target"
-      ) {
+      if (event.propagationPhase === "BubbleUp" || event.propagationPhase === "Target") {
         this._isDragging = true
         this.onDragStartEvent.invoke(event)
-        event.stopPropagation()
 
         this.interactionManager.dispatchEvent({
           interactor: event.interactor,
           target: event.target,
           eventName: "TriggerCanceled",
-          origin: interactable,
+          origin: interactable
         })
       }
     })
     interactable.onDragUpdate.add((event) => {
-      if (this.isDragging) {
+      if (event.propagationPhase === "TrickleDown" || event.propagationPhase === "Target") {
         this.onDragUpdateEvent.invoke(event)
-        event.stopPropagation()
       }
     })
     interactable.onDragEnd.add((event) => {
-      if (
-        event.propagationPhase === "TrickleDown" ||
-        event.propagationPhase === "Target"
-      ) {
+      if (event.propagationPhase === "TrickleDown" || event.propagationPhase === "Target") {
+        // Ensure the target (and ancestors between ScrollArea and target in hierarchy) receives onDragEnd event still.
+        if (event.propagationPhase === "TrickleDown") {
+          const ancestorInteractables: Interactable[] = []
+
+          let ancestor = event.target.sceneObject.getParent()
+          while (ancestor !== interactable.sceneObject) {
+            const ancestorInteractable = ancestor.getComponent(Interactable.getTypeName())
+            if (ancestorInteractable !== null) {
+              ancestorInteractables.push(ancestorInteractable)
+            }
+
+            ancestor = ancestor.getParent()
+          }
+
+          // Trickle down until reaching the target.
+          const trickleDownEvent = event
+          for (const ancestorInteractable of ancestorInteractables) {
+            ancestorInteractable.dragEnd(trickleDownEvent)
+          }
+
+          // Invoke dragEnd on the target.
+          const targetEvent = event
+          targetEvent.propagationPhase = "Target"
+          event.target.dragEnd(targetEvent)
+
+          // Bubble back up to this Interactable.
+          ancestorInteractables.reverse()
+          const bubbleUpEvent = event
+          bubbleUpEvent.propagationPhase = "BubbleUp"
+          for (const ancestorInteractable of ancestorInteractables) {
+            ancestorInteractable.dragEnd(bubbleUpEvent)
+          }
+        }
+
         this._isDragging = false
         this.onDragEndEvent.invoke(event)
-        event.stopPropagation()
       }
     })
 
@@ -334,24 +316,14 @@ export class ScrollArea extends View {
    * Converts local units (-1 to 1) to parent units relative to the ScrollView canvas.
    */
   private convertLocalUnitsToParentUnits(localUnits: vec2): vec2 {
-    const origin = this.parentScreenTransform.localPointToWorldPoint(
-      vec2.zero(),
-    )
-    const invertQuat = this.parentScreenTransform
-      .getSceneObject()
-      .getTransform()
-      .getWorldRotation()
-      .invert()
+    const origin = this.parentScreenTransform.localPointToWorldPoint(vec2.zero())
+    const invertQuat = this.parentScreenTransform.getSceneObject().getTransform().getWorldRotation().invert()
 
-    const worldUnits = this.parentScreenTransform
-      .localPointToWorldPoint(localUnits)
-      .sub(origin)
+    const worldUnits = this.parentScreenTransform.localPointToWorldPoint(localUnits).sub(origin)
 
     const localAxisAlignedUnits = invertQuat.multiplyVec3(worldUnits)
 
-    const parentUnits = localAxisAlignedUnits.div(
-      this.parentScreenTransform.getTransform().getWorldScale(),
-    )
+    const parentUnits = localAxisAlignedUnits.div(this.parentScreenTransform.getTransform().getWorldScale())
 
     return new vec2(parentUnits.x, parentUnits.y)
   }

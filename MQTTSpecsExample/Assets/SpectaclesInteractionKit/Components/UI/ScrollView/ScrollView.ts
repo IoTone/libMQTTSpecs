@@ -1,6 +1,7 @@
 import {InteractorInputType} from "../../../Core/Interactor/Interactor"
 import {DragInteractorEvent} from "../../../Core/Interactor/InteractorEvent"
 import {MobileInteractor} from "../../../Core/MobileInteractor/MobileInteractor"
+import Event, {PublicApi} from "../../../Utils/Event"
 import NativeLogger from "../../../Utils/NativeLogger"
 import {SceneObjectBoundariesProvider} from "./boundariesProvider/SceneObjectBoundariesProvider"
 import {VisualBoundariesProvider} from "./boundariesProvider/VisualBoundariesProvider"
@@ -58,18 +59,16 @@ const TAG = "ScrollView"
 
 /**
  * ScrollView will have two children:
- * - the content wrapper: created by ScrollView user
- * - scroll area: implemented internally by ScrollView
- * and not exposed to the user.
+ * - The content wrapper: created by ScrollView user.
+ * - Scroll area: implemented internally by ScrollView and not exposed to the user.
  *
- * To avoid issues related to
- * initialization order, we check the number of children
- * on StartEvent
+ * To avoid issues related to initialization order, we check the number of children on StartEvent.
  */
 const EXPECTED_CHILDREN_COUNT = 2
 
 /**
- * This class is responsible for creating and positioning grid content items based on a specified prefab and item count. It instantiates the items and arranges them vertically with a specified offset.
+ * This class is responsible for creating and positioning grid content items based on a specified prefab and item count.
+ * It instantiates the items and arranges them vertically with a specified offset.
  */
 @component
 export class ScrollView extends BaseScriptComponent {
@@ -85,27 +84,75 @@ export class ScrollView extends BaseScriptComponent {
 
   private updateEvent = this.createEvent("UpdateEvent")
 
+  /**
+   * Shows visual debugging elements for scroll area bounds and content.
+   */
   @input
+  @hint("Shows visual debugging elements for scroll area bounds and content.")
   _debugDrawEnabled: boolean = false
 
+  /**
+   * Allows content to be scrolled horizontally.
+   */
   @input
+  @hint("Allows content to be scrolled horizontally.")
   enableHorizontalScroll: boolean = false
 
+  /**
+   * Allows content to be scrolled vertically.
+   */
   @input
+  @hint("Allows content to be scrolled vertically.")
   enableVerticalScroll: boolean = true
 
+  /**
+   * Enables physics-based scrolling where content continues moving after release with gradual deceleration and
+   * elastic bounce-back at boundaries."
+   */
   @input
+  @hint(
+    "Enables physics-based scrolling where content continues moving after release with gradual deceleration and \
+elastic bounce-back at boundaries."
+  )
   _enableScrollInertia: boolean = true
 
+  /**
+   * When enabled, prevents content from scrolling beyond designated boundaries defined by the Scroll Limit.
+   */
   @input
+  @hint("When enabled, prevents content from scrolling beyond designated boundaries defined by the Scroll Limit.")
   enableScrollLimit: boolean = true
 
+  /**
+   * Controls how much content must remain visible.
+   * 0: Content can scroll completely out of view.
+   * 0.5: At least 50% of the content will remain in the visible area.
+   * 1: Content can't scroll out of view at all.
+   */
   @input
   @widget(new SliderWidget(0, 1, 0.01))
+  @showIf("enableScrollLimit")
+  @hint(
+    "Controls how much content must remain visible.\n\
+- 0: Content can scroll completely out of view.\n\
+- 0.5: At least 50% of the content will remain in the visible area.\n\
+- 1: Content can't scroll out of view at all."
+  )
   _scrollLimit: number = 0.3
 
+  /**
+   * Defines the size of the interactive area in normalized local coordinates, where (1,1) uses the full component
+   * size.
+   */
   @input("vec2", "{1, 1}")
+  @hint(
+    "Defines the size of the interactive area in normalized local coordinates, where (1,1) uses the full component \
+size."
+  )
   scrollAreaBounds: vec2 = new vec2(1, 1)
+
+  private onContentLengthChangedEvent = new Event<void>()
+  public onContentLengthChanged: PublicApi<void> = this.onContentLengthChangedEvent.publicApi()
 
   onAwake() {
     this.scrollArea = this.createScrollArea()
@@ -123,7 +170,7 @@ export class ScrollView extends BaseScriptComponent {
     const scrollArea = new ScrollArea({
       debugDrawEnabled: this.debugDrawEnabled,
       parentSceneObject: this.sceneObject,
-      scrollAreaBounds: this.scrollAreaBounds,
+      scrollAreaBounds: this.scrollAreaBounds
     })
 
     return scrollArea
@@ -138,10 +185,8 @@ export class ScrollView extends BaseScriptComponent {
       enableHorizontalScroll: this.enableHorizontalScroll,
       enableVerticalScroll: this.enableVerticalScroll,
       scrollView: this,
-      screenTransform: this.sceneObject.getComponent(
-        "Component.ScreenTransform",
-      ),
-      updateEvent: this.updateEvent,
+      screenTransform: this.sceneObject.getComponent("Component.ScreenTransform"),
+      updateEvent: this.updateEvent
     })
 
     scrollArea.onDragStart.add((event) => {
@@ -165,9 +210,7 @@ export class ScrollView extends BaseScriptComponent {
 
   private createContentBoundariesProvider() {
     if (this.sceneObject.getChildrenCount() !== EXPECTED_CHILDREN_COUNT) {
-      throw new Error(
-        "ScrollView requires exactly one child that wraps the content",
-      )
+      throw new Error("ScrollView requires exactly one child that wraps the content")
     }
 
     let contentSceneObject: SceneObject | undefined
@@ -178,9 +221,7 @@ export class ScrollView extends BaseScriptComponent {
     }
 
     if (contentSceneObject === undefined) {
-      throw new Error(
-        "Couldn't find content scene object among ScrollView children.",
-      )
+      throw new Error("Couldn't find content scene object among ScrollView children.")
     }
 
     return new VisualBoundariesProvider(contentSceneObject)
@@ -200,9 +241,7 @@ export class ScrollView extends BaseScriptComponent {
 
   recomputeBoundaries = () => {
     if (!this.scrollProvider.isReady) {
-      this.log.w(
-        "recomputeBoundaries called before OnStartEvent. Call ignored.",
-      )
+      this.log.w("recomputeBoundaries called before OnStartEvent. Call ignored.")
     } else {
       this.scrollProvider.recomputeBoundaries()
     }
@@ -234,6 +273,13 @@ export class ScrollView extends BaseScriptComponent {
   }
   get onFocusExit() {
     return this.scrollArea.onFocusExit
+  }
+
+  /**
+   * @returns if this class is ready to be used.
+   */
+  get isReady() {
+    return this.scrollProvider.isReady
   }
   get isDragging() {
     return this.scrollArea.isDragging
@@ -287,9 +333,7 @@ export class ScrollView extends BaseScriptComponent {
    * @returns the offset to each content edge and the ScrollArea in world units relative to the canvas' rotation.
    */
   get contentOffset(): Rect {
-    return this.scrollProvider.convertLocalOffsetToParentOffset(
-      this.scrollProvider.contentOffset,
-    )
+    return this.scrollProvider.convertLocalOffsetToParentOffset(this.scrollProvider.contentOffset)
   }
 
   /**
@@ -307,6 +351,7 @@ export class ScrollView extends BaseScriptComponent {
       return
     }
     this.scrollProvider.contentLength = length
+    this.onContentLengthChangedEvent.invoke()
   }
 
   /**
@@ -328,9 +373,7 @@ export class ScrollView extends BaseScriptComponent {
    * @returns the ScrollArea's size in local units relative to the ScrollView canvas.
    */
   get scrollAreaSize(): vec2 {
-    return this.scrollProvider.convertLocalUnitsToParentUnits(
-      this.scrollArea.boundariesProvider.size,
-    )
+    return this.scrollProvider.convertLocalUnitsToParentUnits(this.scrollArea.boundariesProvider.size)
   }
 
   /**
@@ -384,21 +427,14 @@ export class ScrollView extends BaseScriptComponent {
   }
 
   private localizeTouchpadVector(touchpadVector: vec3): vec2 {
-    const screenTransform = this.sceneObject.getComponent(
-      "Component.ScreenTransform",
-    )
+    const screenTransform = this.sceneObject.getComponent("Component.ScreenTransform")
 
     // Mobile touchpad drag uses a screen space of [0,1], while screen transforms use a screen space of [-1,1]
-    const touchpadVector2D = new vec2(
-      touchpadVector.x * 2,
-      touchpadVector.y * 2,
-    )
+    const touchpadVector2D = new vec2(touchpadVector.x * 2, touchpadVector.y * 2)
 
     const origin = screenTransform.localPointToWorldPoint(vec2.zero())
 
-    const worldSpaceVector = screenTransform
-      .localPointToWorldPoint(touchpadVector2D)
-      .sub(origin)
+    const worldSpaceVector = screenTransform.localPointToWorldPoint(touchpadVector2D).sub(origin)
 
     return this.localizeDragVector(worldSpaceVector)
   }
@@ -417,13 +453,9 @@ export class ScrollView extends BaseScriptComponent {
 
       if (mobileInteractor.touchpadDragVector !== null) {
         const screenSpaceTouchpadDrag =
-          mobileInteractor.touchpadDragVector?.uniformScale(
-            1 / mobileInteractor.touchpadScrollSpeed,
-          ) ?? vec3.zero()
+          mobileInteractor.touchpadDragVector?.uniformScale(1 / mobileInteractor.touchpadScrollSpeed) ?? vec3.zero()
 
-        this.scrollProvider.scrollBy(
-          this.localizeTouchpadVector(screenSpaceTouchpadDrag),
-        )
+        this.scrollProvider.scrollBy(this.localizeTouchpadVector(screenSpaceTouchpadDrag))
       }
     }
   }

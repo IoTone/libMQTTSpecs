@@ -35,10 +35,7 @@ export default class ARCameraFinderProvider extends BaseCameraFinderProvider {
       }
 
       const deviceTracking = object.getComponent("Component.DeviceTracking")
-      if (
-        deviceTracking.getActualDeviceTrackingMode() ===
-        DeviceTrackingMode.World
-      ) {
+      if (deviceTracking.getActualDeviceTrackingMode() === DeviceTrackingMode.World) {
         return camera
       } else {
         return null

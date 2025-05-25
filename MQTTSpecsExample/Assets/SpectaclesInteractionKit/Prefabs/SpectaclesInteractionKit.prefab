@@ -608,7 +608,6 @@
     indirectTargetingVolumeMultiplier: true
     indirectDragThreshold: true
     handType: true
-    raycastAlgorithm: true
     forcePokeOnNonDominantPalmProximity: true
     directColliderEnterRadius: true
     directColliderExitRadius: true
@@ -631,7 +630,6 @@
       indirectTargetingVolumeMultiplier: !<float> 1.000000
       indirectDragThreshold: !<float> 40.000000
       handType: right
-      raycastAlgorithm: Proxy
       forcePokeOnNonDominantPalmProximity: false
       directColliderEnterRadius: !<float> 1.000000
       directColliderExitRadius: 1.500000
@@ -1118,6 +1116,8 @@
     indirectTargetingVolumeMultiplier: true
     indirectDragThreshold: true
     mouseTargetingMode: true
+    moveInDepth: true
+    moveInDepthAmount: true
   ScriptTypesDefault:
     {}
   ScriptInputs:
@@ -1136,6 +1136,8 @@
       indirectTargetingVolumeMultiplier: !<float> 1.000000
       indirectDragThreshold: !<float> 3.000000
       mouseTargetingMode: !<float> 2.000000
+      moveInDepth: false
+      moveInDepthAmount: !<float> 5.000000
   ScriptTypes:
     "":
       {}
@@ -1153,7 +1155,6 @@
     _maxRaycastDistance: true
     indirectTargetingVolumeMultiplier: true
     indirectDragThreshold: true
-    raycastAlgorithm: true
     forcePokeOnNonDominantPalmProximity: true
     directColliderEnterRadius: true
     directColliderExitRadius: true
@@ -1176,7 +1177,6 @@
       indirectTargetingVolumeMultiplier: !<float> 1.000000
       indirectDragThreshold: !<float> 40.000000
       handType: left
-      raycastAlgorithm: Proxy
       forcePokeOnNonDominantPalmProximity: false
       directColliderEnterRadius: !<float> 1.000000
       directColliderExitRadius: 1.500000
@@ -1359,14 +1359,13 @@
     pinkyUpperJoint: true
     pinkyTip: true
     shouldThumbPokeGlow: true
-    occluderEnabled: true
   ScriptTypesDefault:
     {}
   ScriptInputs:
     "":
       handType: left
       selectVisual: Default
-      handInteractor: !<MappingBased.HandInteractor> 93a82b13-f1ae-404a-b6f3-f6fa4c3d454a
+      handInteractor: !<MappingBased.AssignableType> 93a82b13-f1ae-404a-b6f3-f6fa4c3d454a
       handMesh: !<reference.RenderMeshVisual> 89b8d96b-b23a-4c1d-9afd-ea5ada766330
       root: !<reference.SceneObject> 66a8dd87-df9a-4166-bc02-99d45a2caff6
       autoJointMapping: true
@@ -1405,9 +1404,6 @@
       tapProximityThreshold: !<float> 8.000000
       pinchTexture: !<reference.Texture> 3391429c-5c74-4b5c-b9fc-4ad3ba30bda4
       tapTexture: !<reference.Texture> e33d2c7f-1d12-4250-92fb-433c25ce1923
-      occluderEnabled: false
-      occluderUnitPlaneMesh: !<reference.RenderMesh> a453f19f-0832-419f-bd8f-b3296b433b23
-      radialGradientOcclusionMaterial: !<reference.Material> af45ff34-c96f-42c2-8446-8282edf6dece
       handOutlineMaterial: !<reference.Material> 7ac80b6c-979a-4a00-a694-099f296be161
       handOccluderMaterial: !<reference.Material> 5d5c762b-f0dd-4c06-b76f-bcb8f8fb525f
   ScriptTypes:
@@ -1730,21 +1726,6 @@
     - !<own> 49316d12-58fb-4a4a-b09c-cc6a9303dbe6
   Components:
     []
-- !<SceneObject/c6d77d83-ee46-4487-a43f-d23b0ae9de25>
-  PrefabRemaps:
-    []
-  Name: "[LEGACY] InteractorLineVisual"
-  Enabled: true
-  Layers: 1
-  LocalTransform:
-    position: {x: 0.000000, y: 0.000000, z: 0.000000}
-    rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
-    scale: {x: 1.000000, y: 1.000000, z: 1.000000}
-    hasSegmentScaleCompensation: false
-  Children:
-    - !<own> ca180b07-36ad-49ea-a5f9-c22e23697d15
-  Components:
-    []
 - !<SceneObject/c7fc765f-3e34-42ed-b79c-d0d0f19dfd37>
   PrefabRemaps:
     []
@@ -1775,21 +1756,6 @@
     - !<own> 9ed0157f-fd08-47e6-9180-d9eaa60dae8e
   Components:
     []
-- !<SceneObject/ca180b07-36ad-49ea-a5f9-c22e23697d15>
-  PrefabRemaps:
-    []
-  Name: InteractorLineVisual
-  Enabled: false
-  Layers: 1
-  LocalTransform:
-    position: {x: 0.000000, y: 0.000000, z: 0.000000}
-    rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
-    scale: {x: 1.000000, y: 1.000000, z: 1.000000}
-    hasSegmentScaleCompensation: false
-  Children:
-    []
-  Components:
-    - !<own> f0e07390-6185-4a35-9a7b-632bf9d48126
 - !<SceneObject/d2fbbe47-d72e-4471-a1f1-02ffbcbe9212>
   PrefabRemaps:
     []
@@ -1841,14 +1807,13 @@
     pinkyUpperJoint: true
     pinkyTip: true
     shouldThumbPokeGlow: true
-    occluderEnabled: true
   ScriptTypesDefault:
     {}
   ScriptInputs:
     "":
       handType: right
       selectVisual: Default
-      handInteractor: !<MappingBased.HandInteractor> 6167dd36-c853-49b0-b2ae-7bdf862ab8c3
+      handInteractor: !<MappingBased.AssignableType> 6167dd36-c853-49b0-b2ae-7bdf862ab8c3
       handMesh: !<reference.RenderMeshVisual> 8ac837c8-53c2-4114-915e-b0265e3e9901
       root: !<reference.SceneObject> 88104fa0-ad2d-43a1-8271-80188b594b11
       autoJointMapping: true
@@ -1887,9 +1852,6 @@
       tapProximityThreshold: !<float> 8.000000
       pinchTexture: !<reference.Texture> 3391429c-5c74-4b5c-b9fc-4ad3ba30bda4
       tapTexture: !<reference.Texture> e33d2c7f-1d12-4250-92fb-433c25ce1923
-      occluderEnabled: false
-      occluderUnitPlaneMesh: !<reference.RenderMesh> a453f19f-0832-419f-bd8f-b3296b433b23
-      radialGradientOcclusionMaterial: !<reference.Material> af45ff34-c96f-42c2-8446-8282edf6dece
       handOutlineMaterial: !<reference.Material> 7ac80b6c-979a-4a00-a694-099f296be161
       handOccluderMaterial: !<reference.Material> bb8479b9-021e-4c42-809a-60edf99cbeac
   ScriptTypes:
@@ -2059,7 +2021,6 @@
   Children:
     - !<own> b1f777fc-9def-4cf7-9504-fc75ebd8523b
     - !<own> 3bc29fda-0d40-4a4c-a1d1-ef088f23beb6
-    - !<own> c6d77d83-ee46-4487-a43f-d23b0ae9de25
   Components:
     []
 - !<SceneObject/ea015d35-5918-4f78-a6f5-a17df2637bd4>
@@ -2135,35 +2096,6 @@
   ScriptInputs:
     "":
       {}
-  ScriptTypes:
-    "":
-      {}
-- !<ScriptComponent/f0e07390-6185-4a35-9a7b-632bf9d48126>
-  PrefabRemaps:
-    []
-  Name: InteractorLineVisual
-  Enabled: true
-  ScriptAsset: !<reference> 772760e3-b59e-4284-a8b3-60a0f4dfbbcb
-  ScriptInputsDefault:
-    _beginColor: true
-    _endColor: true
-    lineWidth: true
-    lineLength: true
-    lineStyle: true
-    shouldStick: true
-    _interactor: true
-  ScriptTypesDefault:
-    {}
-  ScriptInputs:
-    "":
-      lineMaterial: !<reference.Material> 515adedb-808a-4b69-af91-2565a9dc2a21
-      _beginColor: !<Vec3> {x: 1.000000, y: 1.000000, z: 0.000000}
-      _endColor: !<Vec3> {x: 1.000000, y: 1.000000, z: 0.000000}
-      lineWidth: 0.500000
-      lineLength: !<float> 160.000000
-      lineStyle: !<float> 2.000000
-      shouldStick: true
-      _interactor: !<reference.ScriptComponent> 00000000-0000-0000-0000-000000000000
   ScriptTypes:
     "":
       {}

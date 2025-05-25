@@ -10,9 +10,7 @@ const RIGHT_HAND_ASSET = requireAsset("./RightHandAsset.handTracking3D")
  * asset from Lens Studio
  */
 @Singleton
-export default class DefaultHandTrackingAssetProvider
-  implements HandTrackingAssetProvider
-{
+export default class DefaultHandTrackingAssetProvider implements HandTrackingAssetProvider {
   public static getInstance: () => DefaultHandTrackingAssetProvider
 
   private leftHandAsset: HandTracking3DAsset

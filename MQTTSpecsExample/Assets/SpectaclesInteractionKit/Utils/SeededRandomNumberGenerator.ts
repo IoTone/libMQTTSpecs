@@ -29,9 +29,7 @@ export class SeededRandomNumberGenerator {
   constructor(seed?: number) {
     this.seed = seed ?? 0
     if (!Number.isInteger(this.seed)) {
-      throw new Error(
-        `Illegal value: Non-Integer seed passed to SeededRandomNumberGenerator: ${this.seed}`,
-      )
+      throw new Error(`Illegal value: Non-Integer seed passed to SeededRandomNumberGenerator: ${this.seed}`)
     }
   }
 
@@ -87,19 +85,17 @@ export class SeededRandomNumberGenerator {
   public getRandomNumberArrayInRangeNoDuplicates(
     rangeMin: number,
     rangeMax: number,
-    numRandomNumbers: number,
+    numRandomNumbers: number
   ): number[] {
     if (rangeMin >= rangeMax) {
-      throw new Error(
-        `Illegal arguments, rangeMin (${rangeMin}) cannot be >= rangeMax (${rangeMax})`,
-      )
+      throw new Error(`Illegal arguments, rangeMin (${rangeMin}) cannot be >= rangeMax (${rangeMax})`)
     }
 
     if (numRandomNumbers > rangeMax - rangeMin) {
       throw new Error(
         `Illegal arguments, numRandomNumbers (${numRandomNumbers}) cannot be > rangeMax - rangeMin (${
           rangeMax - rangeMin
-        })`,
+        })`
       )
     }
 
@@ -146,37 +142,15 @@ export class SeededRandomNumberGenerator {
    * @returns A randomly generated point within the specified AABB, where minPoint.x <= x <= maxPont.x etc.
    */
   randomPointInAABB(minPoint: vec3, maxPoint: vec3): vec3 {
-    if (
-      minPoint.x > maxPoint.x ||
-      minPoint.y > maxPoint.y ||
-      minPoint.z > maxPoint.z
-    ) {
+    if (minPoint.x > maxPoint.x || minPoint.y > maxPoint.y || minPoint.z > maxPoint.z) {
       throw new Error(
-        "Illegal arguments, each component of minPoint cannot be greater than the corresponding component of maxPoint",
+        "Illegal arguments, each component of minPoint cannot be greater than the corresponding component of maxPoint"
       )
     }
 
-    const x = MathUtils.remap(
-      this.randomRange(0, 1)(),
-      1,
-      0,
-      maxPoint.x,
-      minPoint.x,
-    )
-    const y = MathUtils.remap(
-      this.randomRange(0, 1)(),
-      1,
-      0,
-      maxPoint.y,
-      minPoint.y,
-    )
-    const z = MathUtils.remap(
-      this.randomRange(0, 1)(),
-      1,
-      0,
-      maxPoint.z,
-      minPoint.z,
-    )
+    const x = MathUtils.remap(this.randomRange(0, 1)(), 1, 0, maxPoint.x, minPoint.x)
+    const y = MathUtils.remap(this.randomRange(0, 1)(), 1, 0, maxPoint.y, minPoint.y)
+    const z = MathUtils.remap(this.randomRange(0, 1)(), 1, 0, maxPoint.z, minPoint.z)
 
     return new vec3(x, y, z)
   }

@@ -11,8 +11,7 @@ export default abstract class LogLevelProvider {
 
   private onLogLevelChangedEvent = new ReplayEvent<LogLevel>(1)
 
-  onLogLevelChanged: PublicApi<LogLevel> =
-    this.onLogLevelChangedEvent.publicApi()
+  onLogLevelChanged: PublicApi<LogLevel> = this.onLogLevelChangedEvent.publicApi()
 
   /**
    * Get the level of logging that we want to allow from this provider.

@@ -1,10 +1,5 @@
 import {setTimeout} from "../../../../Utils/FunctionTimingUtils"
-import {
-  clamp,
-  DegToRad,
-  smoothDamp,
-  smoothDampAngle,
-} from "../../../../Utils/mathUtils"
+import {clamp, DegToRad, smoothDamp, smoothDampAngle} from "../../../../Utils/mathUtils"
 import {validate} from "../../../../Utils/validate"
 import {ContainerFrame} from "../ContainerFrame"
 
@@ -55,14 +50,8 @@ export class SmoothFollow {
     this.initialRot = this.transform.getLocalRotation()
     this.heading = this.cameraHeading
 
-    this.worldRot = quat
-      .angleAxis(this.heading, vec3.up())
-      .multiply(this.initialRot)
-    this.resize(
-      this.frame.innerSize.x +
-        this.frame.border * 2 +
-        this.frame.constantPadding.x,
-    )
+    this.worldRot = quat.angleAxis(this.heading, vec3.up()).multiply(this.initialRot)
+    this.resize(this.frame.innerSize.x + this.frame.border * 2 + this.frame.constantPadding.x)
     setTimeout(() => {
       this.clampPosition()
     }, 32)
@@ -92,18 +81,11 @@ export class SmoothFollow {
     this.target = this.cartesianToCylindrical(this.worldToBody(this.worldPos))
 
     this.target.z = clamp(this.target.z, this.minDistance, this.maxDistance)
-    this.target.z = Math.max(
-      this.target.z,
-      (1.1 * this.visibleWidth) /
-        2 /
-        Math.tan((this.fieldOfView / 2) * DegToRad),
-    ) // handle very wide panels
+    this.target.z = Math.max(this.target.z, (1.1 * this.visibleWidth) / 2 / Math.tan((this.fieldOfView / 2) * DegToRad)) // handle very wide panels
     this.target.y = clamp(this.target.y, this.minElevation, this.maxElevation)
     const dist = new vec2(this.target.y, this.target.z).length
     const halfFov = Math.atan(
-      (Math.tan((this.fieldOfView / 2) * DegToRad) * dist -
-        this.visibleWidth / 2) /
-        this.target.z,
+      (Math.tan((this.fieldOfView / 2) * DegToRad) * dist - this.visibleWidth / 2) / this.target.z
     )
     this.target.x = clamp(this.target.x, -halfFov, halfFov)
     this.velocity = vec3.zero()
@@ -122,21 +104,21 @@ export class SmoothFollow {
         this.target.x,
         this.velocity.x,
         this.translationTime,
-        getDeltaTime(),
+        getDeltaTime()
       )
       ;[pos.y, this.velocity.y] = smoothDamp(
         pos.y,
         this.target.y,
         this.velocity.y,
         this.translationTime,
-        getDeltaTime(),
+        getDeltaTime()
       )
       ;[pos.z, this.velocity.z] = smoothDamp(
         pos.z,
         this.target.z,
         this.velocity.z,
         this.translationTime,
-        getDeltaTime(),
+        getDeltaTime()
       )
       this.worldPos = this.bodyToWorld(this.cylindricalToCartesian(pos))
       ;[this.heading, this.omega] = smoothDampAngle(
@@ -144,21 +126,15 @@ export class SmoothFollow {
         this.cameraHeading,
         this.omega,
         this.rotationTime,
-        getDeltaTime(),
+        getDeltaTime()
       )
       // force billboard
-      this.worldRot = quat
-        .lookAt(this.cameraPos.sub(this.worldPos).normalize(), vec3.up())
-        .multiply(this.initialRot)
+      this.worldRot = quat.lookAt(this.cameraPos.sub(this.worldPos).normalize(), vec3.up()).multiply(this.initialRot)
     }
   }
 
   private cartesianToCylindrical(v: vec3): vec3 {
-    return new vec3(
-      Math.atan2(-v.x, -v.z),
-      v.y,
-      Math.sqrt(v.x * v.x + v.z * v.z),
-    )
+    return new vec3(Math.atan2(-v.x, -v.z), v.y, Math.sqrt(v.x * v.x + v.z * v.z))
   }
 
   private cylindricalToCartesian(v: vec3): vec3 {
@@ -166,22 +142,15 @@ export class SmoothFollow {
   }
 
   private worldToBody(v: vec3): vec3 {
-    return quat
-      .angleAxis(-this.cameraHeading, vec3.up())
-      .multiplyVec3(v.sub(this.cameraPos))
+    return quat.angleAxis(-this.cameraHeading, vec3.up()).multiplyVec3(v.sub(this.cameraPos))
   }
 
   private bodyToWorld(v: vec3): vec3 {
-    return quat
-      .angleAxis(this.cameraHeading, vec3.up())
-      .multiplyVec3(v)
-      .add(this.cameraPos)
+    return quat.angleAxis(this.cameraHeading, vec3.up()).multiplyVec3(v).add(this.cameraPos)
   }
 
   private get cameraHeading(): number {
-    const forward = this.cameraTransform
-      .getWorldTransform()
-      .multiplyDirection(new vec3(0, 0, -1))
+    const forward = this.cameraTransform.getWorldTransform().multiplyDirection(new vec3(0, 0, -1))
     return Math.atan2(-forward.x, -forward.z)
   }
 

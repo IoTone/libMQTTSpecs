@@ -8,9 +8,7 @@ export type ContainerParentConfig = {
 // generated beforehand and will remain static, actual values not important, except that they match across components
 const SECRET_HASH = "a43675b3f"
 export const FRAME_PARENT_NAME = "ContainerParent" + SECRET_HASH
-export const forceContainerParent = (
-  options: ContainerParentConfig,
-): SceneObject => {
+export const forceContainerParent = (options: ContainerParentConfig): SceneObject => {
   const thisObject = options.target
   const currentParent = thisObject.getParent()
   let containerParent: SceneObject

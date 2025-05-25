@@ -6,17 +6,13 @@ import {validate} from "../../Utils/validate"
 import BaseInteractor from "../Interactor/BaseInteractor"
 import {DragProvider} from "../Interactor/DragProvider"
 import IndirectTargetProvider from "../Interactor/IndirectTargetProvider"
-import {
-  DragType,
-  InteractorInputType,
-  InteractorTriggerType,
-  TargetingMode,
-} from "../Interactor/Interactor"
+import {DragType, InteractorInputType, InteractorTriggerType, TargetingMode} from "../Interactor/Interactor"
 import {MobileRayProvider} from "../Interactor/MobileRayProvider"
 
 const TAG = "MobileInteractor"
 
-// These thresholds are not for deciding when to invoke onDragStart, but rather to tell the MobileInteractor when to switch what type of drag to track.
+// These thresholds are not for deciding when to invoke onDragStart, but rather to tell the MobileInteractor when to
+// switch what type of drag to track.
 const INITIAL_TOUCHPAD_SWITCH_THRESHOLD = 0.05 // Screen position units mapped from the phone's touch surface
 const OVERRIDE_TOUCHPAD_SWITCH_THRESHOLD = 0.1 // Screen position units mapped from the phone's touch surface
 
@@ -30,14 +26,35 @@ const MANIPULATE_SIX_DOF_SWITCH_THRESHOLD = 2 // World units in c
 @component
 export class MobileInteractor extends BaseInteractor {
   @ui.group_start("Mobile Interactor")
+  /**
+   * Whether position and rotation filtering should be enabled when this is first initialized.
+   */
+  @input
+  @hint("Whether position and rotation filtering should be enabled when this is first initialized.")
+  initializePositionAndRotationFilter: boolean = true
+  /**
+   * Controls how much touchpad movement is amplified when translating touch input to 3D space.
+   * Higher values result in faster/larger movements from small touch gestures, while lower values
+   * provide more precise control requiring larger touch gestures to achieve the same movement.
+   */
   @input
   @hint(
-    "Initialize Mobile Input Data Provider with Position and Rotation Filtering",
+    "Controls how much touchpad movement is amplified when translating touch input to 3D space.  Higher values \
+result in faster/larger movements from small touch gestures, while lower values provide more precise control requiring \
+larger touch gestures to achieve the same movement."
   )
-  initializePositionAndRotationFilter: boolean = true
-  @input
   private _touchpadScrollSpeed: number = 250
+  /**
+   * Controls the minimum distance a finger must move on the touchpad to be considered a drag.
+   * Uses normalized screen coordinates (0-1), where 0.05 represents 5% of the screen width/height.
+   * Lower values make dragging more sensitive to small movements.
+   */
   @input
+  @hint(
+    "Controls the minimum distance a finger must move on the touchpad to be considered a drag. Uses normalized \
+screen coordinates (0-1), where 0.05 represents 5% of the screen width/height. Lower values make dragging more \
+sensitive to small movements."
+  )
   private touchpadDragThreshold: number = 0.05
   @ui.group_end
   private indirectTargetProvider: IndirectTargetProvider | undefined
@@ -60,26 +77,22 @@ export class MobileInteractor extends BaseInteractor {
 
   onAwake(): void {
     this.inputType = InteractorInputType.Mobile
-    this.mobileInputData.filterPositionAndRotation =
-      this.initializePositionAndRotationFilter
+    this.mobileInputData.filterPositionAndRotation = this.initializePositionAndRotationFilter
 
     this.defineTouchEvents()
 
     this.rayProvider = new MobileRayProvider()
 
-    this.indirectTargetProvider = new IndirectTargetProvider(
-      this as BaseInteractor,
-      {
-        maxRayDistance: this.maxRaycastDistance,
-        rayProvider: this.rayProvider,
-        targetingVolumeMultiplier: this.indirectTargetingVolumeMultiplier,
-        shouldPreventTargetUpdate: () => {
-          return this.preventTargetUpdate()
-        },
-        spherecastRadii: this.spherecastRadii,
-        spherecastDistanceThresholds: this.spherecastDistanceThresholds,
+    this.indirectTargetProvider = new IndirectTargetProvider(this as BaseInteractor, {
+      maxRayDistance: this.maxRaycastDistance,
+      rayProvider: this.rayProvider,
+      targetingVolumeMultiplier: this.indirectTargetingVolumeMultiplier,
+      shouldPreventTargetUpdate: () => {
+        return this.preventTargetUpdate()
       },
-    )
+      spherecastRadii: this.spherecastRadii,
+      spherecastDistanceThresholds: this.spherecastDistanceThresholds
+    })
   }
 
   get touchpadScrollSpeed(): number {
@@ -103,17 +116,11 @@ export class MobileInteractor extends BaseInteractor {
   }
 
   get distanceToTarget(): number | null {
-    return (
-      this.indirectTargetProvider?.currentInteractableHitInfo?.hit.distance ??
-      null
-    )
+    return this.indirectTargetProvider?.currentInteractableHitInfo?.hit.distance ?? null
   }
 
   get targetHitPosition(): vec3 | null {
-    return (
-      this.indirectTargetProvider?.currentInteractableHitInfo?.hit.position ??
-      null
-    )
+    return this.indirectTargetProvider?.currentInteractableHitInfo?.hit.position ?? null
   }
 
   get targetHitInfo(): InteractableHitInfo | null {
@@ -173,13 +180,9 @@ export class MobileInteractor extends BaseInteractor {
     validate(this.indirectTargetProvider)
 
     this.indirectTargetProvider.update()
-    this.currentInteractable =
-      this.indirectTargetProvider.currentInteractableHitInfo?.interactable ??
-      null
+    this.currentInteractable = this.indirectTargetProvider.currentInteractableHitInfo?.interactable ?? null
     this.currentTrigger =
-      this.touchpadStartPosition !== null
-        ? InteractorTriggerType.Select
-        : InteractorTriggerType.None
+      this.touchpadStartPosition !== null ? InteractorTriggerType.Select : InteractorTriggerType.None
 
     if ((this.currentTrigger & InteractorTriggerType.Select) !== 0) {
       if (this.sixDofStartPosition === null) {
@@ -194,6 +197,8 @@ export class MobileInteractor extends BaseInteractor {
     this.updateDragVector()
 
     this.processTriggerEvents()
+
+    this.handleSelectionLifecycle(this.indirectTargetProvider)
   }
 
   /** @inheritdoc */
@@ -212,25 +217,18 @@ export class MobileInteractor extends BaseInteractor {
   }
 
   private defineTouchEvents(): void {
-    this.createEvent("TouchStartEvent").bind((...args) =>
-      this.onTouchStartEvent(...args),
-    )
+    this.createEvent("TouchStartEvent").bind((...args) => this.onTouchStartEvent(...args))
 
-    this.createEvent("TouchMoveEvent").bind((...args) =>
-      this.onTouchMoveEvent(...args),
-    )
+    this.createEvent("TouchMoveEvent").bind((...args) => this.onTouchMoveEvent(...args))
 
     this.createEvent("TouchEndEvent").bind((...args) => this.onTouchEndEvent())
   }
 
   private onTouchStartEvent(ev: TouchStartEvent): void {
-    this.touchpadCurrentPosition = this.touchpadStartPosition =
-      ev.getTouchPosition()
+    this.touchpadCurrentPosition = this.touchpadStartPosition = ev.getTouchPosition()
     if (this.currentInteractable !== null) {
       this.isManipulating =
-        this.currentInteractable.sceneObject.getComponent(
-          InteractableManipulation.getTypeName(),
-        ) !== null
+        this.currentInteractable.sceneObject.getComponent(InteractableManipulation.getTypeName()) !== null
     }
     if (!global.deviceInfoSystem.isEditor) {
       this.log.v("Mobile Interactor On Touch Start Event")
@@ -269,8 +267,7 @@ export class MobileInteractor extends BaseInteractor {
       this.dragType !== DragType.Touchpad &&
       this.touchpadStartPosition !== null &&
       this.touchpadCurrentPosition !== null &&
-      this.touchpadCurrentPosition?.sub(this.touchpadStartPosition).length >
-        this.touchpadSwitchThreshold
+      this.touchpadCurrentPosition?.sub(this.touchpadStartPosition).length > this.touchpadSwitchThreshold
     ) {
       this.dragType = DragType.Touchpad
       return
@@ -280,8 +277,7 @@ export class MobileInteractor extends BaseInteractor {
       this.dragType !== DragType.SixDof &&
       this.sixDofStartPosition !== null &&
       this.sixDofCurrentPosition !== null &&
-      this.sixDofCurrentPosition?.sub(this.sixDofStartPosition).length >
-        this.sixDofSwitchThreshold
+      this.sixDofCurrentPosition?.sub(this.sixDofStartPosition).length > this.sixDofSwitchThreshold
     ) {
       this.dragType = DragType.SixDof
       return
@@ -298,19 +294,16 @@ export class MobileInteractor extends BaseInteractor {
     if ((this.currentTrigger & InteractorTriggerType.Select) !== 0) {
       const touchpadDragVector = this.touchpadDragProvider.getDragVector(
         this.getTouchpadDragPoint(),
-        this.currentInteractable?.enableInstantDrag ?? null,
+        this.currentInteractable?.enableInstantDrag ?? null
       )
       const sixDofDragVector = this.sixDofDragProvider.getDragVector(
         this.getSixDofDragPoint(),
-        this.currentInteractable?.enableInstantDrag ?? null,
+        this.currentInteractable?.enableInstantDrag ?? null
       )
 
       this.currentDragVector = this.dragProvider.currentDragVector
 
-      this.planecastDragProvider.getDragVector(
-        this.planecastPoint,
-        this.currentInteractable?.enableInstantDrag ?? null,
-      )
+      this.planecastDragProvider.getDragVector(this.planecastPoint, this.currentInteractable?.enableInstantDrag ?? null)
     } else {
       this.currentDragVector = null
       this.clearDragProviders()
@@ -336,7 +329,7 @@ export class MobileInteractor extends BaseInteractor {
         // Remap the touchpad space such that the bottom-left corner is [0,0] rather than the top-left corner.
         this.touchpadCurrentPosition.x,
         1 - this.touchpadCurrentPosition.y,
-        0,
+        0
       ).uniformScale(this.touchpadScrollSpeed)
     }
     return null

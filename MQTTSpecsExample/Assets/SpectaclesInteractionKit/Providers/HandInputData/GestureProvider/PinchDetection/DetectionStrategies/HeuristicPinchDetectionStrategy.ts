@@ -21,9 +21,7 @@ export type HeuristicPinchDetectionStrategyConfig = {
 /**
  * Class to detect pinch using a bistable threshold and the distance between index and thumb tips
  */
-export default class HeuristicPinchDetectionStrategy
-  implements PinchDetectionStrategy
-{
+export default class HeuristicPinchDetectionStrategy implements PinchDetectionStrategy {
   // Native Logging
   private log = new NativeLogger(TAG)
 
@@ -31,11 +29,11 @@ export default class HeuristicPinchDetectionStrategy
 
   private pinchEnterThreshold = new BistableThreshold({
     edgeActivate: this.config.pinchDownThreshold ?? 1.75,
-    edgeDeactivate: 3.5,
+    edgeDeactivate: 3.5
   })
   private thumbProjectThreshold = new BistableThreshold({
     edgeActivate: 3.0,
-    edgeDeactivate: 4.5,
+    edgeDeactivate: 4.5
   })
 
   private currentPinchProximity = 0
@@ -50,11 +48,9 @@ export default class HeuristicPinchDetectionStrategy
   constructor(private config: HeuristicPinchDetectionStrategyConfig) {
     const lensConfig = LensConfig.getInstance()
     const updateDispatcher = lensConfig.updateDispatcher
-    updateDispatcher
-      .createUpdateEvent("HeuristicPinchDetectionStrategyUpdate")
-      .bind(() => {
-        this.update()
-      })
+    updateDispatcher.createUpdateEvent("HeuristicPinchDetectionStrategyUpdate").bind(() => {
+      this.update()
+    })
   }
 
   /** @inheritdoc */
@@ -70,12 +66,10 @@ export default class HeuristicPinchDetectionStrategy
   private update() {
     const adjustedThumbPosition = this.adjustThumbDepthToPointer(
       this.config.thumbTip.position,
-      this.config.indexTip.position,
+      this.config.indexTip.position
     )
 
-    const pinchDistance = adjustedThumbPosition.sub(
-      this.config.indexTip.position,
-    ).lengthSquared
+    const pinchDistance = adjustedThumbPosition.sub(this.config.indexTip.position).lengthSquared
     const thresholdResult = this.pinchEnterThreshold.update(pinchDistance)
 
     // thresholdResult will be null if the bistable threshold was not just crossed, false if just crossed to "deactivate" side, and true if just crossed to "activate" side
@@ -89,9 +83,7 @@ export default class HeuristicPinchDetectionStrategy
   }
 
   private updatePinchProximity(): void {
-    const distance = this.config.thumbTip.position.distance(
-      this.config.indexTip.position,
-    )
+    const distance = this.config.thumbTip.position.distance(this.config.indexTip.position)
     if (distance === null || distance > MAX_PINCH_DISTANCE) {
       this.currentPinchProximity = 0
     }
@@ -101,7 +93,7 @@ export default class HeuristicPinchDetectionStrategy
       MAX_PINCH_DISTANCE,
       MIN_PINCH_DISTANCE,
       1,
-      0,
+      0
     )
 
     this.currentPinchProximity = 1 - mappedDistance

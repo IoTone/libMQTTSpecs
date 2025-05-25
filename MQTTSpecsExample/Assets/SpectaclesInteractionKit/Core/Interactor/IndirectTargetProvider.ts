@@ -1,6 +1,4 @@
-import TargetProvider, {
-  InteractableHitInfo,
-} from "../../Providers/TargetProvider/TargetProvider"
+import TargetProvider, {InteractableHitInfo} from "../../Providers/TargetProvider/TargetProvider"
 import {RaycastInfo, RayProvider} from "./RayProvider"
 
 import BaseInteractor from "./BaseInteractor"
@@ -23,28 +21,23 @@ export default class IndirectTargetProvider extends TargetProvider {
 
   private probe = Physics.createGlobalProbe()
   private currentRay: RaycastInfo | null = null
-  private targetingVolumeMultiplier: number =
-    this.config.targetingVolumeMultiplier ?? 1
+  private targetingVolumeMultiplier: number = this.config.targetingVolumeMultiplier ?? 1
 
   private spherecastRadii: number[] = this.config.spherecastRadii
-  private spherecastDistanceThresholds: number[] =
-    this.config.spherecastDistanceThresholds
+  private spherecastDistanceThresholds: number[] = this.config.spherecastDistanceThresholds
 
   private _drawDebug = this.interactor.drawDebug
 
   constructor(
     private interactor: BaseInteractor,
-    private config: IndirectTargetProviderConfig,
+    private config: IndirectTargetProviderConfig
   ) {
     super()
     this._drawDebug = this.interactor.drawDebug
     this.probe.debugDrawEnabled = this.interactor.drawDebug
-    if (
-      this.config.spherecastRadii.length !==
-      this.config.spherecastDistanceThresholds.length
-    ) {
+    if (this.config.spherecastRadii.length !== this.config.spherecastDistanceThresholds.length) {
       throw new Error(
-        "An Interactor's Spherecast Radii and Spherecast Distance Thresholds input arrays are not the same length!",
+        "An Interactor's Spherecast Radii and Spherecast Distance Thresholds input arrays are not the same length!"
       )
     }
   }
@@ -54,9 +47,7 @@ export default class IndirectTargetProvider extends TargetProvider {
   }
 
   get endPoint(): vec3 {
-    return this.startPoint.add(
-      this.direction.uniformScale(this.config.maxRayDistance),
-    )
+    return this.startPoint.add(this.direction.uniformScale(this.config.maxRayDistance))
   }
 
   get direction(): vec3 {
@@ -108,6 +99,8 @@ export default class IndirectTargetProvider extends TargetProvider {
       this.endPoint,
       // RaycastHits are automatically sorted from nearest to farthest
       (hits: RayCastHit[]) => {
+        this.updateCurrentInteractableSet(hits)
+
         const hitInfo = this.getInteractableHitFromRayCast(hits)
 
         if (hitInfo) {
@@ -124,7 +117,7 @@ export default class IndirectTargetProvider extends TargetProvider {
         } else {
           this.updateTargetedItem(null)
         }
-      },
+      }
     )
   }
 
@@ -140,9 +133,7 @@ export default class IndirectTargetProvider extends TargetProvider {
     }
     const offset = this.spherecastDistanceThresholds[index]
     const castOrigin = ray.locus.add(ray.direction.uniformScale(offset))
-    const castEnd = castOrigin.add(
-      ray.direction.uniformScale(this.config.maxRayDistance - offset),
-    )
+    const castEnd = castOrigin.add(ray.direction.uniformScale(this.config.maxRayDistance - offset))
 
     this.probe.sphereCastAll(
       this.spherecastRadii[index] * this.targetingVolumeMultiplier,
@@ -156,7 +147,7 @@ export default class IndirectTargetProvider extends TargetProvider {
         }
 
         this.indirectSphereCast(ray, index + 1)
-      },
+      }
     )
   }
 

@@ -3,10 +3,7 @@ export interface IUpdateDispatcher {
 
   createLateUpdateEvent(name: string): DispatchedUpdateEvent
 
-  setUpdateEventPriority(
-    updateEvent: DispatchedUpdateEvent,
-    priority: number,
-  ): void
+  setUpdateEventPriority(updateEvent: DispatchedUpdateEvent, priority: number): void
 
   removeUpdateEvent(event: DispatchedUpdateEvent): void
 
@@ -86,20 +83,15 @@ export class UpdateDispatcher implements IUpdateDispatcher {
   }
 
   private onLateUpdate() {
-    this.dispatchUpdateEvents(
-      this.lateUpdateEvents,
-      this.timesLateUpdate,
-      "LateUpdate",
-    )
+    this.dispatchUpdateEvents(this.lateUpdateEvents, this.timesLateUpdate, "LateUpdate")
   }
 
   protected timesUpdate: {[name: string]: {updCnt: number; time: number}} = {}
-  protected timesLateUpdate: {[name: string]: {updCnt: number; time: number}} =
-    {}
+  protected timesLateUpdate: {[name: string]: {updCnt: number; time: number}} = {}
   protected dispatchUpdateEvents: (
     pool: DispatchedUpdateEvent[],
     times: {[name: string]: {updCnt: number; time: number}},
-    eventName: string,
+    eventName: string
   ) => void
   protected dispatchedEvents = 0
 
@@ -111,10 +103,7 @@ export class UpdateDispatcher implements IUpdateDispatcher {
     }
   }
 
-  private removeEventFromPool(
-    event: BaseDispatchedEvent,
-    pool: BaseDispatchedEvent[],
-  ) {
+  private removeEventFromPool(event: BaseDispatchedEvent, pool: BaseDispatchedEvent[]) {
     let n = pool.length
     for (let i = 0; i < n; i++) {
       if (event.id === pool[i].id) {
@@ -128,10 +117,7 @@ export class UpdateDispatcher implements IUpdateDispatcher {
   private dispatchDelayedEvents() {
     const curTime = getTime()
     for (let i = 0; i < this.delayedEvents.length; i++) {
-      if (
-        this.delayedEvents[i].enabled &&
-        !this.delayedEvents[i].getWasCalled()
-      ) {
+      if (this.delayedEvents[i].enabled && !this.delayedEvents[i].getWasCalled()) {
         if (this.delayedEvents[i].callAfter < curTime) {
           this.delayedEvents[i].eventHappened()
         }

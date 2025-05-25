@@ -1,20 +1,5 @@
 //Line vertices have 11 coords - 3 position, 3 previous, 3 tangent, and 2 uv
-export type lineVertex = [
-  number,
-  number,
-  number,
-
-  number,
-  number,
-  number,
-
-  number,
-  number,
-  number,
-
-  number,
-  number,
-]
+export type lineVertex = [number, number, number, number, number, number, number, number, number, number, number]
 
 /**
  * Shifts vertices so that we can join corners of line segments w/ miter
@@ -23,11 +8,7 @@ export type lineVertex = [
  * @param widthOffset offset of the width
  * @returns miterOffset - add or subtract this from a vertex to get offset needed
  */
-export function getMiterOffset(
-  prevSegment: vec3,
-  nextSegment: vec3,
-  widthOffset: number,
-): vec3 {
+export function getMiterOffset(prevSegment: vec3, nextSegment: vec3, widthOffset: number): vec3 {
   let tangent = prevSegment.add(nextSegment).normalize()
   let miter = new vec3(-tangent.y, tangent.x, 0)
   let normalA = new vec3(-prevSegment.y, prevSegment.x, 0)
@@ -56,12 +37,7 @@ export function getEndWidth(current: vec3, next: vec3, widthAtVertex: number) {
  * @param uv_v desired v coordinate for the vertex's uv map
  * vertices are shifted for thickness in the shader
  */
-export function buildSegment(
-  point: vec3,
-  prevSegment: vec3,
-  tangent: vec3,
-  uv_v: number,
-): number[] {
+export function buildSegment(point: vec3, prevSegment: vec3, tangent: vec3, uv_v: number): number[] {
   return [
     //left vertices and tangent
     point.x,
@@ -89,18 +65,12 @@ export function buildSegment(
     tangent.z,
     //right uv
     1,
-    uv_v,
+    uv_v
   ]
 }
 
 // Sets up data for a single line vertex, for use in setVertexInterleaved
-export function buildVertex(
-  position: vec3,
-  prevSegment: vec3,
-  tangent: vec3,
-  uv_u: number,
-  uv_v: number,
-): lineVertex {
+export function buildVertex(position: vec3, prevSegment: vec3, tangent: vec3, uv_u: number, uv_v: number): lineVertex {
   return [
     position.x,
     position.y,
@@ -112,6 +82,6 @@ export function buildVertex(
     tangent.y,
     tangent.z,
     uv_u,
-    uv_v,
+    uv_v
   ]
 }

@@ -154,13 +154,9 @@ export const easingFunctions = {
     }
     t *= 2
     if (t < 1) {
-      return (
-        -0.5 * Math.pow(2, 10 * (t - 1)) * Math.sin((t - 1.1) * 5 * Math.PI)
-      )
+      return -0.5 * Math.pow(2, 10 * (t - 1)) * Math.sin((t - 1.1) * 5 * Math.PI)
     }
-    return (
-      0.5 * Math.pow(2, -10 * (t - 1)) * Math.sin((t - 1.1) * 5 * Math.PI) + 1
-    )
+    return 0.5 * Math.pow(2, -10 * (t - 1)) * Math.sin((t - 1.1) * 5 * Math.PI) + 1
   },
   "ease-in-bounce": (t: number) => {
     return 1 - easingFunctions["ease-out-bounce"](1 - t)
@@ -183,12 +179,7 @@ export const easingFunctions = {
   },
   "ease-out-back-cubic": createCubicBezierEasingFunction(0.34, 1.25, 0.64, 1),
   "ease-in-back-cubic": createCubicBezierEasingFunction(0.36, 0, 0.64, -0.25),
-  "ease-in-out-back-cubic": createCubicBezierEasingFunction(
-    0.3,
-    -0.25,
-    0.6,
-    1.42,
-  ),
+  "ease-in-out-back-cubic": createCubicBezierEasingFunction(0.3, -0.25, 0.6, 1.42)
 } as const
 
 // A simple animation function. It's probably better to use the other animation
@@ -225,9 +216,7 @@ export default function animate(config: AnimateConfig): CancelFunction {
        * This code simply skips all updates in the animate function when deltaTime is 0, ensuring
        * that the animation does not progress incorrectly when in capture mode.
        */
-      AnimationManager.getInstance().requestAnimationFrame(() =>
-        frame(delayFrames),
-      )
+      AnimationManager.getInstance().requestAnimationFrame(() => frame(delayFrames))
 
       return
     }
@@ -259,9 +248,7 @@ export default function animate(config: AnimateConfig): CancelFunction {
     }
 
     // continue the animation
-    AnimationManager.getInstance().requestAnimationFrame(() =>
-      frame(delayFrames === 0 ? 0 : delayFrames - 1),
-    )
+    AnimationManager.getInstance().requestAnimationFrame(() => frame(delayFrames === 0 ? 0 : delayFrames - 1))
   }
 
   // Create a Cancelation function to stop this animation at any time
@@ -327,18 +314,9 @@ export function mix(a: any, b: any, t: number) {
   } else if (a instanceof vec2) {
     return new vec2(mixNumbers(a.x, b.x, t), mixNumbers(a.y, b.y, t))
   } else if (a instanceof vec3) {
-    return new vec3(
-      mixNumbers(a.x, b.x, t),
-      mixNumbers(a.y, b.y, t),
-      mixNumbers(a.z, b.z, t),
-    )
+    return new vec3(mixNumbers(a.x, b.x, t), mixNumbers(a.y, b.y, t), mixNumbers(a.z, b.z, t))
   } else if (b instanceof vec4) {
-    return new vec4(
-      mixNumbers(a.x, b.x, t),
-      mixNumbers(a.y, b.y, t),
-      mixNumbers(a.z, b.z, t),
-      mixNumbers(a.w, b.w, t),
-    )
+    return new vec4(mixNumbers(a.x, b.x, t), mixNumbers(a.y, b.y, t), mixNumbers(a.z, b.z, t), mixNumbers(a.w, b.w, t))
   } else if (b instanceof quat) {
     return quat.slerp(a, b, t)
   }
@@ -358,12 +336,7 @@ function mixNumbers(a: number, b: number, t: number): number {
  * @param y2 the y coordinate of the second point in the bezier curve
  * @returns interpolated number
  */
-function createCubicBezierEasingFunction(
-  x1: number,
-  y1: number,
-  x2: number,
-  y2: number,
-): (t: number) => number {
+function createCubicBezierEasingFunction(x1: number, y1: number, x2: number, y2: number): (t: number) => number {
   const p0 = new vec2(0, 0)
   const p1 = new vec2(x1, y1)
   const p2 = new vec2(x2, y2)

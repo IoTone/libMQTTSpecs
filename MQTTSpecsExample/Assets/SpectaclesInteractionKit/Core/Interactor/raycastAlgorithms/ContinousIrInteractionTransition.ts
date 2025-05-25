@@ -39,24 +39,16 @@ const ContinousIrInteractionTransitionConfigDefault = {
   maxNeckHandDifference: 45,
   enableGazeControl: false,
   minGazePitchDegrees: 25,
-  maxGazePitchDegrees: 40,
+  maxGazePitchDegrees: 40
 }
 
 /**
  * Class to implement Directly controlled continuous IR Transition Strategy
  */
-export default class ContinuousIrInteractionTransition
-  implements IrInteractionTransition
-{
+export default class ContinuousIrInteractionTransition implements IrInteractionTransition {
   /** @inheritdoc */
-  computeXRotationInDegrees(
-    gazePitchInDegrees: number,
-    toWorldFromSituationSpace: mat4,
-    handPoint: vec3,
-  ): number {
-    const transformedHandPoint = toWorldFromSituationSpace
-      .inverse()
-      .multiplyPoint(handPoint)
+  computeXRotationInDegrees(gazePitchInDegrees: number, toWorldFromSituationSpace: mat4, handPoint: vec3): number {
+    const transformedHandPoint = toWorldFromSituationSpace.inverse().multiplyPoint(handPoint)
 
     const rotationInDegrees =
       this.computeMultiplier(transformedHandPoint, gazePitchInDegrees) *
@@ -65,18 +57,10 @@ export default class ContinuousIrInteractionTransition
   }
 
   /** @inheritdoc */
-  computeXRotationInRadians(
-    gazePitchInRadians: number,
-    toWorldFromSituationSpace: mat4,
-    handPoint: vec3,
-  ): number {
+  computeXRotationInRadians(gazePitchInRadians: number, toWorldFromSituationSpace: mat4, handPoint: vec3): number {
     return (
       MathUtils.DegToRad *
-      this.computeXRotationInDegrees(
-        MathUtils.RadToDeg * gazePitchInRadians,
-        toWorldFromSituationSpace,
-        handPoint,
-      )
+      this.computeXRotationInDegrees(MathUtils.RadToDeg * gazePitchInRadians, toWorldFromSituationSpace, handPoint)
     )
   }
 
@@ -86,32 +70,28 @@ export default class ContinuousIrInteractionTransition
    * @param gazePitchInDegrees - gaze pitch given in degrees
    * @returns multiplier for the Ir interaction interaction rotation
    */
-  private computeMultiplier(
-    handPoint: vec3,
-    gazePitchInDegrees: number,
-  ): number {
+  private computeMultiplier(handPoint: vec3, gazePitchInDegrees: number): number {
     const effect = MathUtils.clamp(
       inverseLerp(
         -ContinousIrInteractionTransitionConfigDefault.minNeckHandDifference,
         -ContinousIrInteractionTransitionConfigDefault.maxNeckHandDifference,
-        handPoint.y,
+        handPoint.y
       ),
       0,
-      1,
+      1
     )
 
-    const counterEffect =
-      ContinousIrInteractionTransitionConfigDefault.enableGazeControl
-        ? MathUtils.clamp(
-            inverseLerp(
-              -ContinousIrInteractionTransitionConfigDefault.minGazePitchDegrees,
-              -ContinousIrInteractionTransitionConfigDefault.maxGazePitchDegrees,
-              gazePitchInDegrees,
-            ),
-            0,
-            1,
-          )
-        : 0
+    const counterEffect = ContinousIrInteractionTransitionConfigDefault.enableGazeControl
+      ? MathUtils.clamp(
+          inverseLerp(
+            -ContinousIrInteractionTransitionConfigDefault.minGazePitchDegrees,
+            -ContinousIrInteractionTransitionConfigDefault.maxGazePitchDegrees,
+            gazePitchInDegrees
+          ),
+          0,
+          1
+        )
+      : 0
     return MathUtils.clamp(effect - counterEffect, 0, 1)
   }
 }

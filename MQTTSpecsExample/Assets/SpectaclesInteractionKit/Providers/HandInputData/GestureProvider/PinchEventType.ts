@@ -11,5 +11,5 @@ export type PinchEvent = {
 export enum PinchEventType {
   Down = "Down",
   Up = "Up",
-  Cancel = "Cancel",
+  Cancel = "Cancel"
 }

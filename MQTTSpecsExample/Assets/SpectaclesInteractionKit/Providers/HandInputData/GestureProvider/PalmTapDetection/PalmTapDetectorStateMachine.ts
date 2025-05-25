@@ -8,7 +8,7 @@ const TAG = "PalmTapDetectorStateMachine"
 
 export enum PalmTapDetectorState {
   Idle = "Idle",
-  Tap = "Tap",
+  Tap = "Tap"
 }
 
 /**
@@ -57,9 +57,9 @@ export default class PalmTapDetectorStateMachine {
           nextStateName: PalmTapDetectorState.Tap,
           checkOnSignal: (signal: string) => {
             return signal === PalmTapEventType.Down
-          },
-        },
-      ],
+          }
+        }
+      ]
     })
 
     this.stateMachine.addState({
@@ -77,9 +77,9 @@ export default class PalmTapDetectorStateMachine {
           nextStateName: PalmTapDetectorState.Idle,
           checkOnSignal: (signal: string) => {
             return signal === PalmTapEventType.Up
-          },
-        },
-      ],
+          }
+        }
+      ]
     })
     this.stateMachine.enterState(PalmTapDetectorState.Idle)
   }

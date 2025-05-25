@@ -1,4 +1,4 @@
-- !<AssetImportMetadata/14a0e732-86b0-427f-b1fe-3699a5bc0b6b>
+- !<AssetImportMetadata/6235f498-6e4d-caac-64e7-13fd077e0350>
   ImporterSettings: !<AssetImporterSettings>
     {}
   ImportedAssetIds:
@@ -36,23 +36,26 @@
   ScriptTypesHidden:
     {}
   DefaultScriptInputs:
-    - enableHorizontalScroll: false
+    - _debugDrawEnabled: false
+      enableHorizontalScroll: false
       enableVerticalScroll: true
-      enableScrollLimit: true
-      _debugDrawEnabled: false
       _enableScrollInertia: true
+      enableScrollLimit: true
       _scrollLimit: 0.300000
       scrollAreaBounds: !<Vec2> {x: 1.000000, y: 1.000000}
   ScriptTypes:
     -
       {}
   InputLines:
-    - // @input bool _debugDrawEnabled
-    - // @input bool enableHorizontalScroll
-    - // @input bool enableVerticalScroll = true
-    - // @input bool _enableScrollInertia = true
-    - // @input bool enableScrollLimit = true
-    - '// @input float _scrollLimit = 0.3 {"widget":"slider", "min":0, "max":1, "step":0.01}'
-    - '// @input vec2 scrollAreaBounds = "{1, 1}"'
+    - '// @input bool _debugDrawEnabled {"hint":"Shows visual debugging elements for scroll area bounds and content."}'
+    - '// @input bool enableHorizontalScroll {"hint":"Allows content to be scrolled horizontally."}'
+    - '// @input bool enableVerticalScroll = true {"hint":"Allows content to be scrolled vertically."}'
+    - '// @input bool _enableScrollInertia = true {"hint":"Enables physics-based scrolling where content continues moving after release with gradual deceleration and elastic bounce-back at boundaries."}'
+    - '// @input bool enableScrollLimit = true {"hint":"When enabled, prevents content from scrolling beyond designated boundaries defined by the Scroll Limit."}'
+    - "// @input float _scrollLimit = 0.3 {\"hint\":\"Controls how much content must remain visible.\\n- 0: Content can scroll completely out of view.\\n- 0.5: At least 50% of the content will remain in the visible area.\\n- 1: Content can't scroll out of view at all.\", \"widget\":\"slider\", \"min\":0, \"max\":1, \"step\":0.01, \"showIf\":\"enableScrollLimit\"}"
+    - '// @input vec2 scrollAreaBounds = "{1, 1}" {"hint":"Defines the size of the interactive area in normalized local coordinates, where (1,1) uses the full component size."}'
   SvgIcon: ""
   DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  SetupScript:
+    code: ""
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000

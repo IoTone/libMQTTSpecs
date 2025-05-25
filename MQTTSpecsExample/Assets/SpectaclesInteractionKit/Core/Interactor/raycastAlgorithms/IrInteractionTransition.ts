@@ -11,11 +11,7 @@ export interface IrInteractionTransition {
    * @param handPoint - hand point used for height estimation
    * @returns the rotation in degrees to be applied on targeting direction around X axis
    */
-  computeXRotationInDegrees(
-    gazePitchInDegrees: number,
-    toWorldFromSituationSpace: mat4,
-    handPoint: vec3,
-  ): number
+  computeXRotationInDegrees(gazePitchInDegrees: number, toWorldFromSituationSpace: mat4, handPoint: vec3): number
 
   /**
    * Computes an extra rotation around the X axis of Situation space
@@ -25,9 +21,5 @@ export interface IrInteractionTransition {
    * @param handPoint - hand point used for height estimation
    * @returns the rotation in radians to be applied on targeting direction around X axis
    */
-  computeXRotationInRadians(
-    gazePitchInRadians: number,
-    toWorldFromSituationSpace: mat4,
-    handPoint: vec3,
-  ): number
+  computeXRotationInRadians(gazePitchInRadians: number, toWorldFromSituationSpace: mat4, handPoint: vec3): number
 }

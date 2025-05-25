@@ -34,9 +34,7 @@ export class ScreenTransformAdapter extends BaseScriptComponent {
 
       const size = canvas.getSize()
       canvas.destroy()
-      const screenTransform = sceneObject.createComponent(
-        "Component.ScreenTransform",
-      )
+      const screenTransform = sceneObject.createComponent("Component.ScreenTransform")
       screenTransform.anchors = Rect.create(0, 0, 0, 0)
       screenTransform.offsets.setSize(size)
 

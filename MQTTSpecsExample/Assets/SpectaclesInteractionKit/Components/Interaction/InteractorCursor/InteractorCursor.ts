@@ -1,22 +1,7 @@
-import {
-  Interactor,
-  InteractorInputType,
-} from "../../../Core/Interactor/Interactor"
-import LineRenderer, {
-  LineViewConfig,
-} from "../../../Utils/views/LineRenderer/LineRenderer"
-import {
-  CircleVisual,
-  CircleVisualConfig,
-  CircleVisualMaterialParameters,
-} from "./CircleVisual"
-import {
-  CursorData,
-  CursorState,
-  CursorViewModel,
-  CursorViewState,
-  ManipulateLineData,
-} from "./CursorViewModel"
+import {Interactor, InteractorInputType} from "../../../Core/Interactor/Interactor"
+import LineRenderer, {LineViewConfig} from "../../../Utils/views/LineRenderer/LineRenderer"
+import {CircleVisual, CircleVisualConfig, CircleVisualMaterialParameters} from "./CircleVisual"
+import {CursorData, CursorState, CursorViewModel, CursorViewState, ManipulateLineData} from "./CursorViewModel"
 
 import {InteractionManager} from "../../../Core/InteractionManager/InteractionManager"
 import BaseInteractor from "../../../Core/Interactor/BaseInteractor"
@@ -31,7 +16,7 @@ export enum CursorMode {
   ScaleTopLeft = "ScaleTopLeft",
   ScaleTopRight = "ScaleTopRight",
   Disabled = "Disabled",
-  Custom = "Custom",
+  Custom = "Custom"
 }
 
 export type CursorParameters = {
@@ -113,8 +98,7 @@ export class InteractorCursor extends BaseScriptComponent {
     }
 
     this.circleVisual.isShown = shouldShow
-    this.circleVisual.multipleInteractorsActive =
-      this.checkMultipleInteractorsActive()
+    this.circleVisual.multipleInteractorsActive = this.checkMultipleInteractorsActive()
 
     this.manipulateLine.setEnabled(viewState.lineEnabled)
     if (viewState.cursorEnabled) {
@@ -125,13 +109,43 @@ export class InteractorCursor extends BaseScriptComponent {
     }
   }
 
+  /**
+   * Controls the "stickiness" of the cursor when hovering over interactable objects. When enabled, the cursor
+   * maintains its position on the target object, even when the hand moves slightly, making interaction with small
+   * targets easier. Only applies to hand-based interactions, not other input types like mouse. Disable for immediate
+   * 1:1 cursor movement that follows the hand position exactly.
+   */
   @input
+  @hint(
+    'Controls the "stickiness" of the cursor when hovering over interactable objects. When enabled, the cursor \
+maintains its position on the target object, even when the hand moves slightly, making interaction with small \
+targets easier. Only applies to hand-based interactions, not other input types like mouse. Disable for immediate \
+1:1 cursor movement that follows the hand position exactly.'
+  )
   enableCursorHolding: boolean = true
+  /**
+   * Applies smoothing to cursor movement for hand-based interactions. When enabled, reduces jitter and makes cursor
+   * motion appear more stable, improving precision when interacting with small targets. Only applies to hand-based
+   * interactions.
+   */
   @input
+  @hint(
+    "Applies smoothing to cursor movement for hand-based interactions. When enabled, reduces jitter and makes cursor \
+motion appear more stable, improving precision when interacting with small targets. Only applies to hand-based \
+interactions."
+  )
   enableFilter: boolean = false
 
+  /**
+   * Reference to the component that this cursor will visualize. The cursor will update its position and appearance
+   * based on the interactor's state.
+   */
   @input("Component.ScriptComponent")
   @allowUndefined
+  @hint(
+    "Reference to the component that this cursor will visualize. The cursor will update its position and appearance \
+based on the interactor's state."
+  )
   _interactor?: BaseInteractor
 
   visual!: SceneObject
@@ -147,8 +161,8 @@ export class InteractorCursor extends BaseScriptComponent {
         translate: requireAsset("./translate.png") as Texture,
         scaleTL: requireAsset("./scale-tl.png") as Texture,
         scaleTR: requireAsset("./scale-tr.png") as Texture,
-        disabled: requireAsset("./disabled.png") as Texture,
-      },
+        disabled: requireAsset("./disabled.png") as Texture
+      }
     }
     this.manipulateLineConfig = {
       points: [new vec3(0, 0, 0), new vec3(0, 100, 0)],
@@ -157,7 +171,7 @@ export class InteractorCursor extends BaseScriptComponent {
       endWidth: 0.1,
       startColor: new vec4(1, 1, 1, 1),
       endColor: new vec4(1, 1, 1, 1),
-      enabled: false,
+      enabled: false
     }
 
     this.circleVisual = new CircleVisual(this.circleVisualConfig)
@@ -165,11 +179,7 @@ export class InteractorCursor extends BaseScriptComponent {
     this.manipulateLine = new LineRenderer(this.manipulateLineConfig)
     this.manipulateLine.getSceneObject().setParent(this.getSceneObject())
 
-    this.viewModel = new CursorViewModel(
-      this.enableCursorHolding,
-      this.enableFilter,
-      this.interactor as Interactor,
-    )
+    this.viewModel = new CursorViewModel(this.enableCursorHolding, this.enableFilter, this.interactor as Interactor)
     this.viewModel.onStateChange.add(this.onStateChange)
     this.viewModel.onCursorUpdate.add(this.onCursorUpdate)
 
@@ -179,10 +189,7 @@ export class InteractorCursor extends BaseScriptComponent {
   }
 
   set interactor(interactor: BaseInteractor) {
-    validate(
-      interactor,
-      "InteractorCursor cannot have an undefined Interactor reference.",
-    )
+    validate(interactor, "InteractorCursor cannot have an undefined Interactor reference.")
 
     this._interactor = interactor as BaseInteractor
     this.viewModel.setInteractor(interactor)
@@ -232,7 +239,7 @@ export class InteractorCursor extends BaseScriptComponent {
       this.circleVisual.circleSquishScale = MathUtils.lerp(
         DEFAULT_IDLE_SCALE,
         DEFAULT_SQUISH_SCALE,
-        data.interactionStrength,
+        data.interactionStrength
       )
     } else {
       this.circleVisual.circleSquishScale = DEFAULT_IDLE_SCALE
@@ -303,16 +310,12 @@ export class InteractorCursor extends BaseScriptComponent {
       useTexture: materialParameters.useTexture,
       cursorTexture: materialParameters.cursorTexture,
       handType: materialParameters.handType,
-      multipleInteractorsActive: materialParameters.multipleInteractorsActive,
+      multipleInteractorsActive: materialParameters.multipleInteractorsActive
     }
   }
 
   private updateManipulateLine(data: ManipulateLineData) {
-    this.manipulateLine.points = this.getCurvedLinePoints(
-      data.origin,
-      data.endPoint,
-      data.delta,
-    )
+    this.manipulateLine.points = this.getCurvedLinePoints(data.origin, data.endPoint, data.delta)
   }
 
   private defineScriptEvents() {
@@ -354,11 +357,7 @@ export class InteractorCursor extends BaseScriptComponent {
    * @param curveOffset - the vector that the line's midpoint will be offset by to create the curve
    * @returns an array of points along the curved line created from start to end.
    */
-  private getCurvedLinePoints(
-    start: vec3,
-    end: vec3,
-    curveOffset: vec3 | null,
-  ): vec3[] {
+  private getCurvedLinePoints(start: vec3, end: vec3, curveOffset: vec3 | null): vec3[] {
     let midPoint = vec3.lerp(start, end, LINE_MIDPOINT)
     if (curveOffset !== null) {
       midPoint = midPoint.add(curveOffset)
@@ -374,9 +373,7 @@ export class InteractorCursor extends BaseScriptComponent {
   }
 
   private checkMultipleInteractorsActive(): boolean {
-    const interactors = this.interactionManager.getInteractorsByType(
-      InteractorInputType.All,
-    )
+    const interactors = this.interactionManager.getInteractorsByType(InteractorInputType.All)
 
     const activeInteractors = interactors.filter((interactor) => {
       return interactor.isActive() && interactor.isTargeting()

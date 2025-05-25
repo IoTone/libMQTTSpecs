@@ -9,8 +9,7 @@ const TAG = "PalmTapDetector"
  */
 export default class PalmTapDetector {
   private gestureModule: GestureModule = (() => {
-    const gestureModuleProvider: GestureModuleProvider =
-      GestureModuleProvider.getInstance()
+    const gestureModuleProvider: GestureModuleProvider = GestureModuleProvider.getInstance()
     const gestureModule = gestureModuleProvider.getModule()
     if (gestureModule === undefined) {
       throw new Error("GestureModule is undefined in PalmTapDetector")
@@ -18,8 +17,7 @@ export default class PalmTapDetector {
     return gestureModule
   })()
 
-  private palmTapDetectorStateMachine: PalmTapDetectorStateMachine =
-    new PalmTapDetectorStateMachine()
+  private palmTapDetectorStateMachine: PalmTapDetectorStateMachine = new PalmTapDetectorStateMachine()
 
   private log = new NativeLogger(TAG)
 
@@ -39,17 +37,11 @@ export default class PalmTapDetector {
 
     try {
       this.gestureModule.getPalmTapDownEvent(gestureHandType).add(() => {
-        this.log.i(
-          `GestureModule PalmTapDownEvent: { hand type: ${gestureHandType === 0 ? "Left" : "Right"} }`,
-        )
-        this.palmTapDetectorStateMachine.notifyPalmTapEvent(
-          PalmTapEventType.Down,
-        )
+        this.log.i(`GestureModule PalmTapDownEvent: { hand type: ${gestureHandType === 0 ? "Left" : "Right"} }`)
+        this.palmTapDetectorStateMachine.notifyPalmTapEvent(PalmTapEventType.Down)
       })
       this.gestureModule.getPalmTapUpEvent(gestureHandType).add(() => {
-        this.log.i(
-          `GestureModule PalmTapUpEvent: { hand type: ${gestureHandType === 0 ? "Left" : "Right"} }`,
-        )
+        this.log.i(`GestureModule PalmTapUpEvent: { hand type: ${gestureHandType === 0 ? "Left" : "Right"} }`)
         this.palmTapDetectorStateMachine.notifyPalmTapEvent(PalmTapEventType.Up)
       })
     } catch (error) {

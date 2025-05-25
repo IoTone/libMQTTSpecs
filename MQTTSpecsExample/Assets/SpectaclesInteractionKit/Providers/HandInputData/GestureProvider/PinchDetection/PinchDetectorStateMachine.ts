@@ -7,7 +7,7 @@ const TAG = "PinchDetectorStateMachine"
 
 export enum PinchDetectorState {
   Idle = "Idle",
-  Pinching = "Pinching",
+  Pinching = "Pinching"
 }
 
 /**
@@ -64,9 +64,9 @@ export default class PinchDetectorStateMachine {
             }
 
             return false
-          },
-        },
-      ],
+          }
+        }
+      ]
     })
 
     this.stateMachine.addState({
@@ -87,9 +87,9 @@ export default class PinchDetectorStateMachine {
             }
 
             return false
-          },
-        },
-      ],
+          }
+        }
+      ]
     })
   }
 }

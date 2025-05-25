@@ -23,15 +23,15 @@ export const JOINT_HIERARCHY: JointNode = {
                       children: [
                         {
                           name: "thumb-3",
-                          children: [],
-                        },
-                      ],
-                    },
-                  ],
-                },
-              ],
-            },
-          ],
+                          children: []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
         },
         {
           name: "wrist_to_index",
@@ -47,15 +47,15 @@ export const JOINT_HIERARCHY: JointNode = {
                       children: [
                         {
                           name: "index-3",
-                          children: [],
-                        },
-                      ],
-                    },
-                  ],
-                },
-              ],
-            },
-          ],
+                          children: []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
         },
         {
           name: "wrist_to_mid",
@@ -71,15 +71,15 @@ export const JOINT_HIERARCHY: JointNode = {
                       children: [
                         {
                           name: "mid-3",
-                          children: [],
-                        },
-                      ],
-                    },
-                  ],
-                },
-              ],
-            },
-          ],
+                          children: []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
         },
         {
           name: "wrist_to_ring",
@@ -95,15 +95,15 @@ export const JOINT_HIERARCHY: JointNode = {
                       children: [
                         {
                           name: "ring-3",
-                          children: [],
-                        },
-                      ],
-                    },
-                  ],
-                },
-              ],
-            },
-          ],
+                          children: []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
         },
         {
           name: "wrist_to_pinky",
@@ -119,17 +119,17 @@ export const JOINT_HIERARCHY: JointNode = {
                       children: [
                         {
                           name: "pinky-3",
-                          children: [],
-                        },
-                      ],
-                    },
-                  ],
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    },
-  ],
+                          children: []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }

@@ -1,4 +1,4 @@
-- !<AssetImportMetadata/be8f10ea-b630-4ddf-a2bc-49439232d353>
+- !<AssetImportMetadata/a9e216f1-8a55-f1f3-6a94-c45bac002067>
   ImporterSettings: !<AssetImporterSettings>
     {}
   ImportedAssetIds:
@@ -46,11 +46,14 @@
     -
       {}
   InputLines:
-    - // @input Asset.Material toggledOffMaterial
-    - // @input Asset.Material toggledOffSelectMaterial
-    - // @input Asset.Material toggledOnMaterial
-    - // @input Asset.Material toggledOnSelectMaterial
-    - // @input Asset.Material disabledMaterial
-    - "// @input Component.RenderMeshVisual[] meshVisuals = {}"
+    - "// @input Asset.Material toggledOffMaterial {\"hint\":\"The material applied to the toggle button when it's in the \\\"off\\\" state and not being interacted with. This defines the button's default visual appearance when it's unchecked.\"}"
+    - "// @input Asset.Material toggledOffSelectMaterial {\"hint\":\"The material applied to the toggle button when it's in the \\\"off\\\" state and being actively triggered. This provides visual feedback during active interaction with an unchecked button.\"}"
+    - "// @input Asset.Material toggledOnMaterial {\"hint\":\"The material applied to the toggle button when it's in the \\\"on\\\" state and not being interacted with. This defines the button's visual appearance when it's enabled/checked.\"}"
+    - "// @input Asset.Material toggledOnSelectMaterial {\"hint\":\"The material applied to the toggle button when it's in the \\\"on\\\" state and being actively triggered. This provides visual feedback during active interaction with a checked button.\"}"
+    - "// @input Asset.Material disabledMaterial {\"hint\":\"The material applied to the toggle button when it's disabled and cannot be interacted with. This provides visual feedback that the button is currently inactive.\"}"
+    - "// @input Component.RenderMeshVisual[] meshVisuals = {} {\"hint\":\"An array of RenderMeshVisual components whose materials will be updated to reflect the toggle button's current state.\"}"
   SvgIcon: ""
   DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  SetupScript:
+    code: ""
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000

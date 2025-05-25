@@ -29,23 +29,56 @@ const DEFAULT_BEHIND_ZONE_DISTANCE_CM = 15
  */
 @component
 export class InteractionPlane extends BaseScriptComponent {
+  /**
+   * The size of the interaction plane along the local X and Y axes. Defines the rectangular area of the plane where
+   * hand interactions are detected. Larger values create a bigger interactive surface area.
+   */
   @input
+  @hint(
+    "The size of the interaction plane along the local X and Y axes. Defines the rectangular area of the plane where \
+hand interactions are detected. Larger values create a bigger interactive surface area."
+  )
   private _planeSize: vec2 = new vec2(10, 10)
 
+  /**
+   * The depth of the plane's interaction zone along the local Z axis. Defines how far from the plane hand
+   * interactions are detected. Hand interactions beyond this distance will not be detected. Larger values allow
+   * interaction from greater distances.
+   */
   @input
+  @hint(
+    "The depth of the plane's interaction zone along the local Z axis. Defines how far from the plane hand \
+interactions are detected. Hand interactions beyond this distance will not be detected. Larger values allow \
+interaction from greater distances."
+  )
   private _proximityDistance: number = DEFAULT_INTERACTION_ZONE_DISTANCE_CM
 
+  /**
+   * The maximum distance for Direct interaction with the plane.
+   */
   @input
+  @hint("The maximum distance for Direct interaction with the plane.")
   private _directZoneDistance: number = DEFAULT_DIRECT_ZONE_DISTANCE_CM
 
+  /**
+   * Enables visual debugging of the Interaction Plane.
+   */
   @input
+  @hint("Enables visual debugging of the Interaction Plane.")
   private _drawDebug: boolean = false
 
+  /**
+   * The maximum distance for detecting interactions behind the plane. Creates a failsafe/tolerance zone where
+   * interactions can still be detected even if the user's hand accidentally penetrates through the plane.
+   */
   @input
+  @hint(
+    "The maximum distance for detecting interactions behind the plane. Creates a failsafe/tolerance zone where \
+interactions can still be detected even if the user's hand accidentally penetrates through the plane."
+  )
   private _behindDistance: number = DEFAULT_BEHIND_ZONE_DISTANCE_CM
 
-  private _collider: ColliderComponent =
-    this.sceneObject.createComponent("ColliderComponent")
+  private _collider: ColliderComponent
 
   constructor() {
     super()
@@ -58,11 +91,13 @@ export class InteractionPlane extends BaseScriptComponent {
       InteractionManager.getInstance().deregisterInteractionPlane(this)
     })
 
-    InteractionManager.getInstance().registerInteractionPlane(this)
+    this.createEvent("OnStartEvent").bind(() => {
+      this._collider = this.sceneObject.createComponent("ColliderComponent")
+      this.buildMeshShape()
+      this.collider.debugDrawEnabled = this.drawDebug
 
-    this.buildMeshShape()
-
-    this.collider.debugDrawEnabled = this.drawDebug
+      InteractionManager.getInstance().registerInteractionPlane(this)
+    })
   }
 
   release() {
@@ -71,13 +106,13 @@ export class InteractionPlane extends BaseScriptComponent {
 
   // Manually create the mesh shape for the interaction zone to trigger NearField targeting.
   private buildMeshShape() {
+    if (this.collider === undefined) {
+      return
+    }
+
     const slopeOffset = DEFAULT_INTERACTION_ZONE_SLOPE * this.proximityDistance
     const shape = Shape.createBoxShape()
-    shape.size = new vec3(
-      this.planeSize.x + slopeOffset,
-      this.planeSize.y + slopeOffset,
-      this.proximityDistance * 2,
-    )
+    shape.size = new vec3(this.planeSize.x + slopeOffset, this.planeSize.y + slopeOffset, this.proximityDistance * 2)
 
     this.collider.shape = shape
   }
@@ -138,7 +173,7 @@ export class InteractionPlane extends BaseScriptComponent {
   }
 
   /**
-   * Returns the depth (in world units) of the plane's interaction zone along the local Z axis of the SceneObject.
+   * Returns the depth (in world units) of the plane's behind zone along the local Z axis of the SceneObject.
    */
   get behindDistance(): number {
     return this._behindDistance
@@ -215,19 +250,15 @@ export class InteractionPlane extends BaseScriptComponent {
     const isWithinInteractionZone =
       distance >= 0 &&
       distance <= this.proximityDistance &&
-      Math.abs(x) <=
-        this.planeSize.x + distance * DEFAULT_INTERACTION_ZONE_SLOPE &&
-      Math.abs(y) <=
-        this.planeSize.y + distance * DEFAULT_INTERACTION_ZONE_SLOPE
+      Math.abs(x) <= this.planeSize.x + distance * DEFAULT_INTERACTION_ZONE_SLOPE &&
+      Math.abs(y) <= this.planeSize.y + distance * DEFAULT_INTERACTION_ZONE_SLOPE
 
     // Check if the point is within the direct interaction distance threshold.
     const isWithinDirectZone =
       distance >= 0 &&
       distance <= this.directZoneDistance &&
-      Math.abs(x) <=
-        this.planeSize.x + distance * DEFAULT_INTERACTION_ZONE_SLOPE &&
-      Math.abs(y) <=
-        this.planeSize.y + distance * DEFAULT_INTERACTION_ZONE_SLOPE
+      Math.abs(x) <= this.planeSize.x + distance * DEFAULT_INTERACTION_ZONE_SLOPE &&
+      Math.abs(y) <= this.planeSize.y + distance * DEFAULT_INTERACTION_ZONE_SLOPE
 
     // Check if the point is in behind the plane, within the behind zone distance threshold, and within the planeSize boundaries.
     const isWithinBehindZone =
@@ -242,7 +273,7 @@ export class InteractionPlane extends BaseScriptComponent {
       distance: distance,
       isWithinInteractionZone: isWithinInteractionZone,
       isWithinBehindZone: isWithinBehindZone,
-      isWithinDirectZone: isWithinDirectZone,
+      isWithinDirectZone: isWithinDirectZone
     }
     return planeProjection
   }

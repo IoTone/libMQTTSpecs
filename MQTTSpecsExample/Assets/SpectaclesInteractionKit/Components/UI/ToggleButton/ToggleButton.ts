@@ -7,34 +7,46 @@ import {Interactable} from "../../Interaction/Interactable/Interactable"
  */
 @component
 export class ToggleButton extends BaseScriptComponent {
+  /**
+   * The icon to be shown when the button is toggled on.
+   */
   @input("SceneObject")
-  @hint("The icon to be shown when the button is toggled on")
+  @hint("The icon to be shown when the button is toggled on.")
   @allowUndefined
   _onIcon: SceneObject | undefined
+  /**
+   * The icon to be shown when the button is toggled off.
+   */
   @input("SceneObject")
-  @hint("The icon to be shown when the button is toggled off")
+  @hint("The icon to be shown when the button is toggled off.")
   @allowUndefined
   _offIcon: SceneObject | undefined
+  /**
+   * The initial state of the button, set to true if toggled on upon lens launch.
+   */
   @input
-  @hint(
-    "The initial state of the button, set to true if toggled on upon lens launch.",
-  )
+  @hint("The initial state of the button, set to true if toggled on upon lens launch.")
   private _isToggledOn: boolean = false
+  /**
+   * Enable this to add functions from another script to this component's callback events.
+   */
   @input
-  @hint(
-    "Enable this to add functions from another script to this component's callback events",
-  )
+  @hint("Enable this to add functions from another script to this component's callback events.")
   editEventCallbacks: boolean = false
   @ui.group_start("On State Changed Callbacks")
   @showIf("editEventCallbacks")
+  /**
+   * The script containing functions to be called on toggle state change.
+   */
   @input("Component.ScriptComponent")
-  @hint("The script containing functions to be called on toggle state change")
+  @hint("The script containing functions to be called on toggle state change.")
   @allowUndefined
   private customFunctionForOnStateChanged: ScriptComponent | undefined
+  /**
+   * The names for the functions on the provided script, to be called on toggle state change.
+   */
   @input
-  @hint(
-    "The names for the functions on the provided script, to be called on toggle state change",
-  )
+  @hint("The names for the functions on the provided script, to be called on toggle state change.")
   @allowUndefined
   private onStateChangedFunctionNames: string[] = []
   @ui.group_end
@@ -44,14 +56,12 @@ export class ToggleButton extends BaseScriptComponent {
   public readonly onStateChanged = this.onStateChangedEvent.publicApi()
 
   onAwake() {
-    this.interactable = this.getSceneObject().getComponent(
-      Interactable.getTypeName(),
-    )
+    this.interactable = this.getSceneObject().getComponent(Interactable.getTypeName())
 
     this.createEvent("OnStartEvent").bind(() => {
       if (!this.interactable) {
         throw new Error(
-          "Toggle Button requires an Interactable Component on the same Scene object in order to work - please ensure one is added.",
+          "Toggle Button requires an Interactable Component on the same Scene object in order to work - please ensure one is added."
         )
       }
       this.interactable.onTriggerEnd.add(() => {
@@ -65,10 +75,7 @@ export class ToggleButton extends BaseScriptComponent {
 
     if (this.editEventCallbacks && this.customFunctionForOnStateChanged) {
       this.onStateChanged.add(
-        createCallback<boolean>(
-          this.customFunctionForOnStateChanged,
-          this.onStateChangedFunctionNames,
-        ),
+        createCallback<boolean>(this.customFunctionForOnStateChanged, this.onStateChangedFunctionNames)
       )
     }
 

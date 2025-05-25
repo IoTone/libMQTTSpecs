@@ -7,11 +7,7 @@ import {Interactable} from "../../../Components/Interaction/Interactable/Interac
 import {InteractableManipulation} from "../../../Components/Interaction/InteractableManipulation/InteractableManipulation"
 import {InteractionPlane} from "../../../Components/Interaction/InteractionPlane/InteractionPlane"
 import {HandInteractor} from "../../../Core/HandInteractor/HandInteractor"
-import {
-  Interactor,
-  InteractorInputType,
-  TargetingMode,
-} from "../../../Core/Interactor/Interactor"
+import {Interactor, InteractorInputType, TargetingMode} from "../../../Core/Interactor/Interactor"
 import {InteractorEvent} from "../../../Core/Interactor/InteractorEvent"
 import WorldCameraFinderProvider from "../../../Providers/CameraProvider/WorldCameraFinderProvider"
 import {CursorControllerProvider} from "../../../Providers/CursorControllerProvider/CursorControllerProvider"
@@ -83,11 +79,7 @@ const magicScalar = 0.1213592233
 /**
  * the base scale of the frame
  */
-const scaleFactorVector = new vec3(
-  scaleFactor + magicScalar,
-  scaleFactor + magicScalar,
-  scaleZ * zScaleAdjuster,
-)
+const scaleFactorVector = new vec3(scaleFactor + magicScalar, scaleFactor + magicScalar, scaleZ * zScaleAdjuster)
 
 // the current system UI button is not unit sized
 // it's closer to 2.35 in X and Y
@@ -100,104 +92,229 @@ const BUTTON_CORNER_OFFSET = 1 / scaleFactor
 const NEAR_FIELD_INTERACTION_ZONE_DISTANCE_CM = 30
 
 /**
- * This class represents a container frame that can hold and manage UI elements. It provides settings for auto show/hide, inner size, border, constant padding, and scaling. The class uses prefabs for the frame and labeled buttons, and textures for icons.
+ * This class represents a container frame that can hold and manage UI elements. It provides settings for auto
+ * show/hide, inner size, border, constant padding, and scaling. The class uses prefabs for the frame and labeled
+ * buttons, and textures for icons.
  */
 @component
 export class ContainerFrame extends BaseScriptComponent {
-  private framePrefab: ObjectPrefab = requireAsset(
-    "./Prefabs/FramePrefab.prefab",
-  ) as ObjectPrefab
-  private labeledButtonPrefab = requireAsset(
-    "./Prefabs/container-button.prefab",
-  ) as ObjectPrefab
-  private closeIcon: Texture = requireAsset(
-    "./Textures/close-icon-1.png",
-  ) as Texture
-  private followIcon: Texture = requireAsset(
-    "./Textures/follow-white.png",
-  ) as Texture
-  private unfollowIcon: Texture = requireAsset(
-    "./Textures/follow-black.png",
-  ) as Texture
+  private framePrefab: ObjectPrefab = requireAsset("./Prefabs/FramePrefab.prefab") as ObjectPrefab
+  private labeledButtonPrefab = requireAsset("./Prefabs/container-button.prefab") as ObjectPrefab
+  private closeIcon: Texture = requireAsset("./Textures/close-icon-1.png") as Texture
+  private followIcon: Texture = requireAsset("./Textures/follow-white.png") as Texture
+  private unfollowIcon: Texture = requireAsset("./Textures/follow-black.png") as Texture
 
+  /**
+   * When enabled, the frame automatically appears when hovered and hides when
+   * not being interacted with. Disable to manually control frame visibility.
+   */
   @ui.group_start("Frame Settings")
+  @hint("Controls the appearance, size, and interaction behavior of the container frame.")
   @input
+  @hint(
+    "When enabled, the frame automatically appears when hovered and hides when not being interacted with. Disable \
+to manually control frame visibility."
+  )
   autoShowHide: boolean = true
+  /**
+   * Size of the container's inner content area.
+   */
   @input("vec2", "{32,32}")
+  @hint("Size of the container's inner content area.")
   innerSize: vec2 = new vec2(32, 32)
+  /**
+   * Width of the border around the container.
+   */
   @input
+  @hint("Width of the border around the container.")
   border: number = 7
+  /**
+   * Extra padding that maintains a fixed size in centimeters regardless of frame scaling, useful for toolbars and
+   * fixed-size UI elements
+   */
   @input("vec2", "{0,0}")
-  @hint("In world units (cm), stays constant through scaling")
+  @hint(
+    "Extra padding that maintains a fixed size in centimeters regardless of frame scaling, useful for toolbars and \
+fixed-size UI elements."
+  )
   constantPadding: vec2 = new vec2(0, 0)
+  /**
+   * Enables interactive scaling of the container frame via corner handles.
+   */
   @input
+  @hint("Enables interactive scaling of the container frame via corner handles.")
   private allowScaling: boolean = true
+  /**
+   * Automatically scales child content when the frame is resized to maintain proportions.
+   */
   @input
+  @hint("Automatically scales child content when the frame is resized to maintain proportions.")
   autoScaleContent: boolean = true
+  /**
+   * When enabled, Z-axis scaling of content will match X-axis scaling during frame resizing.
+   */
   @input
+  @hint("When enabled, Z-axis scaling of content will match X-axis scaling during frame resizing.")
+  relativeZ: boolean = false
+  /**
+   * When enabled, allows interaction with content inside the container and hides the container's glow for visual
+   * clarity.
+   */
+  @input
+  @hint(
+    "When enabled, allows interaction with content inside the container and hides the container's glow for visual \
+clarity."
+  )
   private isContentInteractable: boolean = false
+  /**
+   * Enables moving the container frame.
+   */
   @input
+  @hint("Enables moving the container frame.")
   allowTranslation: boolean = true
+  /**
+   * When enabled, creates a transparent center in the frame, allowing content behind the container to be visible.
+   */
+  @input
+  @hint("When enabled, creates a transparent center in the frame, allowing content behind the container to be visible.")
+  cutOut: boolean = false
   @ui.group_end
   @ui.label("")
   @ui.group_start("Min/Max Size")
+  @hint("Sets the minimum and maximum dimensions that the container frame can be resized to.")
+  /**
+   * Minimum dimensions in world units (cm) that the container can be resized to.
+   */
   @input("vec2", "{10,10}")
-  @hint("In world units (cm)")
+  @hint("Minimum dimensions in world units (cm) that the container can be resized to.")
   private minimumSize: vec2 = new vec2(10, 10)
+  /**
+   * Maximum dimensions in world units (cm) that the container can be resized to.
+   */
   @input("vec2", "{150,150}")
-  @hint("In world units (cm)")
+  @hint("Maximum dimensions in world units (cm) that the container can be resized to.")
   private maximumSize: vec2 = new vec2(150, 150)
   @ui.group_end
   @ui.label("")
   @ui.group_start("Billboarding")
+  @hint("Controls how the container frame automatically rotates to face the camera/user.")
+  /**
+   * Enables the container to automatically rotate to face the camera/user.
+   */
   @input
+  @hint("Enables the container to automatically rotate to face the camera/user.")
   private useBillboarding: boolean = false
+  /**
+   * When enabled, the container rotates around the X-axis to face the user, but only during movement/translation
+   * unless xAlways is also enabled.
+   */
   @input
   @showIf("useBillboarding")
+  @hint(
+    "When enabled, the container rotates around the X-axis to face the user, but only during movement/translation \
+unless xAlways is also enabled."
+  )
   private xOnTranslate: boolean = false
+  /**
+   * When enabled, the container continuously rotates around the X-axis to face the user, regardless of movement.
+   */
   @input
   @showIf("xOnTranslate")
+  @hint("When enabled, the container continuously rotates around the X-axis to face the user, regardless of movement.")
   private xAlways: boolean = false
+  /**
+   * When enabled, the container rotates around the Y-axis to face the user, but only during movement/translation
+   * unless yAlways is also enabled.
+   */
   @input
   @showIf("useBillboarding")
+  @hint(
+    "When enabled, the container rotates around the Y-axis to face the user, but only during movement/translation \
+unless yAlways is also enabled."
+  )
   private yOnTranslate: boolean = false
+  /**
+   * When enabled, the container continuously rotates around the Y-axis to face the user, regardless of movement.
+   */
   @input
   @showIf("yOnTranslate")
+  @hint("When enabled, the container continuously rotates around the Y-axis to face the user, regardless of movement.")
   private yAlways: boolean = false
   @ui.group_end
   @ui.label("")
   @ui.group_start("Snapping")
+  @hint("Controls how the container snaps to other containers or world features when moved.")
+  /**
+   * Enables container snapping functionality for automatic alignment to other containers or world features when
+   * moved.
+   */
   @input
-  @hint("Use Snapping Behaviors")
+  @hint(
+    "Enables container snapping functionality for automatic alignment to other containers or world features when \
+moved."
+  )
   private useSnapping: boolean = false
+  /**
+   * Enables snapping to other containers when moving.
+   */
   @input
   @showIf("useSnapping")
-  @hint("Container to Container Snapping")
+  @hint("Enables snapping to other containers when moving.")
   private itemSnapping: boolean = false
+  /**
+   * Enables snapping to physical surfaces in the real-world environment when moving.
+   */
   @input
   @showIf("useSnapping")
-  @hint("Container to World Snapping")
+  @hint("Enables snapping to physical surfaces in the real-world environment when moving.")
   private worldSnapping: boolean = false
   @ui.group_end
   @ui.label("")
   @ui.group_start("Follow Behavior")
+  @hint("Controls whether the container automatically follows the user's view when moving around.")
+  /**
+   * Shows a button that allows users to toggle whether the container follows their view as they move.
+   */
   @input
+  @hint("Shows a button that allows users to toggle whether the container follows their view as they move.")
   showFollowButton: boolean = false
+  /**
+   * When enabled, creates a follow behavior that keeps the container in front of the user's view.
+   */
   @input
   @label("Front Follow Behavior")
   @showIf("showFollowButton")
+  @hint("When enabled, creates a follow behavior that keeps the container in front of the user's view.")
   private useFOVFollow: boolean = false
+  /**
+   * Controls whether the container actively follows the user's view. Setting this defines the initial state.
+   */
   @input
   @showIf("useFOVFollow")
+  @hint("Controls whether the container actively follows the user's view. Setting this defines the initial state.")
   isFollowing: boolean = false
   @ui.group_end
   @ui.label("")
   @ui.group_start("Close Button")
+  @hint("Controls whether a close button is displayed in the corner of the container.")
+  /**
+   * Shows a button that allows users to close or dismiss the container.
+   */
   @input
+  @hint("Shows a button that allows users to close or dismiss the container.")
   showCloseButton: boolean = true
   @ui.group_end
   @ui.group_start("Interaction Plane")
+  @hint("Settings for an interaction plane that extends around the container.")
+  /**
+   * Enables an Interaction Plane that creates a near-field targeting zone around the container that improves
+   * precision when interacting with buttons and UI elements using hand tracking.
+   */
   @input
+  @hint(
+    "Enables an Interaction Plane that creates a near-field targeting zone around the container that improves \
+precision when interacting with buttons and UI elements using hand tracking."
+  )
   private _enableInteractionPlane: boolean = false
   @ui.group_end
   @ui.separator
@@ -228,10 +345,7 @@ export class ContainerFrame extends BaseScriptComponent {
 
   private buttonSize: number = defaultButtonSize
 
-  private buttonScaleVector: vec3 = vec3
-    .one()
-    .uniformScale(defaultButtonSize)
-    .div(scaleFactorVector)
+  private buttonScaleVector: vec3 = vec3.one().uniformScale(defaultButtonSize).div(scaleFactorVector)
 
   private cursorHandler!: CursorHandler
 
@@ -275,12 +389,10 @@ export class ContainerFrame extends BaseScriptComponent {
   onTranslationEnd = this.onTranslationEndEvent.publicApi()
 
   private onHoverEnterInnerInteractableEvent = new Event()
-  onHoverEnterInnerInteractable =
-    this.onHoverEnterInnerInteractableEvent.publicApi()
+  onHoverEnterInnerInteractable = this.onHoverEnterInnerInteractableEvent.publicApi()
 
   private onHoverExitInnerInteractableEvent = new Event()
-  onHoverExitInnerInteractable =
-    this.onHoverExitInnerInteractableEvent.publicApi()
+  onHoverExitInnerInteractable = this.onHoverExitInnerInteractableEvent.publicApi()
 
   forceTranslate: boolean = false
 
@@ -290,7 +402,7 @@ export class ContainerFrame extends BaseScriptComponent {
     isPinching: false,
     position: vec3.zero(),
     drag: vec3.zero(),
-    innerInteractableActive: false,
+    innerInteractableActive: false
   }
 
   private _opacity: number = 1
@@ -411,7 +523,7 @@ export class ContainerFrame extends BaseScriptComponent {
     this.closeButton = new LabeledPinchButton({
       prefab: this.labeledButtonPrefab,
       parent: this.frame,
-      labels: [this.closeIcon],
+      labels: [this.closeIcon]
     })
 
     this.closeButton.onTrigger.add(() => {
@@ -423,7 +535,7 @@ export class ContainerFrame extends BaseScriptComponent {
       parent: this.frame,
       labels: [this.followIcon, this.unfollowIcon],
       toggle: true,
-      triggerColor: new vec4(0.8, 0.8, 0.8, 1),
+      triggerColor: new vec4(0.8, 0.8, 0.8, 1)
     })
     this.followButton.setIconScale(new vec2(1.85, 1.85))
 
@@ -436,7 +548,7 @@ export class ContainerFrame extends BaseScriptComponent {
     this.cursorHandler = new CursorHandler({
       target: this.target,
       frame: this,
-      margin: this.border,
+      margin: this.border
     })
 
     // SIK Components
@@ -449,23 +561,17 @@ export class ContainerFrame extends BaseScriptComponent {
     this.interactable.targetingMode = TargetingMode.Indirect
     this.interactable.allowMultipleInteractors = false
 
-    this.manipulate = this.frame.createComponent(
-      InteractableManipulation.getTypeName(),
-    )
+    this.manipulate = this.frame.createComponent(InteractableManipulation.getTypeName())
 
-    this.billboardComponent = this.useBillboarding
-      ? this.parent.createComponent(Billboard.getTypeName())
-      : null
+    this.billboardComponent = this.useBillboarding ? this.parent.createComponent(Billboard.getTypeName()) : null
 
     if (this.billboardComponent !== null) {
-      this.billboardComponent.xAxisEnabled = false || this.xAlways
-      this.billboardComponent.yAxisEnabled = false || this.yAlways
+      this.billboardComponent.xAxisEnabled = this.xAlways
+      this.billboardComponent.yAxisEnabled = this.yAlways
     }
 
     // material
-    this.renderMeshVisual = this.frame.getComponent(
-      "Component.RenderMeshVisual",
-    )
+    this.renderMeshVisual = this.frame.getComponent("Component.RenderMeshVisual")
     this.material = this.renderMeshVisual.mainMaterial.clone()
     this.renderMeshVisual.mainMaterial = this.material
 
@@ -482,7 +588,7 @@ export class ContainerFrame extends BaseScriptComponent {
       scaleSpeed: undefined,
       allowScaling: this.allowScaling,
       minimumSize: this.minimumSize,
-      maximumSize: this.maximumSize,
+      maximumSize: this.maximumSize
     }
 
     this.inputHandler = new FrameInputHandler(this.inputHandlerOptions)
@@ -507,12 +613,8 @@ export class ContainerFrame extends BaseScriptComponent {
     this.manipulate.setManipulateRoot(this.parentTransform)
     this.manipulate.setCanScale(false)
 
-    this.parentTransform.setWorldPosition(
-      this.targetTransform.getWorldPosition(),
-    )
-    this.parentTransform.setWorldRotation(
-      this.targetTransform.getWorldRotation(),
-    )
+    this.parentTransform.setWorldPosition(this.targetTransform.getWorldPosition())
+    this.parentTransform.setWorldRotation(this.targetTransform.getWorldRotation())
     this.frame.setParentPreserveWorldTransform(this.parent)
 
     this.frameTransform.setLocalPosition(vec3.zero())
@@ -526,32 +628,24 @@ export class ContainerFrame extends BaseScriptComponent {
     this.scaleFrame()
 
     // We need a collider or one is created. We don't actually use it for anything
-    this.parentCollider = this.parent.createComponent(
-      "Physics.ColliderComponent",
-    )
+    this.parentCollider = this.parent.createComponent("Physics.ColliderComponent")
     const shape = Shape.createBoxShape()
     shape.size = new vec3(0.01, 0.01, 0.01)
     this.parentCollider.shape = shape
 
-    this.parentInteractable = this.parent.createComponent(
-      Interactable.getTypeName(),
-    )
+    this.parentInteractable = this.parent.createComponent(Interactable.getTypeName())
     this.parentHoverBehavior = new HoverBehavior(this.parentInteractable)
 
     this.unSubscribeList.push(
       this.parentHoverBehavior.onHoverStart.add((e: InteractorEvent) => {
-        this.cursorHandler.setCursor(
-          CursorControllerProvider.getInstance().getCursorByInteractor(
-            e.interactor,
-          ),
-        )
+        this.cursorHandler.setCursor(CursorControllerProvider.getInstance().getCursorByInteractor(e.interactor))
         if (this.autoShowHide) this.showVisual()
         if (this.material.mainPass.isHovered === 0) {
           this.showCursorHighlight()
         }
         this.inputState.isHovered = true
         this.inputState.rawHovered = true
-      }),
+      })
     )
 
     this.unSubscribeList.push(
@@ -563,10 +657,7 @@ export class ContainerFrame extends BaseScriptComponent {
         let targetParent: SceneObject | null = targetObject
         let hoveringInteractable = false
 
-        while (
-          targetParent !== null &&
-          !targetParent.isSame(this.sceneObject)
-        ) {
+        while (targetParent !== null && !targetParent.isSame(this.sceneObject)) {
           if (targetObject === this.target || targetParent === this.target) {
             hoveringInteractable = true
             break
@@ -591,15 +682,12 @@ export class ContainerFrame extends BaseScriptComponent {
         this.hoveringContentInteractableLast = hoveringInteractable
 
         // hover over interactable area ( non border container ) OR interactable container content
-        if (
-          hoveringInteractable ||
-          this.inputHandler.state.hoveringInteractable
-        ) {
+        if (hoveringInteractable || this.inputHandler.state.hoveringInteractable) {
           this.inputState.innerInteractableActive = true
         } else {
           this.inputState.innerInteractableActive = false
         }
-      }),
+      })
     )
 
     this.unSubscribeList.push(
@@ -611,7 +699,7 @@ export class ContainerFrame extends BaseScriptComponent {
         this.inputState.isHovered = false
         this.inputState.rawHovered = false
         this.inputState.innerInteractableActive = false
-      }),
+      })
     )
 
     this.unSubscribeList.push(
@@ -619,10 +707,9 @@ export class ContainerFrame extends BaseScriptComponent {
         if (event.interactor.targetHitInfo) {
           this.updateCursorHighlightPosition(event)
 
-          if (event.target === this.interactable)
-            this.inputHandler.lastHovered = true
+          if (event.target === this.interactable) this.inputHandler.lastHovered = true
         }
-      }),
+      })
     )
 
     let dragStart = vec3.zero()
@@ -632,19 +719,10 @@ export class ContainerFrame extends BaseScriptComponent {
         const targetObject = e?.target.sceneObject
         let targetParent: SceneObject | null = targetObject
         validate(e.interactor.planecastPoint)
-        dragStart = this.parentTransform
-          .getInvertedWorldTransform()
-          .multiplyPoint(e.interactor.planecastPoint)
+        dragStart = this.parentTransform.getInvertedWorldTransform().multiplyPoint(e.interactor.planecastPoint)
 
-        while (
-          targetParent !== null &&
-          !targetParent.isSame(this.sceneObject)
-        ) {
-          if (
-            targetObject === this.target ||
-            targetObject === this.frame ||
-            targetParent === this.target
-          ) {
+        while (targetParent !== null && !targetParent.isSame(this.sceneObject)) {
+          if (targetObject === this.target || targetObject === this.frame || targetParent === this.target) {
             this.inputState.isPinching = true
             this.currentInteractor = e.interactor
           }
@@ -653,7 +731,7 @@ export class ContainerFrame extends BaseScriptComponent {
           }
           targetParent = targetParent?.getParent()
         }
-      }),
+      })
     )
 
     this.unSubscribeList.push(
@@ -665,46 +743,34 @@ export class ContainerFrame extends BaseScriptComponent {
             .getInvertedWorldTransform()
             .multiplyPoint(event.interactor.planecastPoint)
           const dragDelta = dragPos.sub(dragStart)
-          const sizeDelta = new vec2(
-            dragDelta.x * Math.sign(dragStart.x) * 2,
-            dragDelta.y * Math.sign(dragStart.y) * 2,
-          )
-          const dragScale =
-            1 +
-            Math.max(
-              sizeDelta.x / this.scalingSizeStart.x,
-              sizeDelta.y / this.scalingSizeStart.y,
-            )
+          const sizeDelta = new vec2(dragDelta.x * Math.sign(dragStart.x) * 2, dragDelta.y * Math.sign(dragStart.y) * 2)
+          const dragScale = 1 + Math.max(sizeDelta.x / this.scalingSizeStart.x, sizeDelta.y / this.scalingSizeStart.y)
           const minScale = Math.max(
             this.minimumSize.x / this.scalingSizeStart.x,
-            this.minimumSize.y / this.scalingSizeStart.y,
+            this.minimumSize.y / this.scalingSizeStart.y
           )
           const maxScale = Math.min(
             this.maximumSize.x / this.scalingSizeStart.x,
-            this.maximumSize.y / this.scalingSizeStart.y,
+            this.maximumSize.y / this.scalingSizeStart.y
           )
-          this.innerSize = this.scalingSizeStart.uniformScale(
-            MathUtils.clamp(dragScale, minScale, maxScale),
-          )
-          this.interactionPlane.planeSize = this.totalInnerSize.add(
-            vec2.one().uniformScale(this.border * 2),
-          )
+          this.innerSize = this.scalingSizeStart.uniformScale(MathUtils.clamp(dragScale, minScale, maxScale))
+          this.interactionPlane.planeSize = this.totalInnerSize.add(vec2.one().uniformScale(this.border * 2))
         }
-      }),
+      })
     )
 
     this.unSubscribeList.push(
       this.interactable.onTriggerEnd(() => {
         this.inputState.isPinching = false
         this.currentInteractor = null
-      }),
+      })
     )
 
     this.unSubscribeList.push(
       this.interactable.onTriggerCanceled(() => {
         this.inputState.isPinching = false
         this.currentInteractor = null
-      }),
+      })
     )
 
     if (this.useSnapping) {
@@ -737,20 +803,17 @@ export class ContainerFrame extends BaseScriptComponent {
     // handle scaling affordances
     this.setAllowScaling(this.allowScaling)
 
+    this.cutOutCenter = this.cutOut
+
     this.createEvent("OnDestroyEvent").bind(this.onDestroy)
 
     // hide cursorHighlight on start
     this.material.mainPass.isHovered = 0
     this.backingAlpha = this.material.mainPass.backingAlpha
 
-    this.interactionPlane = this.sceneObject.createComponent(
-      InteractionPlane.getTypeName(),
-    )
-    this.interactionPlane.planeSize = this.totalInnerSize.add(
-      vec2.one().uniformScale(this.border * 2),
-    )
-    this.interactionPlane.proximityDistance =
-      NEAR_FIELD_INTERACTION_ZONE_DISTANCE_CM
+    this.interactionPlane = this.sceneObject.createComponent(InteractionPlane.getTypeName())
+    this.interactionPlane.planeSize = this.totalInnerSize.add(vec2.one().uniformScale(this.border * 2))
+    this.interactionPlane.proximityDistance = NEAR_FIELD_INTERACTION_ZONE_DISTANCE_CM
 
     this.interactionPlane.enabled = this.enableInteractionPlane
 
@@ -768,8 +831,21 @@ export class ContainerFrame extends BaseScriptComponent {
     return this._enableInteractionPlane
   }
 
-  enableCutout(isEnabled: boolean) {
-    this.material.mainPass.cutOutCenter = isEnabled ? 1 : 0
+  /**
+   * @input cutOut:boolean
+   * enable or disable graphical cutout of center of container
+   * useful for content behind the container in z space
+   */
+  set cutOutCenter(cutOut: boolean) {
+    this.cutOut = cutOut
+    this.material.mainPass.cutOutCenter = cutOut ? 1 : 0
+  }
+
+  /**
+   * returns if center is cutout
+   */
+  get cutOutCenter(): boolean {
+    return this.cutOut
   }
 
   private updateCursorHighlightPosition = (e: InteractorEvent) => {
@@ -794,7 +870,7 @@ export class ContainerFrame extends BaseScriptComponent {
       cancelSet: this.cursorHighlightCancel,
       update: (t) => {
         this.material.mainPass.isHovered = t
-      },
+      }
     })
   }
 
@@ -805,9 +881,8 @@ export class ContainerFrame extends BaseScriptComponent {
       duration: CURSOR_HIGHLIGHT_ANIMATION_DURATION * startingHighlight,
       cancelSet: this.cursorHighlightCancel,
       update: (t) => {
-        this.material.mainPass.isHovered =
-          startingHighlight - t * startingHighlight
-      },
+        this.material.mainPass.isHovered = startingHighlight - t * startingHighlight
+      }
     })
   }
 
@@ -818,10 +893,7 @@ export class ContainerFrame extends BaseScriptComponent {
 
   setButtonScale = (size: number) => {
     this.buttonSize = size * buttonMagicNumber
-    this.buttonScaleVector = vec3
-      .one()
-      .uniformScale(this.buttonSize)
-      .div(scaleFactorVector)
+    this.buttonScaleVector = vec3.one().uniformScale(this.buttonSize).div(scaleFactorVector)
     this.scaleAndPositionButtons()
   }
 
@@ -853,13 +925,9 @@ export class ContainerFrame extends BaseScriptComponent {
     if (this.inputHandler.state.translating) {
       if (this.billboardComponent !== null) {
         this.billboardComponent.xAxisEnabled =
-          (this.xOnTranslate &&
-            (this.allowTranslation || this.forceTranslate)) ||
-          this.xAlways
+          (this.xOnTranslate && (this.allowTranslation || this.forceTranslate)) || this.xAlways
         this.billboardComponent.yAxisEnabled =
-          (this.yOnTranslate &&
-            (this.allowTranslation || this.forceTranslate)) ||
-          this.yAlways
+          (this.yOnTranslate && (this.allowTranslation || this.forceTranslate)) || this.yAlways
       }
       if (!this.translatingLastFrame) {
         // just started translating
@@ -870,12 +938,9 @@ export class ContainerFrame extends BaseScriptComponent {
       }
       this.translatingLastFrame = true
     } else {
-      if (
-        this.billboardComponent !== null &&
-        (!this.isFollowing || this.xAlways || this.yAlways)
-      ) {
-        this.billboardComponent.xAxisEnabled = false || this.xAlways
-        this.billboardComponent.yAxisEnabled = false || this.yAlways
+      if (this.billboardComponent !== null && (!this.isFollowing || this.xAlways || this.yAlways)) {
+        this.billboardComponent.xAxisEnabled = this.xAlways
+        this.billboardComponent.yAxisEnabled = this.yAlways
       }
       if (this.translatingLastFrame) {
         // just stopped translating
@@ -902,23 +967,16 @@ export class ContainerFrame extends BaseScriptComponent {
     }
 
     this.inputState.innerInteractableActive =
-      this.inputState.innerInteractableActive ||
-      this.inputHandler.state.hoveringInteractable
+      this.inputState.innerInteractableActive || this.inputHandler.state.hoveringInteractable
 
-    if (
-      this.inputState.innerInteractableActive &&
-      !this.hoveringInnerInteractableLast
-    ) {
+    if (this.inputState.innerInteractableActive && !this.hoveringInnerInteractableLast) {
       const currentOpacity = this._opacity
       if (this.autoShowHide) {
         this.tweenOpacity(currentOpacity, this.interactableHoverOpacity)
       }
       // start hovering inner interactable
       this.onHoverEnterInnerInteractableEvent.invoke()
-    } else if (
-      !this.inputState.innerInteractableActive &&
-      this.hoveringInnerInteractableLast
-    ) {
+    } else if (!this.inputState.innerInteractableActive && this.hoveringInnerInteractableLast) {
       const currentOpacity = this._opacity
       if (this.inputState.rawHovered) {
         if (this.autoShowHide) {
@@ -977,32 +1035,24 @@ export class ContainerFrame extends BaseScriptComponent {
 
     const meshEdges = scaleFactor * magicScalar
 
-    this.material.mainPass.scaleX =
-      this.targetScaleCache.x +
-      doubleMargin -
-      meshEdges +
-      this.constantPadding.x
-    this.material.mainPass.scaleY =
-      this.targetScaleCache.y +
-      doubleMargin -
-      meshEdges +
-      this.constantPadding.y
+    this.material.mainPass.scaleX = this.targetScaleCache.x + doubleMargin - meshEdges + this.constantPadding.x
+    this.material.mainPass.scaleY = this.targetScaleCache.y + doubleMargin - meshEdges + this.constantPadding.y
 
     this.material.mainPass.scaleZ = scaleZ / zScaleAdjuster
 
     this.material.mainPass.rawScale = new vec2(
       this.targetScaleCache.x + this.constantPadding.x,
-      this.targetScaleCache.y + this.constantPadding.y,
+      this.targetScaleCache.y + this.constantPadding.y
     )
 
     const fullScale = new vec2(
       this.targetScaleCache.x + this.constantPadding.x + doubleMargin,
-      this.targetScaleCache.y + this.constantPadding.y + doubleMargin,
+      this.targetScaleCache.y + this.constantPadding.y + doubleMargin
     )
 
     this.material.mainPass.fullScale = new vec2(fullScale.x, fullScale.y)
 
-    let aspectRatio = new vec2(1, 1)
+    const aspectRatio = new vec2(1, 1)
     if (fullScale.x > fullScale.y) {
       aspectRatio.y = fullScale.x / fullScale.y
     } else {
@@ -1013,37 +1063,29 @@ export class ContainerFrame extends BaseScriptComponent {
 
     this.material.mainPass.originalScale = new vec2(
       this.originalScale.x + this.currentBorder,
-      this.originalScale.y + this.currentBorder,
+      this.originalScale.y + this.currentBorder
     )
 
     this.colliderShape.size = new vec3(
-      (this.targetScaleCache.x +
-        this.currentBorder * 2 +
-        this.constantPadding.x) /
-        scaleFactor,
-      (this.targetScaleCache.y +
-        this.currentBorder * 2 +
-        this.constantPadding.y) /
-        scaleFactor,
-      scaleZ / zScaleAdjuster,
+      (this.targetScaleCache.x + this.currentBorder * 2 + this.constantPadding.x) / scaleFactor,
+      (this.targetScaleCache.y + this.currentBorder * 2 + this.constantPadding.y) / scaleFactor,
+      scaleZ / zScaleAdjuster
     )
 
     this.renderMeshVisual.mainMaterial.mainPass.frustumCullMin = new vec3(
       this.colliderShape.size.x * -0.5 - this.frustumBuffer,
       this.colliderShape.size.y * -0.5 - this.frustumBuffer,
-      this.colliderShape.size.z * -0.5,
+      this.colliderShape.size.z * -0.5
     )
 
     this.renderMeshVisual.mainMaterial.mainPass.frustumCullMax = new vec3(
       this.colliderShape.size.x * 0.5 + this.frustumBuffer,
       this.colliderShape.size.y * 0.5 + this.frustumBuffer,
-      this.colliderShape.size.z * 0.5,
+      this.colliderShape.size.z * 0.5
     )
 
-    this.inputHandler.gutterSize.x =
-      this.currentBorder / (scaleFactor * this.colliderShape.size.x)
-    this.inputHandler.gutterSize.y =
-      this.currentBorder / (scaleFactor * this.colliderShape.size.y)
+    this.inputHandler.gutterSize.x = this.currentBorder / (scaleFactor * this.colliderShape.size.x)
+    this.inputHandler.gutterSize.y = this.currentBorder / (scaleFactor * this.colliderShape.size.y)
 
     this.scaleAndPositionButtons()
 
@@ -1056,16 +1098,15 @@ export class ContainerFrame extends BaseScriptComponent {
     if (this.autoScaleContent) {
       if (!this.forcePreserveScale) {
         const factor = this.innerSize.div(this.originalScale)
-        this.targetTransform.setLocalScale(new vec3(factor.x, factor.y, 1))
+        const z = this.relativeZ ? 1 * factor.x : 1
+        this.targetTransform.setLocalScale(new vec3(factor.x, factor.y, z))
       } else {
         // update original with cloned cache to prevent reset on next scaling
         this.originalScale = this.targetScaleCache.uniformScale(1)
       }
     }
 
-    this.smoothFollow?.resize(
-      this.innerSize.x + doubleMargin + this.constantPadding.x,
-    )
+    this.smoothFollow?.resize(this.innerSize.x + doubleMargin + this.constantPadding.x)
 
     if (!this.forcePreserveScale) {
       this.onScalingUpdate.invoke()
@@ -1078,35 +1119,18 @@ export class ContainerFrame extends BaseScriptComponent {
     this.closeButton.transform.setLocalScale(this.buttonScaleVector)
     this.followButton.transform.setLocalScale(this.buttonScaleVector)
 
-    const halfFrameWidth =
-      (this.innerSize.x * 0.5 +
-        this.constantPadding.x * 0.5 +
-        this.currentBorder) /
-      scaleFactor
-    const halfFrameHeight =
-      (this.innerSize.y * 0.5 +
-        this.constantPadding.y * 0.5 +
-        this.currentBorder) /
-      scaleFactor
+    const halfFrameWidth = (this.innerSize.x * 0.5 + this.constantPadding.x * 0.5 + this.currentBorder) / scaleFactor
+    const halfFrameHeight = (this.innerSize.y * 0.5 + this.constantPadding.y * 0.5 + this.currentBorder) / scaleFactor
 
-    const buttonOffset =
-      (this.buttonSize / scaleFactor) * -1 - BUTTON_CORNER_OFFSET
+    const buttonOffset = (this.buttonSize / scaleFactor) * -1 - BUTTON_CORNER_OFFSET
 
     // CORNER POSITIONING
     this.closeButton.transform.setLocalPosition(
-      new vec3(
-        -halfFrameWidth - buttonOffset,
-        halfFrameHeight + buttonOffset,
-        0.1,
-      ),
+      new vec3(-halfFrameWidth - buttonOffset, halfFrameHeight + buttonOffset, 0.1)
     )
 
     this.followButton.transform.setLocalPosition(
-      new vec3(
-        halfFrameWidth + buttonOffset,
-        halfFrameHeight + buttonOffset,
-        0.1,
-      ),
+      new vec3(halfFrameWidth + buttonOffset, halfFrameHeight + buttonOffset, 0.1)
     )
   }
 
@@ -1123,7 +1147,7 @@ export class ContainerFrame extends BaseScriptComponent {
     xOnTranslate: boolean = false,
     xAlways: boolean = false,
     yOnTranslate: boolean = false,
-    yAlways: boolean = false,
+    yAlways: boolean = false
   ): void => {
     this.useBillboarding = useBillboard
 
@@ -1134,13 +1158,11 @@ export class ContainerFrame extends BaseScriptComponent {
       this.yAlways = yAlways
 
       if (this.billboardComponent === null) {
-        this.billboardComponent = this.parent.createComponent(
-          Billboard.getTypeName(),
-        )
+        this.billboardComponent = this.parent.createComponent(Billboard.getTypeName())
       }
 
-      this.billboardComponent.xAxisEnabled = false || this.xAlways
-      this.billboardComponent.yAxisEnabled = false || this.yAlways
+      this.billboardComponent.xAxisEnabled = this.xAlways
+      this.billboardComponent.yAxisEnabled = this.yAlways
     } else {
       if (this.billboardComponent) {
         this.billboardComponent.xAxisEnabled = false
@@ -1150,23 +1172,11 @@ export class ContainerFrame extends BaseScriptComponent {
   }
 
   setYAlways = (yAlways: boolean) => {
-    this.setBillboarding(
-      this.useBillboarding,
-      this.xOnTranslate,
-      this.xAlways,
-      this.yOnTranslate,
-      yAlways,
-    )
+    this.setBillboarding(this.useBillboarding, this.xOnTranslate, this.xAlways, this.yOnTranslate, yAlways)
   }
 
   setUseBillboarding = (useBillboarding: boolean): void => {
-    this.setBillboarding(
-      useBillboarding,
-      this.xOnTranslate,
-      this.xAlways,
-      this.yOnTranslate,
-      this.yAlways,
-    )
+    this.setBillboarding(useBillboarding, this.xOnTranslate, this.xAlways, this.yOnTranslate, this.yAlways)
   }
 
   /**
@@ -1247,7 +1257,7 @@ export class ContainerFrame extends BaseScriptComponent {
     this.snapBehavior = new SnappableBehavior({
       frame: this,
       worldSnapping: this.worldSnapping,
-      itemSnapping: this.itemSnapping,
+      itemSnapping: this.itemSnapping
     })
     this.onSnappingComplete = this.snapBehavior.snappingComplete()
   }
@@ -1280,9 +1290,7 @@ export class ContainerFrame extends BaseScriptComponent {
     this.forcePreserveScale = true
     this.innerSize = newSize
 
-    this.interactionPlane.planeSize = this.totalInnerSize.add(
-      vec2.one().uniformScale(this.border * 2),
-    )
+    this.interactionPlane.planeSize = this.totalInnerSize.add(vec2.one().uniformScale(this.border * 2))
   }
 
   /**
@@ -1292,7 +1300,7 @@ export class ContainerFrame extends BaseScriptComponent {
     this.useFOVFollow = useFollow
     if (useFollow && !this.smoothFollow) {
       this.smoothFollow = new SmoothFollow({
-        frame: this,
+        frame: this
       })
     }
   }
@@ -1305,10 +1313,8 @@ export class ContainerFrame extends BaseScriptComponent {
 
     if (this.isFollowing) {
       if (this.billboardComponent !== null) {
-        this.billboardComponent.xAxisEnabled =
-          (this.xOnTranslate && this.allowTranslation) || this.xAlways
-        this.billboardComponent.yAxisEnabled =
-          (this.yOnTranslate && this.allowTranslation) || this.yAlways
+        this.billboardComponent.xAxisEnabled = (this.xOnTranslate && this.allowTranslation) || this.xAlways
+        this.billboardComponent.yAxisEnabled = (this.yOnTranslate && this.allowTranslation) || this.yAlways
       }
       this.followButton.toggled = true
       this.followButton.setColor("trigger")
@@ -1394,10 +1400,7 @@ export class ContainerFrame extends BaseScriptComponent {
    * @returns vec2 of the total size of the container, including constant padding
    */
   get totalInnerSize(): vec2 {
-    return new vec2(
-      this.innerSize.x + this.constantPadding.x,
-      this.innerSize.y + this.constantPadding.y,
-    )
+    return new vec2(this.innerSize.x + this.constantPadding.x, this.innerSize.y + this.constantPadding.y)
   }
 
   /*
@@ -1606,10 +1609,8 @@ export class ContainerFrame extends BaseScriptComponent {
     const currentOpacity = this._opacity
     // enable on show
     this.renderMeshVisual.enabled = true
-    if (this.closeButton && this.showCloseButton)
-      this.closeButton.object.enabled = true
-    if (this.followButton && this.showFollowButton)
-      this.followButton.object.enabled = true
+    if (this.closeButton && this.showCloseButton) this.closeButton.object.enabled = true
+    if (this.followButton && this.showFollowButton) this.followButton.object.enabled = true
 
     this.tweenOpacity(currentOpacity, 1)
   }
@@ -1633,20 +1634,15 @@ export class ContainerFrame extends BaseScriptComponent {
    * @param currentOpacity
    * @param targetOpacity
    */
-  tweenOpacity = (
-    currentOpacity: number,
-    targetOpacity: number,
-    endCallback = () => {},
-  ) => {
+  tweenOpacity = (currentOpacity: number, targetOpacity: number, endCallback = () => {}) => {
     if (this.opacityCancel) this.opacityCancel.cancel()
     animate({
-      duration:
-        OPACITY_TWEEN_DURATION * Math.abs(targetOpacity - currentOpacity),
+      duration: OPACITY_TWEEN_DURATION * Math.abs(targetOpacity - currentOpacity),
       update: (t: number) => {
         this.opacity = lerp(currentOpacity, targetOpacity, t)
       },
       ended: endCallback,
-      cancelSet: this.opacityCancel,
+      cancelSet: this.opacityCancel
     })
   }
 
@@ -1730,17 +1726,14 @@ export class ContainerFrame extends BaseScriptComponent {
     this.material.mainPass.scaleHandles = scaleHandles
   }
 
-  private tweenMarginSqueeze = (
-    currentSqueeze: number,
-    targetSqueeze: number,
-  ) => {
+  private tweenMarginSqueeze = (currentSqueeze: number, targetSqueeze: number) => {
     animate({
       duration: SQUEEZE_TWEEN_DURATION,
       easing: "ease-out-back-cubic",
       update: (t: number) => {
         this.onMovingShrinkFactor = lerp(currentSqueeze, targetSqueeze, t)
       },
-      cancelSet: this.squeezeCancel,
+      cancelSet: this.squeezeCancel
     })
   }
 
@@ -1750,7 +1743,7 @@ export class ContainerFrame extends BaseScriptComponent {
       update: (t: number) => {
         this.translateMode = lerp(current, target, t)
       },
-      cancelSet: this.translateModeCancel,
+      cancelSet: this.translateModeCancel
     })
   }
 }

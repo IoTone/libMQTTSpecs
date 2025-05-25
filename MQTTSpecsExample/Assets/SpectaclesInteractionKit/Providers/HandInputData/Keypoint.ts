@@ -14,11 +14,9 @@ export class Keypoint {
 
   constructor(
     readonly name: string,
-    private objectTracking3DComponent: ObjectTracking3D,
+    private objectTracking3DComponent: ObjectTracking3D
   ) {
-    this.attachmentPoint = this.objectTracking3DComponent.createAttachmentPoint(
-      this.name,
-    )
+    this.attachmentPoint = this.objectTracking3DComponent.createAttachmentPoint(this.name)
     this.transform = this.attachmentPoint.getTransform()
   }
 
@@ -40,11 +38,7 @@ export class Keypoint {
    * Returns the screen-space position of this keypoint
    */
   get screenPosition(): vec2 {
-    return this.worldCamera.worldSpaceToScreenSpace(
-      this.position.x,
-      this.position.y,
-      this.position.z,
-    )
+    return this.worldCamera.worldSpaceToScreenSpace(this.position.x, this.position.y, this.position.z)
   }
 
   /**
@@ -117,9 +111,7 @@ export class Keypoint {
    * need to remove the attachment point.
    */
   clearAttachmentPoint(): void {
-    this.attachmentPoint = this.objectTracking3DComponent.createAttachmentPoint(
-      this.name,
-    )
+    this.attachmentPoint = this.objectTracking3DComponent.createAttachmentPoint(this.name)
     this.transform = this.attachmentPoint.getTransform()
   }
 }

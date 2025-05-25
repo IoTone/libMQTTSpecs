@@ -1,10 +1,5 @@
 import {CancelSet} from "../../../Utils/animate"
-import {
-  EdgeSelector,
-  EdgeType,
-  ScrollView,
-  ScrollViewEventArgs,
-} from "./ScrollView"
+import {EdgeSelector, EdgeType, ScrollView, ScrollViewEventArgs} from "./ScrollView"
 
 import {InteractorEvent} from "../../../Core/Interactor/InteractorEvent"
 import Event from "../../../Utils/Event"
@@ -64,11 +59,7 @@ export class ScrollProvider {
   private dragVelocity: vec2 = vec2.zero()
   private inertiaVelocity: vec2 = vec2.zero()
 
-  private dragVelocityFilter = new MovingAverageFilter<vec2>(
-    VELOCITY_WINDOW_SIZE,
-    vec2.zero,
-    averageVec2,
-  )
+  private dragVelocityFilter = new MovingAverageFilter<vec2>(VELOCITY_WINDOW_SIZE, vec2.zero, averageVec2)
 
   private decelerateTime = DECELERATE_TIME
   private decelerateMinSpeed = DECELERATE_MIN_SPEED
@@ -168,10 +159,7 @@ export class ScrollProvider {
    */
   resetContentOrigin() {
     const originOffset = this.getOffsetToEdge({x: -1, y: 1, type: "Content"})
-    this.contentOrigin = new vec2(
-      this.contentPosition.x + originOffset.x,
-      this.contentPosition.y + originOffset.y,
-    )
+    this.contentOrigin = new vec2(this.contentPosition.x + originOffset.x, this.contentPosition.y + originOffset.y)
   }
 
   /**
@@ -182,9 +170,7 @@ export class ScrollProvider {
   }
 
   get overflow() {
-    const scrollAreaSize = this.convertLocalUnitsToParentUnits(
-      this.scrollArea.size,
-    )
+    const scrollAreaSize = this.convertLocalUnitsToParentUnits(this.scrollArea.size)
 
     const scrollViewHeight = scrollAreaSize.y
     return this.contentLength - scrollViewHeight
@@ -192,11 +178,7 @@ export class ScrollProvider {
 
   get scrollPercentage() {
     const scrollPercentage =
-      MathUtils.clamp(
-        -this.contentOrigin.y + this.contentPosition.y,
-        0,
-        this.overflow,
-      ) / this.overflow
+      MathUtils.clamp(-this.contentOrigin.y + this.contentPosition.y, 0, this.overflow) / this.overflow
 
     return scrollPercentage
   }
@@ -224,17 +206,12 @@ export class ScrollProvider {
     }
 
     this.content = content
-    this.contentScrollLimit = new BufferedBoundariesProvider(
-      this.content,
-      Rect.create(0, 0, 0, 0),
-    )
+    this.contentScrollLimit = new BufferedBoundariesProvider(this.content, Rect.create(0, 0, 0, 0))
     this.recomputeBoundaries()
 
     // Sometimes this will be called after the user instantiates the ScrollView and sets the contentLength, so we ensure that prior values are respected.
     if (this.contentLength === 0) {
-      this.contentLength = this.convertLocalUnitsToParentUnits(
-        this.content.size,
-      ).y
+      this.contentLength = this.convertLocalUnitsToParentUnits(this.content.size).y
     }
 
     this.onReadyEvent.invoke()
@@ -253,7 +230,7 @@ export class ScrollProvider {
       invertedLimit * scrollAreaSize.x,
       invertedLimit * scrollAreaSize.x,
       invertedLimit * scrollAreaSize.y,
-      invertedLimit * scrollAreaSize.y,
+      invertedLimit * scrollAreaSize.y
     )
 
     this.isYOverflow = this.scrollArea.size.y < this.content.size.y
@@ -269,47 +246,30 @@ export class ScrollProvider {
       return
     }
 
-    let deltaX =
-      this.scrollView.enableHorizontalScroll && this.isXOverflow
-        ? dragVector.x
-        : 0
-    let deltaY =
-      this.scrollView.enableVerticalScroll && this.isYOverflow
-        ? dragVector.y
-        : 0
+    let deltaX = this.scrollView.enableHorizontalScroll && this.isXOverflow ? dragVector.x : 0
+    let deltaY = this.scrollView.enableVerticalScroll && this.isYOverflow ? dragVector.y : 0
 
-    this.content.position = this.content.position.add(
-      new vec3(deltaX, deltaY, 0),
-    )
+    this.content.position = this.content.position.add(new vec3(deltaX, deltaY, 0))
 
     if (this.enableScrollLimit && this.isEdgeInsideScrollArea("ScrollLimit")) {
       this.limitToEdgeInstantly("ScrollLimit")
       this.dragVelocity = vec2.zero()
     } else if (this.isGrabbed) {
-      const rawVelocity = new vec2(deltaX, deltaY).uniformScale(
-        1 / getDeltaTime(),
-      )
+      const rawVelocity = new vec2(deltaX, deltaY).uniformScale(1 / getDeltaTime())
 
       this.dragVelocity = this.dragVelocityFilter.filter(rawVelocity, getTime())
 
       // If the filtered drag velocity is not the same direction as the current frame's delta, negate the delta to avoid hooking.
       if (Math.sign(this.dragVelocity.x) !== Math.sign(deltaX)) {
-        this.content.position = this.content.position.add(
-          new vec3(-deltaX, 0, 0),
-        )
+        this.content.position = this.content.position.add(new vec3(-deltaX, 0, 0))
       }
       if (Math.sign(this.dragVelocity.y) !== Math.sign(deltaY)) {
-        this.content.position = this.content.position.add(
-          new vec3(0, -deltaY, 0),
-        )
+        this.content.position = this.content.position.add(new vec3(0, -deltaY, 0))
       }
     }
 
     this.onScrollUpdateEvent.invoke({
-      contentPosition: new vec2(
-        this.content.position.x,
-        this.content.position.y,
-      ),
+      contentPosition: new vec2(this.content.position.x, this.content.position.y)
     })
   }
 
@@ -318,9 +278,7 @@ export class ScrollProvider {
    * @param selectedEdges - Struct that describes the selected edge as an {@link EdgeSelector}
    */
   snapToEdges(selectedEdges: EdgeSelector): void {
-    this.content.position = this.content.position.add(
-      this.getOffsetToEdge(selectedEdges),
-    )
+    this.content.position = this.content.position.add(this.getOffsetToEdge(selectedEdges))
   }
 
   /**
@@ -353,26 +311,15 @@ export class ScrollProvider {
   }
 
   private offsetBetween(a: Rect, b: Rect): Rect {
-    return Rect.create(
-      a.left - b.left,
-      a.right - b.right,
-      a.bottom - b.bottom,
-      a.top - b.top,
-    )
+    return Rect.create(a.left - b.left, a.right - b.right, a.bottom - b.bottom, a.top - b.top)
   }
 
   get contentOffset(): Rect {
-    return this.offsetBetween(
-      this.scrollArea.boundaries,
-      this.content.boundaries,
-    )
+    return this.offsetBetween(this.scrollArea.boundaries, this.content.boundaries)
   }
 
   get scrollLimitOffset(): Rect {
-    return this.offsetBetween(
-      this.scrollArea.boundaries,
-      this.contentScrollLimit.boundaries,
-    )
+    return this.offsetBetween(this.scrollArea.boundaries, this.contentScrollLimit.boundaries)
   }
 
   // Simulates physics (velocity upon release, friction, elasticity when past edge) when the user is not grabbing the ScrollView.
@@ -382,11 +329,7 @@ export class ScrollProvider {
     }
 
     const initialEdgeSelector = this.selectEdgesInsideScrollArea("Content")
-    if (
-      this.inertiaVelocity.equal(vec2.zero()) &&
-      initialEdgeSelector.x === 0 &&
-      initialEdgeSelector.y === 0
-    ) {
+    if (this.inertiaVelocity.equal(vec2.zero()) && initialEdgeSelector.x === 0 && initialEdgeSelector.y === 0) {
       return
     }
 
@@ -396,12 +339,7 @@ export class ScrollProvider {
     let currentVelocity = this.inertiaVelocity
 
     // Apply friction to decelerate the contents post-interaction.
-    const frictionResults = this.applyFriction(
-      currentPosition,
-      currentVelocity,
-      this.decelerateTime,
-      deltaTime,
-    )
+    const frictionResults = this.applyFriction(currentPosition, currentVelocity, this.decelerateTime, deltaTime)
 
     currentPosition = frictionResults[0]
     currentVelocity = frictionResults[1]
@@ -416,12 +354,7 @@ export class ScrollProvider {
     }
 
     // Apply elasticity to return the contents within the boundaries.
-    const elasticityResults = this.applyElasticity(
-      currentPosition,
-      currentVelocity,
-      this.elasticTime,
-      deltaTime,
-    )
+    const elasticityResults = this.applyElasticity(currentPosition, currentVelocity, this.elasticTime, deltaTime)
 
     currentPosition = elasticityResults[0]
     currentVelocity = elasticityResults[1]
@@ -430,26 +363,17 @@ export class ScrollProvider {
 
     // If the content is within the ScrollArea boundaries and has a low enough velocity, stop moving the contents to reduce update cost.
     let currentEdgeSelector = this.selectEdgesInsideScrollArea("Content")
-    if (
-      currentEdgeSelector.x === 0 &&
-      Math.abs(this.inertiaVelocity.x) < this.decelerateMinSpeed
-    ) {
+    if (currentEdgeSelector.x === 0 && Math.abs(this.inertiaVelocity.x) < this.decelerateMinSpeed) {
       currentVelocity.x = 0
     }
-    if (
-      currentEdgeSelector.y === 0 &&
-      Math.abs(this.inertiaVelocity.y) < this.decelerateMinSpeed
-    ) {
+    if (currentEdgeSelector.y === 0 && Math.abs(this.inertiaVelocity.y) < this.decelerateMinSpeed) {
       currentVelocity.y = 0
     }
 
     this.inertiaVelocity = currentVelocity
 
     this.onScrollUpdateEvent.invoke({
-      contentPosition: new vec2(
-        this.content.position.x,
-        this.content.position.y,
-      ),
+      contentPosition: new vec2(this.content.position.x, this.content.position.y)
     })
   }
 
@@ -470,16 +394,12 @@ export class ScrollProvider {
    */
   private isEdgeInsideScrollArea(edgeType: EdgeType) {
     const edgesInsideScrollArea = this.selectEdgesInsideScrollArea(edgeType)
-    return (
-      (this.isXOverflow && edgesInsideScrollArea.x !== 0) ||
-      (this.isYOverflow && edgesInsideScrollArea.y !== 0)
-    )
+    return (this.isXOverflow && edgesInsideScrollArea.x !== 0) || (this.isYOverflow && edgesInsideScrollArea.y !== 0)
   }
 
   private selectEdgesInsideScrollArea(edgeType: EdgeType): EdgeSelector {
     const snapEdges: EdgeSelector = {x: 0, y: 0, type: edgeType}
-    const offset =
-      edgeType === "Content" ? this.contentOffset : this.scrollLimitOffset
+    const offset = edgeType === "Content" ? this.contentOffset : this.scrollLimitOffset
 
     /**
      * only try to snap if there is an overflow in the x dimension
@@ -523,10 +443,7 @@ export class ScrollProvider {
   }
 
   private getOffsetToEdge(selectedEdges: EdgeSelector): vec3 {
-    const offset =
-      selectedEdges.type === "Content"
-        ? this.contentOffset
-        : this.scrollLimitOffset
+    const offset = selectedEdges.type === "Content" ? this.contentOffset : this.scrollLimitOffset
 
     const targetPositionOffset = vec2.zero()
     if (selectedEdges.x === -1) {
@@ -541,8 +458,7 @@ export class ScrollProvider {
       targetPositionOffset.y = offset.bottom
     }
 
-    const worldUnitOffset =
-      this.convertLocalUnitsToParentUnits(targetPositionOffset)
+    const worldUnitOffset = this.convertLocalUnitsToParentUnits(targetPositionOffset)
 
     return new vec3(worldUnitOffset.x, worldUnitOffset.y, 0)
   }
@@ -565,34 +481,19 @@ export class ScrollProvider {
     this.inertiaVelocity = newInertiaVelocity
   }
 
-  private applyFriction(
-    position: vec3,
-    velocity: vec2,
-    decelerateTime: number,
-    deltaTime: number,
-  ): [vec3, vec2] {
+  private applyFriction(position: vec3, velocity: vec2, decelerateTime: number, deltaTime: number): [vec3, vec2] {
     const edgeSelector = this.selectEdgesInsideScrollArea("Content")
 
     // If the content is within the X-axis bounds, move the contents along the X-axis and apply friction.
     if (this.scrollView.enableHorizontalScroll && edgeSelector.x === 0) {
-      const smoothResults = smoothSlide(
-        position.x,
-        velocity.x,
-        decelerateTime,
-        deltaTime,
-      )
+      const smoothResults = smoothSlide(position.x, velocity.x, decelerateTime, deltaTime)
       position.x = smoothResults[0]
       velocity.x = smoothResults[1]
     }
 
     // If the content is within the Y-axis bounds, move the contents along the Y-axis and apply friction.
     if (this.scrollView.enableVerticalScroll && edgeSelector.y === 0) {
-      const smoothResults = smoothSlide(
-        position.y,
-        velocity.y,
-        decelerateTime,
-        deltaTime,
-      )
+      const smoothResults = smoothSlide(position.y, velocity.y, decelerateTime, deltaTime)
       position.y = smoothResults[0]
       velocity.y = smoothResults[1]
     }
@@ -600,12 +501,7 @@ export class ScrollProvider {
     return [position, velocity]
   }
 
-  private applyElasticity(
-    position: vec3,
-    velocity: vec2,
-    elasticTime: number,
-    deltaTime: number,
-  ): [vec3, vec2] {
+  private applyElasticity(position: vec3, velocity: vec2, elasticTime: number, deltaTime: number): [vec3, vec2] {
     const edgeSelector = this.selectEdgesInsideScrollArea("Content")
     const contentOffset = this.getOffsetToEdge(edgeSelector)
 
@@ -613,13 +509,7 @@ export class ScrollProvider {
     if (this.scrollView.enableHorizontalScroll && edgeSelector.x !== 0) {
       const contentLimitX = position.x + contentOffset.x
 
-      const smoothResults = smoothDamp(
-        position.x,
-        contentLimitX,
-        velocity.x,
-        elasticTime,
-        deltaTime,
-      )
+      const smoothResults = smoothDamp(position.x, contentLimitX, velocity.x, elasticTime, deltaTime)
       position.x = smoothResults[0]
       velocity.x = smoothResults[1]
 
@@ -634,13 +524,7 @@ export class ScrollProvider {
     if (this.scrollView.enableVerticalScroll && edgeSelector.y !== 0) {
       const contentLimitY = position.y + contentOffset.y
 
-      const smoothResults = smoothDamp(
-        position.y,
-        contentLimitY,
-        velocity.y,
-        elasticTime,
-        deltaTime,
-      )
+      const smoothResults = smoothDamp(position.y, contentLimitY, velocity.y, elasticTime, deltaTime)
       position.y = smoothResults[0]
       velocity.y = smoothResults[1]
 
@@ -661,37 +545,22 @@ export class ScrollProvider {
     const bottomLeftCorner = new vec2(offset.left, offset.bottom)
     const topRightCorner = new vec2(offset.right, offset.top)
 
-    const bottomLeftOffsetWorld =
-      this.convertLocalUnitsToParentUnits(bottomLeftCorner)
-    const topRightOffsetWorld =
-      this.convertLocalUnitsToParentUnits(topRightCorner)
+    const bottomLeftOffsetWorld = this.convertLocalUnitsToParentUnits(bottomLeftCorner)
+    const topRightOffsetWorld = this.convertLocalUnitsToParentUnits(topRightCorner)
 
-    return Rect.create(
-      bottomLeftOffsetWorld.x,
-      topRightOffsetWorld.x,
-      bottomLeftOffsetWorld.y,
-      topRightOffsetWorld.y,
-    )
+    return Rect.create(bottomLeftOffsetWorld.x, topRightOffsetWorld.x, bottomLeftOffsetWorld.y, topRightOffsetWorld.y)
   }
 
   /**
    * Converts local units (normalized -1 to 1) to world units relative to the ScrollView canvas.
    */
   private convertLocalUnitsToWorldUnits(localUnits: vec2): vec2 {
-    const origin = this.config.screenTransform.localPointToWorldPoint(
-      vec2.zero(),
-    )
+    const origin = this.config.screenTransform.localPointToWorldPoint(vec2.zero())
 
-    const invertQuat = this.config.screenTransform
-      .getSceneObject()
-      .getTransform()
-      .getWorldRotation()
-      .invert()
+    const invertQuat = this.config.screenTransform.getSceneObject().getTransform().getWorldRotation().invert()
 
     const worldUnits = invertQuat.multiplyVec3(
-      this.config.screenTransform
-        .localPointToWorldPoint(localUnits)
-        .sub(origin),
+      this.config.screenTransform.localPointToWorldPoint(localUnits).sub(origin)
     )
 
     return new vec2(worldUnits.x, worldUnits.y)
@@ -702,9 +571,7 @@ export class ScrollProvider {
    */
   public convertLocalUnitsToParentUnits(localUnits: vec2): vec2 {
     const worldUnits = this.convertLocalUnitsToWorldUnits(localUnits)
-    const worldScale = this.config.screenTransform
-      .getTransform()
-      .getWorldScale()
+    const worldScale = this.config.screenTransform.getTransform().getWorldScale()
 
     return new vec2(worldUnits.x / worldScale.x, worldUnits.y / worldScale.y)
   }

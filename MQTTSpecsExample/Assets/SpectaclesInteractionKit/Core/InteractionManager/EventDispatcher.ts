@@ -1,10 +1,6 @@
 import {Interactable} from "../../Components/Interaction/Interactable/Interactable"
 import {InteractorInputType} from "../Interactor/Interactor"
-import {
-  DispatchableEventArgs,
-  InteractableEventName,
-  InteractorEvent,
-} from "../Interactor/InteractorEvent"
+import {DispatchableEventArgs, InteractableEventName, InteractorEvent} from "../Interactor/InteractorEvent"
 
 export type SceneObjectMap = Map<SceneObject, Interactable>
 
@@ -30,8 +26,7 @@ export class EventDispatcher {
   dispatch(eventArgs: DispatchableEventArgs): void {
     if (
       eventArgs.target.allowMultipleInteractors === false &&
-      (eventArgs.target.hoveringInteractor & eventArgs.interactor.inputType) ===
-        0
+      (eventArgs.target.hoveringInteractor & eventArgs.interactor.inputType) === 0
     ) {
       // Don't dispatch the event if multiple interactors aren't allowed & there's already an active interactor
       if (eventArgs.target.hoveringInteractor !== InteractorInputType.None) {
@@ -41,10 +36,7 @@ export class EventDispatcher {
       // Cover the edge case where an interactable that doesn't allow multiple interactors has multiple possible interactors
       // The active interactor exits so we can dispatch events on the interactor that previously had its events blocked
       // However, we need to send enter events to update the hovering/triggering interactor input type.
-      if (
-        eventArgs.target.hoveringInteractor === InteractorInputType.None &&
-        eventArgs.eventName === "HoverUpdate"
-      ) {
+      if (eventArgs.target.hoveringInteractor === InteractorInputType.None && eventArgs.eventName === "HoverUpdate") {
         eventArgs.eventName = "HoverEnter"
       } else if (
         eventArgs.target.triggeringInteractor === InteractorInputType.None &&
@@ -55,15 +47,11 @@ export class EventDispatcher {
     }
 
     const ancestors: Interactable[] = []
-    this.getInteractableAncestors(
-      eventArgs.target.sceneObject.getParent(),
-      ancestors,
-      eventArgs.origin?.sceneObject,
-    )
+    this.getInteractableAncestors(eventArgs.target.sceneObject.getParent(), ancestors, eventArgs.origin?.sceneObject)
 
     const stoppableEventArgs = {
       ...eventArgs,
-      propagationStopped: false,
+      propagationStopped: false
     }
 
     this.trickleDown(ancestors, stoppableEventArgs)
@@ -74,7 +62,7 @@ export class EventDispatcher {
   private getInteractableAncestors(
     node: SceneObject | null,
     ancestors: Interactable[],
-    excludedNode: SceneObject | undefined = undefined,
+    excludedNode: SceneObject | undefined = undefined
   ) {
     if (node === null || node === excludedNode) {
       return
@@ -88,10 +76,7 @@ export class EventDispatcher {
     this.getInteractableAncestors(node.getParent(), ancestors, excludedNode)
   }
 
-  private trickleDown(
-    ancestors: Interactable[],
-    eventArgs: StoppableEventArgs,
-  ) {
+  private trickleDown(ancestors: Interactable[], eventArgs: StoppableEventArgs) {
     for (let i = ancestors.length - 1; i >= 0; i--) {
       if (eventArgs.propagationStopped) {
         break
@@ -101,7 +86,7 @@ export class EventDispatcher {
         ...eventArgs,
         interactable: ancestors[i],
         propagationPhase: "TrickleDown",
-        stopPropagation: () => this.stopPropagation(eventArgs),
+        stopPropagation: () => this.stopPropagation(eventArgs)
       }
       this.invokeEvent(event, eventArgs.eventName)
     }
@@ -116,7 +101,7 @@ export class EventDispatcher {
       ...eventArgs,
       interactable: eventArgs.target,
       propagationPhase: "Target",
-      stopPropagation: () => this.stopPropagation(eventArgs),
+      stopPropagation: () => this.stopPropagation(eventArgs)
     }
     this.invokeEvent(event, eventArgs.eventName)
   }
@@ -131,7 +116,7 @@ export class EventDispatcher {
         ...eventArgs,
         interactable: ancestors[i],
         propagationPhase: "BubbleUp",
-        stopPropagation: () => this.stopPropagation(eventArgs),
+        stopPropagation: () => this.stopPropagation(eventArgs)
       }
       this.invokeEvent(event, eventArgs.eventName)
     }
@@ -141,10 +126,7 @@ export class EventDispatcher {
     eventArgs.propagationStopped = true
   }
 
-  private invokeEvent(
-    event: InteractorEvent,
-    eventName: InteractableEventName,
-  ) {
+  private invokeEvent(event: InteractorEvent, eventName: InteractableEventName) {
     const interactable = event.interactable
     switch (eventName) {
       case "HoverEnter":

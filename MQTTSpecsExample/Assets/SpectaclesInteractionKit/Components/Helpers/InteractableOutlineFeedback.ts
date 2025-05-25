@@ -2,30 +2,46 @@ import {validate} from "../../Utils/validate"
 import {Interactable} from "../Interaction/Interactable/Interactable"
 
 /**
- * This class provides visual feedback by adding an outline to mesh visuals when they are hovered or pinched. It allows customization of the outline color, thickness, and target meshes.
+ * This class provides visual feedback by adding an outline to mesh visuals when they are hovered or pinched. It allows
+ * customization of the outline color, thickness, and target meshes.
  */
 @component
 export class InteractableOutlineFeedback extends BaseScriptComponent {
+  /**
+   * This is the material that will provide the mesh outline.
+   */
   @input
-  @hint("This is the material that will provide the mesh outline")
+  @hint("This is the material that will provide the mesh outline.")
   targetOutlineMaterial!: Material
 
+  /**
+   * This is the color of the outline when hovered.
+   */
   @input("vec4", "{1, 1, 0.04, 1}")
-  @hint("This is the colour of the outline when hovered")
+  @hint("This is the color of the outline when hovered.")
   @widget(new ColorWidget())
   hoveringColor: vec4 = new vec4(1, 1, 0.04, 1)
 
+  /**
+   * This is the color of the outline when triggered.
+   */
   @input("vec4", "{1, 1, 1, 1}")
-  @hint("This is the colour of the outline when pinched")
+  @hint("This is the color of the outline when triggered.")
   @widget(new ColorWidget())
   activatingColor: vec4 = new vec4(1, 1, 1, 1)
 
+  /**
+   * This is the thickness of the outline.
+   */
   @input
-  @hint("This is the thickness of the outline")
+  @hint("This is the thickness of the outline.")
   outlineWeight: number = 0.25
 
+  /**
+   * These are the meshes that will be outlined on pinch/hover.
+   */
   @input
-  @hint("These are the meshes that will be outlined on pinch/hover")
+  @hint("These are the meshes that will be outlined on pinch/hover.")
   meshVisuals: RenderMeshVisual[] = []
 
   private interactable: Interactable | null = null
@@ -57,12 +73,10 @@ export class InteractableOutlineFeedback extends BaseScriptComponent {
     this.highlightMaterial.mainPass.lineWeight = this.outlineWeight
     this.highlightMaterial.mainPass.lineColor = this.hoveringColor
 
-    this.interactable = this.getSceneObject().getComponent(
-      Interactable.getTypeName(),
-    )
+    this.interactable = this.getSceneObject().getComponent(Interactable.getTypeName())
     if (!this.interactable) {
       throw new Error(
-        "No interactable was found - please ensure that a component matching the Interactable typename provided was added to this SceneObject.",
+        "No interactable was found - please ensure that a component matching the Interactable typename provided was added to this SceneObject."
       )
     }
 
@@ -81,10 +95,7 @@ export class InteractableOutlineFeedback extends BaseScriptComponent {
       for (let k = 0; k < matCount; k++) {
         const material = this.meshVisuals[i].getMaterial(k)
 
-        if (
-          this.highlightMaterial !== undefined &&
-          material.isSame(this.highlightMaterial)
-        ) {
+        if (this.highlightMaterial !== undefined && material.isSame(this.highlightMaterial)) {
           addMaterial = false
           break
         }
@@ -107,10 +118,7 @@ export class InteractableOutlineFeedback extends BaseScriptComponent {
       for (let k = 0; k < matCount; k++) {
         const material = this.meshVisuals[i].getMaterial(k)
 
-        if (
-          this.highlightMaterial !== undefined &&
-          material.isSame(this.highlightMaterial)
-        ) {
+        if (this.highlightMaterial !== undefined && material.isSame(this.highlightMaterial)) {
           continue
         }
 

@@ -24,7 +24,7 @@ export default class RaycastProxy extends RaycastBase {
     if (targetingData !== null) {
       return {
         locus: targetingData.targetingLocusInWorld,
-        direction: targetingData.targetingDirectionInWorld,
+        direction: targetingData.targetingDirectionInWorld
       }
     } else {
       return null

@@ -1,4 +1,4 @@
-- !<AssetImportMetadata/68e85211-2ccd-4aee-bde9-5a5db1349c5d>
+- !<AssetImportMetadata/79700100-493e-4f3f-1496-316d2457cc09>
   ImportedAssetIds:
     TypeScriptAsset: !<reference> 05dadbfb-e87d-4ad7-8d85-2ea8a0c4d804
   ImporterName: TypeScriptAssetImporter
@@ -35,5 +35,8 @@
     -
       {}
   InputLines:
-    - '// @input int logLevelFilter = 8 {"widget":"combobox", "values":[{"label":"Error", "value":3}, {"label":"Warning", "value":4}, {"label":"Info", "value":6}, {"label":"Debug", "value":7}, {"label":"Verbose", "value":8}]}'
+    - "// @input int logLevelFilter = 8 {\"hint\":\"Controls the verbosity of logs. Higher values show more detailed logs, while lower values only show critical information.\\n   - Error (3): Errors that may affect functionality.\\n   - Warning (4): Potential issues that don't affect normal operation.\\n   - Info (6): General information about application state.\\n   - Debug (7): Detailed information useful for debugging.\\n   - Verbose (8): Maximum detail including fine-grained operational data.\", \"widget\":\"combobox\", \"values\":[{\"label\":\"Error\", \"value\":3}, {\"label\":\"Warning\", \"value\":4}, {\"label\":\"Info\", \"value\":6}, {\"label\":\"Debug\", \"value\":7}, {\"label\":\"Verbose\", \"value\":8}]}"
   DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  SetupScript:
+    code: ""
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000

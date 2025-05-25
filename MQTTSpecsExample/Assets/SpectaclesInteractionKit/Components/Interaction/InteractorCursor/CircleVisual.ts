@@ -32,7 +32,7 @@ export type CircleVisualMaterialParameters = {
 const enum CursorMaterialHandType {
   Left = -1,
   NonHand = 0,
-  Right = 1,
+  Right = 1
 }
 
 const OUTLINE_ANIMATE_DURATION = 0.1
@@ -60,9 +60,7 @@ export class CircleVisual {
 
   private visual = this.sceneObject.getComponent("Component.RenderMeshVisual")
 
-  private billboardComponent = this.sceneObject.createComponent(
-    Billboard.getTypeName(),
-  )
+  private billboardComponent = this.sceneObject.createComponent(Billboard.getTypeName())
 
   constructor(private config: CircleVisualConfig) {
     const cloneMaterial = this.visual.mainMaterial.clone()
@@ -111,7 +109,7 @@ export class CircleVisual {
         duration: OUTLINE_ANIMATE_DURATION,
         update: (t: number) => {
           this.visual.mainPass.maxAlpha = MathUtils.lerp(initialAlpha, 1, t)
-        },
+        }
       })
     } else {
       animate({
@@ -122,7 +120,7 @@ export class CircleVisual {
         },
         ended: () => {
           this.sceneObject.enabled = false
-        },
+        }
       })
     }
     this._isShown = show
@@ -149,12 +147,8 @@ export class CircleVisual {
       cancelSet: this.outlineAlphaCancelSet,
       duration: OUTLINE_ANIMATE_DURATION,
       update: (t: number) => {
-        this.visual.mainPass.outlineAlpha = MathUtils.lerp(
-          initialAlpha,
-          alpha,
-          t,
-        )
-      },
+        this.visual.mainPass.outlineAlpha = MathUtils.lerp(initialAlpha, alpha, t)
+      }
     })
     this._outlineAlpha = alpha
   }
@@ -181,12 +175,8 @@ export class CircleVisual {
       cancelSet: this.outlineOffsetCancelSet,
       duration: OUTLINE_ANIMATE_DURATION,
       update: (t: number) => {
-        this.visual.mainPass.outlineOffset = MathUtils.lerp(
-          initialOffset,
-          offset,
-          t,
-        )
-      },
+        this.visual.mainPass.outlineOffset = MathUtils.lerp(initialOffset, offset, t)
+      }
     })
 
     this._outlineOffset = offset
@@ -428,7 +418,7 @@ export class CircleVisual {
       useTexture: this.visual.mainPass.useTexture,
       cursorTexture: this.visual.mainPass.cursorTexture,
       handType: this.visual.mainPass.handType,
-      multipleInteractorsActive: this.visual.mainPass.multipleInteractorsActive,
+      multipleInteractorsActive: this.visual.mainPass.multipleInteractorsActive
     }
   }
 }

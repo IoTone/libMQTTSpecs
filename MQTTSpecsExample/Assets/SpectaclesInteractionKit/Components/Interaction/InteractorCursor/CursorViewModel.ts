@@ -6,7 +6,7 @@ import {
   Interactor,
   InteractorInputType,
   InteractorTriggerType,
-  TargetingMode,
+  TargetingMode
 } from "../../../Core/Interactor/Interactor"
 import WorldCameraFinderProvider from "../../../Providers/CameraProvider/WorldCameraFinderProvider"
 import {HandInputData} from "../../../Providers/HandInputData/HandInputData"
@@ -23,12 +23,12 @@ export enum CursorState {
   Idle = "Idle",
   Hovering = "Hovering",
   Manipulating = "Manipulating",
-  Scrolling = "Scrolling",
+  Scrolling = "Scrolling"
 }
 
 export enum CursorInteractor {
   Primary,
-  Secondary,
+  Secondary
 }
 
 export type CursorViewState = (
@@ -82,7 +82,7 @@ const DEFAULT_CURSOR_FILTER = {
   frequency: 60,
   dcutoff: 0.16,
   minCutoff: 0.5,
-  beta: 0.2,
+  beta: 0.2
 }
 
 const TAG = "CursorViewModel"
@@ -103,8 +103,7 @@ export class CursorViewModel {
 
   private handProvider: HandInputData = HandInputData.getInstance()
 
-  private interactionManager: InteractionManager =
-    InteractionManager.getInstance()
+  private interactionManager: InteractionManager = InteractionManager.getInstance()
 
   private onStateChangeEvent = new Event<CursorState>()
   public onStateChange = this.onStateChangeEvent.publicApi()
@@ -136,7 +135,7 @@ export class CursorViewModel {
   constructor(
     private enableCursorHolding: boolean,
     private enableFilter: boolean,
-    private _interactor?: Interactor,
+    private _interactor?: Interactor
   ) {
     // If passing an Interactor within the constructor, ensure the Interactor callbacks are setup correctly.
     if (_interactor !== undefined) {
@@ -158,15 +157,8 @@ export class CursorViewModel {
       this.interactor?.onCurrentInteractableChanged.add((interactable) => {
         this.currentInteractable = interactable
         this.currentManipulation =
-          interactable !== null
-            ? interactable.sceneObject.getComponent(
-                InteractableManipulation.getTypeName(),
-              )
-            : null
-        this.isScrolling =
-          interactable !== null
-            ? this.checkScrollable(interactable.sceneObject)
-            : false
+          interactable !== null ? interactable.sceneObject.getComponent(InteractableManipulation.getTypeName()) : null
+        this.isScrolling = interactable !== null ? this.checkScrollable(interactable.sceneObject) : false
       }) ?? null
   }
 
@@ -185,33 +177,24 @@ export class CursorViewModel {
         this.onStateChangeEvent.invoke(CursorState.Inactive)
 
         // If we enter the inactive state due to direct targeting, set the cursor distance to be closer to hand for post-direct interaction.
-        const isDirect =
-          this.interactor !== null &&
-          this.interactor.activeTargetingMode === TargetingMode.Direct
+        const isDirect = this.interactor !== null && this.interactor.activeTargetingMode === TargetingMode.Direct
         this.cursorDistance = isDirect ? MIN_DISTANCE : DEFAULT_INITIAL_DISTANCE
       },
       transitions: [
         {
           nextStateName: CursorState.Idle,
           checkOnUpdate: () => {
-            return (
-              (this.checkVisibleTargetingState() &&
-                this.interactor?.currentInteractable === null) ??
-              false
-            )
-          },
+            return (this.checkVisibleTargetingState() && this.interactor?.currentInteractable === null) ?? false
+          }
         },
         {
           nextStateName: CursorState.Hovering,
           // If the interactor targets an object on the first frame of being active, jump immediately to the object to avoid jumpy cursor.
           checkOnUpdate: () => {
-            return (
-              this.checkVisibleTargetingState() &&
-              this.interactor?.currentInteractable !== null
-            )
-          },
-        },
-      ],
+            return this.checkVisibleTargetingState() && this.interactor?.currentInteractable !== null
+          }
+        }
+      ]
     })
 
     this.stateMachine.addState({
@@ -221,26 +204,19 @@ export class CursorViewModel {
 
         // When entering idle state with no Interactable target, lerp to the default distance
         const distance = Math.max(this.cursorDistance, MIN_DISTANCE)
-        this.animateCursorDistance(
-          distance,
-          "ease-in-out-cubic",
-          DEFAULT_IDLE_ANIMATE_DURATION_SECONDS,
-        )
+        this.animateCursorDistance(distance, "ease-in-out-cubic", DEFAULT_IDLE_ANIMATE_DURATION_SECONDS)
       },
       onUpdate: (): void => {
         const position = this.getFarFieldCursorPosition()
 
-        this.updateIndirectCursorPosition(
-          this.interactor?.interactionStrength ?? null,
-          position,
-        )
+        this.updateIndirectCursorPosition(this.interactor?.interactionStrength ?? null, position)
       },
       transitions: [
         {
           nextStateName: CursorState.Inactive,
           checkOnUpdate: () => {
             return !this.interactor || !this.checkVisibleTargetingState()
-          },
+          }
         },
         {
           nextStateName: CursorState.Hovering,
@@ -258,14 +234,10 @@ export class CursorViewModel {
 
             const distance = origin.distance(hitPosition)
 
-            this.animateCursorDistance(
-              distance,
-              "linear",
-              DEFAULT_HOVER_ANIMATE_DURATION_SECONDS,
-            )
-          },
-        },
-      ],
+            this.animateCursorDistance(distance, "linear", DEFAULT_HOVER_ANIMATE_DURATION_SECONDS)
+          }
+        }
+      ]
     })
 
     this.stateMachine.addState({
@@ -275,10 +247,7 @@ export class CursorViewModel {
       },
       onUpdate: () => {
         // Cancel the animation if a trigger happens mid-animation
-        if (
-          this.isAnimating &&
-          this.interactor?.currentTrigger !== InteractorTriggerType.None
-        ) {
+        if (this.isAnimating && this.interactor?.currentTrigger !== InteractorTriggerType.None) {
           this.cancelAnimation()
         }
 
@@ -288,41 +257,31 @@ export class CursorViewModel {
           }
 
           this.cursorDistance =
-            this.interactor?.targetHitInfo?.hit.position.distance(
-              this.interactor.startPoint,
-            ) ?? this.cursorDistance
+            this.interactor?.targetHitInfo?.hit.position.distance(this.interactor.startPoint) ?? this.cursorDistance
         }
 
-        const position = this.shouldCursorHold()
-          ? this.getHeldCursorPosition()
-          : this.getFarFieldCursorPosition()
+        const position = this.shouldCursorHold() ? this.getHeldCursorPosition() : this.getFarFieldCursorPosition()
 
-        this.updateIndirectCursorPosition(
-          this.interactor?.interactionStrength ?? null,
-          position,
-        )
+        this.updateIndirectCursorPosition(this.interactor?.interactionStrength ?? null, position)
       },
       transitions: [
         {
           nextStateName: CursorState.Inactive,
           checkOnUpdate: () => {
             return !this.interactor || !this.checkVisibleTargetingState()
-          },
+          }
         },
         {
           nextStateName: CursorState.Idle,
           checkOnUpdate: () => {
             return !this.interactor?.currentInteractable
-          },
+          }
         },
         {
           nextStateName: CursorState.Manipulating,
           checkOnUpdate: () => {
-            return (
-              this.interactor?.currentTrigger !== InteractorTriggerType.None &&
-              this.currentManipulation !== null
-            )
-          },
+            return this.interactor?.currentTrigger !== InteractorTriggerType.None && this.currentManipulation !== null
+          }
         },
         {
           nextStateName: CursorState.Scrolling,
@@ -332,12 +291,12 @@ export class CursorViewModel {
               this.isScrolling &&
               (this.scrollView?.isDragging ?? false)
             )
-          },
-        },
+          }
+        }
       ],
       onExit: () => {
         this.cancelAnimation()
-      },
+      }
     })
 
     this.stateMachine.addState({
@@ -348,33 +307,28 @@ export class CursorViewModel {
          * We were showing the cursor held to center as a visual feedback if line is disabled,
          * But we disabled this by default in LAF-3485.
          */
-        this.updateIndirectCursorPosition(
-          DEFAULT_MANIPULATE_STRENGTH,
-          this.getHeldCursorPosition(),
-        )
+        this.updateIndirectCursorPosition(DEFAULT_MANIPULATE_STRENGTH, this.getHeldCursorPosition())
       },
       transitions: [
         {
           nextStateName: CursorState.Inactive,
           checkOnUpdate: () => {
             return !this.interactor || !this.checkVisibleTargetingState()
-          },
+          }
         },
         {
           nextStateName: CursorState.Idle,
           checkOnUpdate: () => {
             return !this.interactor?.currentInteractable
-          },
+          }
         },
         {
           nextStateName: CursorState.Hovering,
           checkOnUpdate: () => {
-            return (
-              this.interactor?.currentTrigger === InteractorTriggerType.None
-            )
-          },
-        },
-      ],
+            return this.interactor?.currentTrigger === InteractorTriggerType.None
+          }
+        }
+      ]
     })
 
     this.stateMachine.addState({
@@ -383,10 +337,7 @@ export class CursorViewModel {
       onUpdate: () => {
         const planecastPosition = this.getPlanecastCursorPosition()
 
-        this.updateIndirectCursorPosition(
-          this.interactor?.interactionStrength ?? null,
-          planecastPosition,
-        )
+        this.updateIndirectCursorPosition(this.interactor?.interactionStrength ?? null, planecastPosition)
       },
 
       transitions: [
@@ -394,7 +345,7 @@ export class CursorViewModel {
           nextStateName: CursorState.Inactive,
           checkOnUpdate: () => {
             return !this.interactor || !this.checkVisibleTargetingState()
-          },
+          }
         },
         {
           nextStateName: CursorState.Idle,
@@ -402,20 +353,17 @@ export class CursorViewModel {
             return (
               !this.interactor?.currentInteractable ||
               // If the planecasted point is not within the ScrollView's bounds, immediately switch to Idle to avoid a flicker.
-              (!this.checkPlanecastWithinScrollView() &&
-                this.interactor?.currentTrigger === InteractorTriggerType.None)
+              (!this.checkPlanecastWithinScrollView() && this.interactor?.currentTrigger === InteractorTriggerType.None)
             )
-          },
+          }
         },
         {
           nextStateName: CursorState.Hovering,
           checkOnUpdate: () => {
-            return (
-              this.interactor?.currentTrigger === InteractorTriggerType.None
-            )
-          },
-        },
-      ],
+            return this.interactor?.currentTrigger === InteractorTriggerType.None
+          }
+        }
+      ]
     })
 
     this.stateMachine.enterState(CursorState.Inactive)
@@ -423,17 +371,13 @@ export class CursorViewModel {
 
   private getPlanecastCursorPosition(): vec3 | null {
     if (this.interactor === null) {
-      this.log.d(
-        "Cursor failed to get planecast position due to null interactor, and will return null.",
-      )
+      this.log.d("Cursor failed to get planecast position due to null interactor, and will return null.")
       return null
     }
 
     const position = this.interactor.planecastPoint
 
-    return this.shouldFilter() && position
-      ? this.filter.filter(position, getTime())
-      : position
+    return this.shouldFilter() && position ? this.filter.filter(position, getTime()) : position
   }
 
   private checkPlanecastWithinScrollView() {
@@ -443,10 +387,8 @@ export class CursorViewModel {
     }
 
     return (
-      this.scrollView
-        ?.getSceneObject()
-        ?.getComponent("Component.ScreenTransform")
-        ?.containsWorldPoint(cursorPos) ?? false
+      this.scrollView?.getSceneObject()?.getComponent("Component.ScreenTransform")?.containsWorldPoint(cursorPos) ??
+      false
     )
   }
 
@@ -459,14 +401,12 @@ export class CursorViewModel {
     const direction = this.interactor?.direction ?? null
     if (this.interactor === null || origin === null || direction === null) {
       this.log.d(
-        "Cursor failed to get far field position due to null interactor, origin, or direction, and will return null.",
+        "Cursor failed to get far field position due to null interactor, origin, or direction, and will return null."
       )
       return null
     }
     const position = origin.add(direction.uniformScale(this.cursorDistance))
-    return this.shouldFilter()
-      ? this.filter.filter(position, getTime())
-      : position
+    return this.shouldFilter() ? this.filter.filter(position, getTime()) : position
   }
 
   /**
@@ -479,11 +419,9 @@ export class CursorViewModel {
     if (!this.interactor) {
       return null
     }
-    const isTriggering =
-      (this.interactor.currentTrigger & InteractorTriggerType.Select) !== 0
+    const isTriggering = (this.interactor.currentTrigger & InteractorTriggerType.Select) !== 0
 
-    const wasTriggering =
-      (this.interactor.previousTrigger & InteractorTriggerType.Select) !== 0
+    const wasTriggering = (this.interactor.previousTrigger & InteractorTriggerType.Select) !== 0
 
     if (isTriggering) {
       // While triggering, ensuring that the initial local position is maintained.
@@ -491,9 +429,7 @@ export class CursorViewModel {
         this.interactor?.currentInteractable?.sceneObject
           .getTransform()
           .getWorldTransform()
-          .multiplyPoint(
-            this.interactor?.targetHitInfo?.localHitPosition ?? vec3.zero(),
-          ) ?? null
+          .multiplyPoint(this.interactor?.targetHitInfo?.localHitPosition ?? vec3.zero()) ?? null
     } else if (wasTriggering && !isTriggering) {
       // On the frame that the Interactor stops triggering, maintain the same cursor position as previous frame to account for targeting changes.
       position = this.cursorPosition
@@ -503,9 +439,7 @@ export class CursorViewModel {
       if (!origin) {
         return null
       }
-      const direction = this.interactor.targetHitInfo?.hit.position
-        ?.sub(origin)
-        .normalize()
+      const direction = this.interactor.targetHitInfo?.hit.position?.sub(origin).normalize()
 
       if (!direction) {
         return null
@@ -515,9 +449,7 @@ export class CursorViewModel {
     }
 
     if (position) {
-      return this.shouldFilter()
-        ? this.filter.filter(position, getTime())
-        : position
+      return this.shouldFilter() ? this.filter.filter(position, getTime()) : position
     } else {
       return this.getFarFieldCursorPosition()
     }
@@ -530,27 +462,19 @@ export class CursorViewModel {
   private shouldCursorHold(): boolean {
     return (
       this.enableCursorHolding &&
-      ((this.interactor &&
-        (this.interactor.inputType & InteractorInputType.BothHands) !== 0) ??
-        false)
+      ((this.interactor && (this.interactor.inputType & InteractorInputType.BothHands) !== 0) ?? false)
     )
   }
 
   private shouldFilter(): boolean {
     return (
       this.enableFilter &&
-      ((this.interactor &&
-        (this.interactor.inputType & InteractorInputType.BothHands) !== 0) ??
-        false)
+      ((this.interactor && (this.interactor.inputType & InteractorInputType.BothHands) !== 0) ?? false)
     )
   }
 
   // Animates the cursor to move to a certain distance using easing functions
-  private animateCursorDistance(
-    distance: number,
-    easing: keyof typeof easingFunctions,
-    duration: number,
-  ) {
+  private animateCursorDistance(distance: number, easing: keyof typeof easingFunctions, duration: number) {
     // Ensure only one thing is modifying the cursor distance at a time
     this.distanceCancelSet.cancel()
     this.isAnimating = true
@@ -565,7 +489,7 @@ export class CursorViewModel {
       ended: () => {
         this.isAnimating = false
       },
-      easing: easing,
+      easing: easing
     })
   }
 
@@ -585,8 +509,7 @@ export class CursorViewModel {
       return false
     }
 
-    const interactable =
-      this.interactionManager.getInteractableBySceneObject(sceneObject)
+    const interactable = this.interactionManager.getInteractableBySceneObject(sceneObject)
 
     if (interactable !== null && interactable.isScrollable) {
       this.scrollView = sceneObject.getComponent(ScrollView.getTypeName())
@@ -603,14 +526,10 @@ export class CursorViewModel {
    * positions to interaction hit point if snapping.
    * If there is no origin, then hide the cursor instead.
    */
-  private updateIndirectCursorPosition(
-    interactionStrength: number | null,
-    position: vec3 | null,
-  ): void {
+  private updateIndirectCursorPosition(interactionStrength: number | null, position: vec3 | null): void {
     if (position !== null) {
       if (!this.isAnimating) {
-        this.cursorDistance =
-          this.interactor?.startPoint?.distance(position) ?? this.cursorDistance
+        this.cursorDistance = this.interactor?.startPoint?.distance(position) ?? this.cursorDistance
       }
 
       this._cursorPosition = this.positionOverride ?? position
@@ -620,11 +539,10 @@ export class CursorViewModel {
         cursorData: {
           position: this.cursorPosition,
           interactionStrength: interactionStrength ?? null,
-          isTriggering:
-            this.interactor?.currentTrigger !== InteractorTriggerType.None,
-          scale: this.calculateCursorScale(),
+          isTriggering: this.interactor?.currentTrigger !== InteractorTriggerType.None,
+          scale: this.calculateCursorScale()
         },
-        lineEnabled: false,
+        lineEnabled: false
       })
     }
   }
@@ -634,9 +552,7 @@ export class CursorViewModel {
     if (this.interactor?.enabled) {
       // If the interactor is targeting via direct pinch or poke (but not necessarily near field mode due to no plane), hide the cursor.
       const isVisibleTargetingMode =
-        (this.interactor.activeTargetingMode &
-          (TargetingMode.Poke | TargetingMode.Direct | TargetingMode.None)) ===
-        0
+        (this.interactor.activeTargetingMode & (TargetingMode.Poke | TargetingMode.Direct | TargetingMode.None)) === 0
 
       // If the cursor is tied to a HandInteractor, hide the cursor when in near field mode
       const isNotNearField =
@@ -644,8 +560,7 @@ export class CursorViewModel {
         (this.interactor as HandInteractor).isFarField()
 
       return (
-        ((isVisibleTargetingMode && isNotNearField) ||
-          this.interactor.inputType === InteractorInputType.Mouse) &&
+        ((isVisibleTargetingMode && isNotNearField) || (this.interactor.inputType & InteractorInputType.Mouse) !== 0) &&
         this.interactor.isActive() &&
         this.interactor.isTargeting()
       )
@@ -668,7 +583,7 @@ export class CursorViewModel {
         DEFAULT_MID_FIELD_THRESHOLD_CM,
         DEFAULT_FAR_FIELD_THRESHOLD_CM,
         0,
-        1,
+        1
       )
 
       return DEFAULT_MID_FIELD_SCALE + scaleDifference * t
@@ -683,7 +598,7 @@ export class CursorViewModel {
         DEFAULT_NEAR_FIELD_THRESHOLD_CM,
         DEFAULT_MID_FIELD_THRESHOLD_CM,
         0,
-        1,
+        1
       )
 
       return DEFAULT_NEAR_FIELD_SCALE + scaleDifference * t

@@ -1,8 +1,4 @@
-import {
-  Interactor,
-  InteractorTriggerType,
-  TargetingMode,
-} from "../../../Core/Interactor/Interactor"
+import {Interactor, InteractorTriggerType, TargetingMode} from "../../../Core/Interactor/Interactor"
 import animate, {CancelSet} from "../../../Utils/animate"
 import {withAlpha, withoutAlpha} from "../../../Utils/color"
 import InteractorLineRenderer, {VisualStyle} from "./InteractorLineRenderer"
@@ -13,8 +9,6 @@ import WorldCameraFinderProvider from "../../../Providers/CameraProvider/WorldCa
 import {ViewConfig} from "../../../Utils/views/View"
 
 const FADE_DURATION_SECS = 0.21
-
-const TAG = "InteractorLineVisual"
 
 export type InteractorLineConfig = ViewConfig & {
   interactor: Interactor
@@ -28,44 +22,93 @@ export type InteractorLineConfig = ViewConfig & {
 }
 
 /**
- * This class provides visual representation for interactor lines. It allows customization of the line's material, colors, width, length, and visual style. The class integrates with the InteractionManager and WorldCameraFinderProvider to manage interactions and camera positioning.
+ * @deprecated No longer recommended for use in new projects.
+ * This class provides visual representation for interactor lines. It allows customization of the line's material,
+ * colors, width, length, and visual style. The class integrates with the InteractionManager and
+ * WorldCameraFinderProvider to manage interactions and camera positioning.
  */
 @component
 export class InteractorLineVisual extends BaseScriptComponent {
   private camera = WorldCameraFinderProvider.getInstance()
-  private interactionManager: InteractionManager =
-    InteractionManager.getInstance()
+  private interactionManager: InteractionManager = InteractionManager.getInstance()
 
+  /**
+   * The material used to render the interactor line visual. Can be set to InteractorLineMaterial.
+   */
   @input
+  @hint("The material used to render the interactor line visual. Can be set to InteractorLineMaterial.")
   private lineMaterial!: Material
 
+  /**
+   * The color at the start (origin) of the interactor line visual.
+   */
   @input("vec3", "{1, 1, 0}")
+  @hint("The color at the start (origin) of the interactor line visual.")
   @widget(new ColorWidget())
   public _beginColor: vec3 = new vec3(1, 1, 0)
 
+  /**
+   * The color at the end (target) of the interactor line visual.
+   */
   @input("vec3", "{1, 1, 0}")
+  @hint("The color at the end (target) of the interactor line visual.")
   @widget(new ColorWidget())
   public _endColor: vec3 = new vec3(1, 1, 0)
 
+  /**
+   * The width of the interactor line visual.
+   */
   @input
+  @hint("The width of the interactor line visual.")
   private lineWidth: number = 0.5
 
+  /**
+   * The default length of the interactor line visual. Controls how far the ray extends when not targeting any
+   * object.
+   */
   @input
+  @hint(
+    "The default length of the interactor line visual. Controls how far the ray extends when not targeting any \
+object."
+  )
   private lineLength: number = 160
 
+  /**
+   * Controls the visual style of the interactor line:
+   * 0: Full: Renders a continuous line from start to end.
+   * 1: Split: Creates a segmented line with gaps between sections.
+   * 2: FadedEnd: Gradually fades out the line toward its end point.
+   */
   @input
-  @widget(
-    new ComboBoxWidget()
-      .addItem("Full", 0)
-      .addItem("Split", 1)
-      .addItem("FadedEnd", 2),
+  @hint(
+    "Controls the visual style of the interactor line:\n\
+- Full: Renders a continuous line from start to end.\n\
+- Split: Creates a segmented line with gaps between sections.\n\
+- FadedEnd: Gradually fades out the line toward its end point."
   )
+  @widget(new ComboBoxWidget().addItem("Full", 0).addItem("Split", 1).addItem("FadedEnd", 2))
   public lineStyle: number = 2
 
+  /**
+   * When enabled, makes the interactor line 'stick' to targeted Interactables by pointing directly at them when the
+   * user interacts with them.
+   */
   @input
+  @hint(
+    "When enabled, makes the interactor line 'stick' to targeted Interactables by pointing directly at them when the \
+user interacts with them."
+  )
   private shouldStick: boolean = true
 
+  /**
+   * Reference to the Interactor component that this line will visualize. The line visual appears only when the
+   * referenced interactor is using Indirect targeting mode and is actively targeting.
+   */
   @input("Component.ScriptComponent")
+  @hint(
+    "Reference to the Interactor component that this line will visualize. The line visual appears only when the \
+referenced interactor is using Indirect targeting mode and is actively targeting."
+  )
   @allowUndefined
   _interactor?: BaseInteractor
 
@@ -143,7 +186,7 @@ export class InteractorLineVisual extends BaseScriptComponent {
       startColor: withAlpha(this._beginColor, 1),
       endColor: withAlpha(this._endColor, 1),
       startWidth: this.lineWidth,
-      endWidth: this.lineWidth,
+      endWidth: this.lineWidth
     })
 
     this.line.getSceneObject().setParent(this.sceneObject)
@@ -193,7 +236,7 @@ export class InteractorLineVisual extends BaseScriptComponent {
       easing: "ease-out-cubic",
       update: (t) => {
         this.line.opacity = isShown ? t : 1 - t
-      },
+      }
     })
   }
 
@@ -218,8 +261,7 @@ export class InteractorLineVisual extends BaseScriptComponent {
       return this.defaultScale
     }
 
-    return this.interactor?.activeTargetingMode === TargetingMode.Direct ||
-      this.shouldStick
+    return this.interactor?.activeTargetingMode === TargetingMode.Direct || this.shouldStick
       ? new vec3(1, distance / this.maxLength, 1)
       : this.defaultScale
   }
@@ -264,15 +306,10 @@ export class InteractorLineVisual extends BaseScriptComponent {
     this.transform.setWorldPosition(locus)
     this.transform.setWorldScale(distanceScale)
 
-    if (
-      this.shouldStick &&
-      (InteractorTriggerType.Select & this.interactor.currentTrigger) !== 0
-    ) {
+    if (this.shouldStick && (InteractorTriggerType.Select & this.interactor.currentTrigger) !== 0) {
       const target = this.interactor.currentInteractable
       if (target) {
-        const targetPos: vec3 = target.sceneObject
-          .getTransform()
-          .getWorldPosition()
+        const targetPos: vec3 = target.sceneObject.getTransform().getWorldPosition()
         direction = targetPos.sub(locus).normalize()
       }
     }
@@ -281,9 +318,7 @@ export class InteractorLineVisual extends BaseScriptComponent {
     const newRight = direction.cross(locusToCamera).normalize()
     const newForward = newRight.cross(direction)
 
-    this.transform.setWorldRotation(
-      this.rotationFromOrthogonal(newRight, direction, newForward),
-    )
+    this.transform.setWorldRotation(this.rotationFromOrthogonal(newRight, direction, newForward))
 
     this.showVisual(true)
   }

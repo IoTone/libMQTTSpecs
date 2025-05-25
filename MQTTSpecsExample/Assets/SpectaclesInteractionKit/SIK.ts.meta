@@ -1,4 +1,4 @@
-- !<AssetImportMetadata/bb667b89-1f08-44f2-a05a-b3a6887f886c>
+- !<AssetImportMetadata/6cfa178a-940c-7efa-2e20-fe850451a3bb>
   ImportedAssetIds:
     TypeScriptAsset: !<reference> 415227e9-0f55-4cca-83bd-f670e0c9e887
   ImporterName: TypeScriptAssetImporter
@@ -39,3 +39,6 @@
       {}
   SvgIcon: ""
   DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  SetupScript:
+    code: ""
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000

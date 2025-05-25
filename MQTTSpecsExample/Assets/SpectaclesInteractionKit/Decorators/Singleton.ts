@@ -3,9 +3,7 @@
  *
  * @param constructor
  */
-export function Singleton<T extends new (...args: any[]) => any>(
-  constructor: T,
-): T {
+export function Singleton<T extends new (...args: any[]) => any>(constructor: T): T {
   let _instance: InstanceType<T> | null = null
 
   const newConstructor: any = function (...args: any[]) {

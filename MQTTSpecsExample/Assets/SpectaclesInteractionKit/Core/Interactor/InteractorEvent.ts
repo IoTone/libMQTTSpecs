@@ -17,6 +17,8 @@ export type DispatchableEventArgs = {
   target: Interactable
   eventName: InteractableEventName
   origin?: Interactable
+  connectionId?: string | null
+  endedInsideInteractable?: boolean
 }
 
 /**
@@ -45,6 +47,17 @@ export type InteractorEvent = {
    * The current phase for this event
    */
   propagationPhase: EventPropagationPhase
+
+  /**
+   * Connection ID of the user that propagated this event.
+   */
+  connectionId?: string | null
+
+  /**
+   * Whether the Interactor was inside the Interactable when triggering ends. This is only relevant for OnTriggerEnd,
+   * and will be null for other events.
+   */
+  endedInsideInteractable?: boolean | null
 
   /**
    * Stop propagating this event on the propagation path.

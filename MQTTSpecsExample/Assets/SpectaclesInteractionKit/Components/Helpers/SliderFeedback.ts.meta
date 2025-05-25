@@ -1,4 +1,4 @@
-- !<AssetImportMetadata/40ec8e6a-3f97-45fd-9a3b-68f79f919a6f>
+- !<AssetImportMetadata/11a2b3cc-f9ef-0307-0711-1543f64dcc30>
   ImporterSettings: !<AssetImporterSettings>
     {}
   ImportedAssetIds:
@@ -37,7 +37,10 @@
     -
       {}
   InputLines:
-    - // @input Component.RenderMeshVisual renderMeshVisual
-    - // @input SceneObject knobObject
+    - "// @input Component.RenderMeshVisual renderMeshVisual {\"hint\":\"The RenderMeshVisual component of the slider track that visualizes the slider's value. This mesh will have its material's level property updated to reflect the current slider position, and its pinch property modified during interaction events to provide additional visual feedback.\"}"
+    - "// @input SceneObject knobObject {\"hint\":\"Reference to the SceneObject containing the slider's interactive knob. This object must have an Interactable component attached to allow user interaction.\"}"
   SvgIcon: ""
   DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  SetupScript:
+    code: ""
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000

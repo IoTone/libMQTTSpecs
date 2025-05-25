@@ -21,16 +21,14 @@ export function parseColor(str: string, alpha: number = 1.0): vec4 {
   }
 
   if (str.length !== 6) {
-    throw new Error(
-      `parseColor: can't parse string of length ${str.length} "${str}"`,
-    )
+    throw new Error(`parseColor: can't parse string of length ${str.length} "${str}"`)
   }
 
   return new vec4(
     parseInt(str.substr(0, 2), 16) / 255,
     parseInt(str.substr(2, 2), 16) / 255,
     parseInt(str.substr(4, 2), 16) / 255,
-    alpha,
+    alpha
   )
 }
 
@@ -62,16 +60,16 @@ export const DARKGRAY = (alpha = 1) => parseColor("#202020", alpha)
 export const DEFAULT_COLOR_STOPS: [ColorStop, ColorStop, ColorStop] = [
   {
     color: parseColor("#E92754"),
-    percent: 4.42,
+    percent: 4.42
   },
   {
     color: parseColor("#2B7391"),
-    percent: 52.2,
+    percent: 52.2
   },
   {
     color: parseColor("#FFFC00"),
-    percent: 98.98,
-  },
+    percent: 98.98
+  }
 ]
 
 /**
@@ -80,16 +78,16 @@ export const DEFAULT_COLOR_STOPS: [ColorStop, ColorStop, ColorStop] = [
 export const CRITICAL_COLOR_STOPS: [ColorStop, ColorStop, ColorStop] = [
   {
     color: parseColor("#541858"),
-    percent: 25.98,
+    percent: 25.98
   },
   {
     color: parseColor("#921633"),
-    percent: 47.28,
+    percent: 47.28
   },
   {
     color: parseColor("#FFFC0C"),
-    percent: 106.17,
-  },
+    percent: 106.17
+  }
 ]
 
 /**
@@ -227,15 +225,16 @@ export function getMostCommonHue(texture: Texture): number {
 
   // Extract the data from the texture into the pixel buffer
   const proceduralTexture = ProceduralTextureProvider.createFromTexture(texture)
-  const proceduralTextureControl =
-    proceduralTexture.control as ProceduralTextureProvider
+  const proceduralTextureControl = proceduralTexture.control as ProceduralTextureProvider
   proceduralTextureControl.getPixels(0, 0, width, height, pixelBuffer)
 
   const sampleCount = MOST_COMMON_HUE_SAMPLES
   const pixels = width * height
-  const samples = new SeededRandomNumberGenerator(
-    pixels,
-  ).getRandomNumberArrayInRangeNoDuplicates(0, pixels - 1, sampleCount)
+  const samples = new SeededRandomNumberGenerator(pixels).getRandomNumberArrayInRangeNoDuplicates(
+    0,
+    pixels - 1,
+    sampleCount
+  )
 
   // Reuse the vector for each loop to reduce allocations
   var pixelColor = vec3.zero()

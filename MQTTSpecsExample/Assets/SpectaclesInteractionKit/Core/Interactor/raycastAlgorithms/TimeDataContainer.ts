@@ -9,7 +9,7 @@ const TAG = "TimedDataContainer"
 export class TimedData<T> {
   constructor(
     public timestamp: number,
-    public data: T,
+    public data: T
   ) {}
 }
 
@@ -20,7 +20,7 @@ export class TimedData<T> {
  */
 export enum WindowMode {
   TIME,
-  FRAME,
+  FRAME
 }
 
 /**
@@ -35,7 +35,7 @@ export class TimedDataContainer<T> {
   constructor(
     private _windowMode: WindowMode,
     private _windowSize: number,
-    private sampleOps: SampleOps<T>,
+    private sampleOps: SampleOps<T>
   ) {}
 
   /**

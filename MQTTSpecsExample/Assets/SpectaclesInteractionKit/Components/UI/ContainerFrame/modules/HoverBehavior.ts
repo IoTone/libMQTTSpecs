@@ -10,12 +10,12 @@ enum State {
   Inactive = "Inactive",
   InactiveToActive = "InactiveToActive",
   Active = "Active",
-  ActiveToInactive = "ActiveToInactive",
+  ActiveToInactive = "ActiveToInactive"
 }
 
 enum Signal {
   RequestActive = "RequestActive",
-  RequestInActive = "RequestInActive",
+  RequestInActive = "RequestInActive"
 }
 
 const STATE_CHANGE_DEBOUNCE_TIME_S = 0.05 // 50ms
@@ -48,7 +48,7 @@ export class HoverBehavior {
 
   constructor(
     private interactable: Interactable,
-    private name: string = "HoverBehavior",
+    private name: string = "HoverBehavior"
   ) {
     this.setupStateMachine()
 
@@ -67,9 +67,7 @@ export class HoverBehavior {
   private bindHoverEvents(): void {
     this.unsubscribeList.push(this.interactable.onHoverEnter(this.onHoverEnter))
     this.unsubscribeList.push(this.interactable.onHoverExit(this.onHoverExit))
-    this.unsubscribeList.push(
-      this.interactable.onHoverUpdate(this.onHoverUpdated),
-    )
+    this.unsubscribeList.push(this.interactable.onHoverUpdate(this.onHoverUpdated))
   }
 
   private unBindHoverEvents(): void {
@@ -98,9 +96,7 @@ export class HoverBehavior {
       if (DEBUG_MESSAGES) {
         this.log.d(`container requested active state:${this.requestActive}`)
       }
-      this.stateMachine.sendSignal(
-        this.requestActive ? Signal.RequestActive : Signal.RequestInActive,
-      )
+      this.stateMachine.sendSignal(this.requestActive ? Signal.RequestActive : Signal.RequestInActive)
     }
 
     // Update actual state immediately
@@ -119,9 +115,9 @@ export class HoverBehavior {
           nextStateName: State.InactiveToActive,
           checkOnSignal: (signal, data) => {
             return signal === Signal.RequestActive
-          },
-        },
-      ],
+          }
+        }
+      ]
     })
 
     // Inactive Transition State
@@ -132,15 +128,15 @@ export class HoverBehavior {
           nextStateName: State.Inactive,
           checkOnSignal: (signal, data) => {
             return signal === Signal.RequestInActive
-          },
+          }
         },
         {
           nextStateName: State.Active,
           checkOnUpdate: (state) => {
             return state.stateElapsedTime > STATE_CHANGE_DEBOUNCE_TIME_S
-          },
-        },
-      ],
+          }
+        }
+      ]
     })
 
     // Active State
@@ -168,9 +164,9 @@ export class HoverBehavior {
           nextStateName: State.ActiveToInactive,
           checkOnSignal: (signal, data) => {
             return signal === Signal.RequestInActive
-          },
-        },
-      ],
+          }
+        }
+      ]
     })
 
     //  Active Transition State
@@ -181,15 +177,15 @@ export class HoverBehavior {
           nextStateName: State.Inactive,
           checkOnUpdate: (state) => {
             return state.stateElapsedTime > STATE_CHANGE_DEBOUNCE_TIME_S
-          },
+          }
         },
         {
           nextStateName: State.Active,
           checkOnSignal: (signal, data) => {
             return signal === Signal.RequestActive
-          },
-        },
-      ],
+          }
+        }
+      ]
     })
   }
 }

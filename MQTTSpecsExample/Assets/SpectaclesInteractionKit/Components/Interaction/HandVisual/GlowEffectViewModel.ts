@@ -13,7 +13,7 @@ export enum GlowEffectStates {
   Pinching = "Pinching",
   PinchingNotTargeting = "PinchingNotTargeting",
   NearTapping = "NearTapping",
-  Tapping = "Tapping",
+  Tapping = "Tapping"
 }
 
 export enum StateMachineSignals {
@@ -26,7 +26,7 @@ export enum StateMachineSignals {
   EnterPalmUIMode = "EnterPalmUIMode",
   ExitPalmUIMode = "ExitPalmUIMode",
   EnterTap = "EnterTap",
-  ExitTap = "ExitTap",
+  ExitTap = "ExitTap"
 }
 
 export type GlowEffectViewModelConfig = {
@@ -135,9 +135,7 @@ export class GlowEffectViewModel {
     stateMachine.addState({
       name: GlowEffectStates.IdleTargeting,
       onEnter: () => {
-        this.log.v(
-          `${this.config.handType} Entered state: ${this.currentState}`,
-        )
+        this.log.v(`${this.config.handType} Entered state: ${this.currentState}`)
         this.animateIndexGlowBaseEvent.invoke(false)
         this.animateIndexGlowBonusEvent.invoke(false)
 
@@ -149,29 +147,27 @@ export class GlowEffectViewModel {
           nextStateName: GlowEffectStates.IdleNotTargeting,
           checkOnSignal: (signal: string) => {
             return signal === StateMachineSignals.ExitTargeting
-          },
+          }
         },
         {
           nextStateName: GlowEffectStates.NearPinching,
           checkOnSignal: (signal: string) => {
             return signal === StateMachineSignals.EnterNearPinch
-          },
+          }
         },
         {
           nextStateName: GlowEffectStates.NearTapping,
           checkOnSignal: (signal: string) => {
             return signal === StateMachineSignals.EnterPalmUIMode
-          },
-        },
-      ],
+          }
+        }
+      ]
     })
 
     stateMachine.addState({
       name: GlowEffectStates.IdleNotTargeting,
       onEnter: () => {
-        this.log.v(
-          `${this.config.handType} Entered state: ${this.currentState}`,
-        )
+        this.log.v(`${this.config.handType} Entered state: ${this.currentState}`)
         this.animateIndexGlowBaseEvent.invoke(false)
         this.animateIndexGlowBonusEvent.invoke(false)
 
@@ -183,23 +179,21 @@ export class GlowEffectViewModel {
           nextStateName: GlowEffectStates.IdleTargeting,
           checkOnSignal: (signal: string) => {
             return signal === StateMachineSignals.EnterTargeting
-          },
+          }
         },
         {
           nextStateName: GlowEffectStates.NearPinching,
           checkOnSignal: (signal: string) => {
             return signal === StateMachineSignals.EnterNearPinch
-          },
-        },
-      ],
+          }
+        }
+      ]
     })
 
     stateMachine.addState({
       name: GlowEffectStates.NearPinching,
       onEnter: () => {
-        this.log.v(
-          `${this.config.handType} Entered state: ${this.currentState}`,
-        )
+        this.log.v(`${this.config.handType} Entered state: ${this.currentState}`)
         this.animateIndexGlowBaseEvent.invoke(true)
         this.animateIndexGlowBonusEvent.invoke(false)
 
@@ -211,35 +205,33 @@ export class GlowEffectViewModel {
           nextStateName: GlowEffectStates.IdleTargeting,
           checkOnSignal: (signal: string) => {
             return signal === StateMachineSignals.ExitNearPinch
-          },
+          }
         },
         {
           nextStateName: GlowEffectStates.IdleNotTargeting,
           checkOnSignal: (signal: string) => {
             return signal === StateMachineSignals.ExitTargeting
-          },
+          }
         },
         {
           nextStateName: GlowEffectStates.NearTapping,
           checkOnSignal: (signal: string) => {
             return signal === StateMachineSignals.EnterPalmUIMode
-          },
+          }
         },
         {
           nextStateName: GlowEffectStates.Pinching,
           checkOnSignal: (signal: string) => {
             return signal === StateMachineSignals.EnterPinch
-          },
-        },
-      ],
+          }
+        }
+      ]
     })
 
     stateMachine.addState({
       name: GlowEffectStates.Pinching,
       onEnter: () => {
-        this.log.v(
-          `${this.config.handType} Entered state: ${this.currentState}`,
-        )
+        this.log.v(`${this.config.handType} Entered state: ${this.currentState}`)
         this.animateIndexGlowBaseEvent.invoke(true)
         this.animateIndexGlowBonusEvent.invoke(true)
 
@@ -251,23 +243,21 @@ export class GlowEffectViewModel {
           nextStateName: GlowEffectStates.PinchingNotTargeting,
           checkOnSignal: (signal: string) => {
             return signal === StateMachineSignals.ExitTargeting
-          },
+          }
         },
         {
           nextStateName: GlowEffectStates.NearPinching,
           checkOnSignal: (signal: string) => {
             return signal === StateMachineSignals.ExitPinch
-          },
-        },
-      ],
+          }
+        }
+      ]
     })
 
     stateMachine.addState({
       name: GlowEffectStates.PinchingNotTargeting,
       onEnter: () => {
-        this.log.v(
-          `${this.config.handType} Entered state: ${this.currentState}`,
-        )
+        this.log.v(`${this.config.handType} Entered state: ${this.currentState}`)
         this.animateIndexGlowBaseEvent.invoke(true)
         this.animateIndexGlowBonusEvent.invoke(true)
 
@@ -279,23 +269,21 @@ export class GlowEffectViewModel {
           nextStateName: GlowEffectStates.IdleNotTargeting,
           checkOnSignal: (signal: string) => {
             return signal === StateMachineSignals.ExitPinch
-          },
+          }
         },
         {
           nextStateName: GlowEffectStates.Pinching,
           checkOnSignal: (signal: string) => {
             return signal === StateMachineSignals.EnterTargeting
-          },
-        },
-      ],
+          }
+        }
+      ]
     })
 
     stateMachine.addState({
       name: GlowEffectStates.NearTapping,
       onEnter: () => {
-        this.log.v(
-          `${this.config.handType} Entered state: ${this.currentState}`,
-        )
+        this.log.v(`${this.config.handType} Entered state: ${this.currentState}`)
         this.tapModeChangedEvent.invoke(true)
 
         this.animateIndexGlowBaseEvent.invoke(true)
@@ -312,23 +300,21 @@ export class GlowEffectViewModel {
           },
           onExecution: () => {
             this.tapModeChangedEvent.invoke(false)
-          },
+          }
         },
         {
           nextStateName: GlowEffectStates.Tapping,
           checkOnSignal: (signal: string) => {
             return signal === StateMachineSignals.EnterTap
-          },
-        },
-      ],
+          }
+        }
+      ]
     })
 
     stateMachine.addState({
       name: GlowEffectStates.Tapping,
       onEnter: () => {
-        this.log.v(
-          `${this.config.handType} Entered state: ${this.currentState}`,
-        )
+        this.log.v(`${this.config.handType} Entered state: ${this.currentState}`)
         this.animateIndexGlowBaseEvent.invoke(true)
         this.animateIndexGlowBonusEvent.invoke(true)
 
@@ -340,9 +326,9 @@ export class GlowEffectViewModel {
           nextStateName: GlowEffectStates.NearTapping,
           checkOnSignal: (signal: string) => {
             return signal === StateMachineSignals.ExitTap
-          },
-        },
-      ],
+          }
+        }
+      ]
     })
 
     stateMachine.enterState(GlowEffectStates.IdleTargeting, true)

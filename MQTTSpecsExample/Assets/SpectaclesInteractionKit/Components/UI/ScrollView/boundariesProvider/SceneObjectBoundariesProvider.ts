@@ -6,14 +6,9 @@ const TAG = "SceneObjectBoundariesProvider"
  * Apply a boundary by computing it from a Scene Object
  */
 export abstract class SceneObjectBoundariesProvider extends BoundariesProvider {
-  protected screenTransform: ScreenTransform = this.sceneObject.getComponent(
-    "Component.ScreenTransform",
-  )
+  protected screenTransform: ScreenTransform = this.sceneObject.getComponent("Component.ScreenTransform")
 
-  protected startingPosition = this.localPointToParentPoint(
-    this.screenTransform,
-    vec2.zero(),
-  )
+  protected startingPosition = this.localPointToParentPoint(this.screenTransform, vec2.zero())
   protected startingBoundaries: Rect
 
   /**
@@ -33,15 +28,12 @@ export abstract class SceneObjectBoundariesProvider extends BoundariesProvider {
   }
 
   get boundaries(): Rect {
-    const offsetPosition = this.localPointToParentPoint(
-      this.screenTransform,
-      vec2.zero(),
-    ).sub(this.startingPosition)
+    const offsetPosition = this.localPointToParentPoint(this.screenTransform, vec2.zero()).sub(this.startingPosition)
     return Rect.create(
       this.startingBoundaries.left + offsetPosition.x,
       this.startingBoundaries.right + offsetPosition.x,
       this.startingBoundaries.bottom + offsetPosition.y,
-      this.startingBoundaries.top + offsetPosition.y,
+      this.startingBoundaries.top + offsetPosition.y
     )
   }
 
@@ -64,40 +56,21 @@ export abstract class SceneObjectBoundariesProvider extends BoundariesProvider {
    * Recomputes starting boundaries
    */
   recomputeStartingBoundaries(): void {
-    this.startingPosition = this.localPointToParentPoint(
-      this.screenTransform,
-      vec2.zero(),
-    )
+    this.startingPosition = this.localPointToParentPoint(this.screenTransform, vec2.zero())
     this.startingBoundaries = this.getBoundaries()
   }
 
   protected abstract getBoundaries(): Rect
 
-  protected createScreenTransformRectBoundaries(
-    screenTransform: ScreenTransform,
-  ): Rect {
-    const topLeftCorner = this.localPointToParentPoint(
-      screenTransform,
-      new vec2(-1, 1),
-    )
+  protected createScreenTransformRectBoundaries(screenTransform: ScreenTransform): Rect {
+    const topLeftCorner = this.localPointToParentPoint(screenTransform, new vec2(-1, 1))
 
-    const bottomRightCorner = this.localPointToParentPoint(
-      screenTransform,
-      new vec2(1, -1),
-    )
+    const bottomRightCorner = this.localPointToParentPoint(screenTransform, new vec2(1, -1))
 
-    return Rect.create(
-      topLeftCorner.x,
-      bottomRightCorner.x,
-      bottomRightCorner.y,
-      topLeftCorner.y,
-    )
+    return Rect.create(topLeftCorner.x, bottomRightCorner.x, bottomRightCorner.y, topLeftCorner.y)
   }
 
-  private localPointToParentPoint(
-    screenTransform: ScreenTransform,
-    position: vec2,
-  ) {
+  private localPointToParentPoint(screenTransform: ScreenTransform, position: vec2) {
     const worldPoint = screenTransform.localPointToWorldPoint(position)
     const parentPoint = this.screenTransform.worldPointToParentPoint(worldPoint)
 

@@ -77,26 +77,15 @@ export default class HeadlockRotationCalculator {
    * Returns the exact angle to rotate the target by along the given axis.
    * This function will include the logic for interpolation / buffer tolerances later.
    */
-  private calculateRotationOffset(
-    angle: number,
-    axisVector: vec3,
-    positionVector: vec3,
-  ): vec3 {
+  private calculateRotationOffset(angle: number, axisVector: vec3, positionVector: vec3): vec3 {
     const rotationQuaternion = quat.angleAxis(angle, axisVector)
 
     // Rotate the current offset about the given axis, then normalize the new position onto the sphere.
-    let newPositionVector = rotationQuaternion
-      .multiplyVec3(positionVector)
-      .normalize()
-      .uniformScale(this.distance)
+    let newPositionVector = rotationQuaternion.multiplyVec3(positionVector).normalize().uniformScale(this.distance)
 
     if (this.axisEasing !== 1) {
       const timeRatio = getDeltaTime() / this.duration
-      newPositionVector = vec3.lerp(
-        positionVector,
-        newPositionVector,
-        this.axisEasing * timeRatio,
-      )
+      newPositionVector = vec3.lerp(positionVector, newPositionVector, this.axisEasing * timeRatio)
     }
     const rotationOffset = newPositionVector.sub(positionVector)
 
@@ -114,14 +103,10 @@ export default class HeadlockRotationCalculator {
     positionVector: vec3,
     originVector: vec3,
     forwardVector: vec3,
-    upVector?: vec3,
+    upVector?: vec3
   ): number {
-    const positionVectorOnPlane = positionVector
-      .projectOnPlane(axisVector)
-      .normalize()
-    const forwardVectorOnPlane = forwardVector
-      .projectOnPlane(axisVector)
-      .normalize()
+    const positionVectorOnPlane = positionVector.projectOnPlane(axisVector).normalize()
+    const forwardVectorOnPlane = forwardVector.projectOnPlane(axisVector).normalize()
 
     let angleBetween = forwardVectorOnPlane.angleTo(positionVectorOnPlane)
 
@@ -129,23 +114,14 @@ export default class HeadlockRotationCalculator {
     let positionAngleOnPlane = originVector.angleTo(positionVectorOnPlane)
 
     if (this.axis === RotationAxis.Pitch && upVector !== undefined) {
-      const forwardVectorOnXZ = new vec2(
-        forwardVectorOnPlane.x,
-        forwardVectorOnPlane.z,
-      ).normalize()
-      const positionVectorOnXZ = new vec2(
-        positionVectorOnPlane.x,
-        positionVectorOnPlane.z,
-      ).normalize()
+      const forwardVectorOnXZ = new vec2(forwardVectorOnPlane.x, forwardVectorOnPlane.z).normalize()
+      const positionVectorOnXZ = new vec2(positionVectorOnPlane.x, positionVectorOnPlane.z).normalize()
 
-      const sameDirection =
-        forwardVectorOnXZ.angleTo(positionVectorOnXZ) < Math.PI / 2
+      const sameDirection = forwardVectorOnXZ.angleTo(positionVectorOnXZ) < Math.PI / 2
 
       if (upVector.y < 0 || !sameDirection) {
         const direction = -Math.sign(forwardVectorOnPlane.y)
-        const rotatedOriginVec = quat
-          .angleAxis((direction * Math.PI) / 2, axisVector)
-          .multiplyVec3(originVector)
+        const rotatedOriginVec = quat.angleAxis((direction * Math.PI) / 2, axisVector).multiplyVec3(originVector)
 
         forwardAngleOnPlane = rotatedOriginVec.angleTo(forwardVectorOnPlane)
         positionAngleOnPlane = rotatedOriginVec.angleTo(positionVectorOnPlane)
@@ -163,8 +139,7 @@ export default class HeadlockRotationCalculator {
 
     // Calculate the angle to rotate just enough to keep the camera within the buffer cone.
     // Possibly not needed.
-    const bufferAngle =
-      angleDelta - Math.sign(angleDelta) * this.axisBufferRadians
+    const bufferAngle = angleDelta - Math.sign(angleDelta) * this.axisBufferRadians
 
     return bufferAngle
   }
@@ -182,23 +157,13 @@ export default class HeadlockRotationCalculator {
     positionVector: vec3,
     originVector: vec3,
     forwardVector: vec3,
-    upVector?: vec3,
+    upVector?: vec3
   ): vec3 {
     if (this.skipRotation()) {
       return vec3.zero()
     }
-    const angle = this.calculateAngleDelta(
-      axisVector,
-      positionVector,
-      originVector,
-      forwardVector,
-      upVector,
-    )
-    const rotationOffset = this.calculateRotationOffset(
-      angle,
-      axisVector,
-      positionVector,
-    )
+    const angle = this.calculateAngleDelta(axisVector, positionVector, originVector, forwardVector, upVector)
+    const rotationOffset = this.calculateRotationOffset(angle, axisVector, positionVector)
 
     return rotationOffset
   }

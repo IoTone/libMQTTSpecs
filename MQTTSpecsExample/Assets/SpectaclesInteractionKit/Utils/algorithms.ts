@@ -9,10 +9,7 @@
  * If it returns false, the search continues to the next object.
  * @returns the object returned by the predicate function, otherwise null.
  */
-export function bfs<T>(
-  rootObjects: SceneObject[],
-  predicate: (sceneObject: SceneObject) => T,
-): T | null {
+export function bfs<T>(rootObjects: SceneObject[], predicate: (sceneObject: SceneObject) => T): T | null {
   for (const rootObject of rootObjects) {
     const queue = [rootObject]
     while (queue.length > 0) {
@@ -45,10 +42,7 @@ export function bfs<T>(
  * If it returns false, the search continues to the next object.
  * @returns the collection of objects that match the the predicate function, otherwise an empty list.
  */
-export function filterTrees<T>(
-  rootObjects: SceneObject[],
-  predicate: (sceneObject: SceneObject) => T,
-): T[] {
+export function filterTrees<T>(rootObjects: SceneObject[], predicate: (sceneObject: SceneObject) => T): T[] {
   const results: T[] = []
   for (const rootObject of rootObjects) {
     const queue = [rootObject]
@@ -77,10 +71,7 @@ export function filterTrees<T>(
  * @param rootObject The root of the tree to apply the function to.
  * @param toApply This function is called with every scene object descended from rootObject as an argument.
  */
-export function applyToDescendants(
-  rootObject: SceneObject,
-  toApply: (sceneObject: SceneObject) => void,
-): void {
+export function applyToDescendants(rootObject: SceneObject, toApply: (sceneObject: SceneObject) => void): void {
   for (const childObject of rootObject.children) {
     applyToDescendants(childObject, toApply)
   }

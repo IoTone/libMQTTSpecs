@@ -38,11 +38,33 @@ export class SpringAnimate {
     this.velocity = this.velocity.add(acceleration.uniformScale(getDeltaTime()))
 
     // Update position
-    const updatedValue = currentValue.add(
-      this.velocity.uniformScale(getDeltaTime()),
-    )
+    const updatedValue = currentValue.add(this.velocity.uniformScale(getDeltaTime()))
 
     return updatedValue
+  }
+
+  /**
+   * Creates a new spring animation with the given duration and bounce.
+   * @param duration - The perceptual duration of the animation in seconds.
+   * @param bounce - How much bounce the spring should have. 0 is no bounce, 1 is infinite bounce.
+   * @returns A new spring animation object.
+   */
+  public static spring(duration: number, bounce: number): SpringAnimate {
+    const k = Math.pow((2 * Math.PI) / duration, 2)
+    const damp = ((1 - bounce) * (4 * Math.PI)) / duration
+    return new SpringAnimate(k, damp, 1)
+  }
+
+  public static smooth(duration = 0.3): SpringAnimate {
+    return SpringAnimate.spring(duration, 0)
+  }
+
+  public static snappy(duration = 0.3): SpringAnimate {
+    return SpringAnimate.spring(duration, 0.15)
+  }
+
+  public static bouncy(duration = 0.5): SpringAnimate {
+    return SpringAnimate.spring(duration, 0.3)
   }
 
   public reset(): void {

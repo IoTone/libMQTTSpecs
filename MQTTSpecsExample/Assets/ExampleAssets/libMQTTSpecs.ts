@@ -178,6 +178,7 @@ const enum PacketType {
 // Simple MQTT Client
 export class MqttClientLib2 extends EventEmitter<MqttEvents> {
   // private _ws?: ls.WebSocket;
+  private internetModule: InternetModule = require("LensStudio:InternetModule");
   private _ws?: WebSocket;
   private _buffer: Uint8Array;
   private _offset: number;
@@ -185,7 +186,7 @@ export class MqttClientLib2 extends EventEmitter<MqttEvents> {
   private _connected: boolean;
   private _packetId: number;
   private _keepAliveTimer?: number;
-
+   
   constructor(options: ConnectOptions, private parent: MqttClient2) {
     super();
     this._options = {
@@ -200,6 +201,7 @@ export class MqttClientLib2 extends EventEmitter<MqttEvents> {
   }
 
   public connect(): void {
+    print("MqttClientLib2 connect()");   
     if (this._connected) {
       this.emit('error', new Error('Already connected'));
       return;
@@ -272,6 +274,7 @@ export class MqttClientLib2 extends EventEmitter<MqttEvents> {
   }
 
   private _onConnect(): void {
+    print("MqttClientLib2 _onConnect()");
     this._connected = true;
 
     const packet = this._createPacket();
@@ -538,6 +541,7 @@ export class MqttClient2 extends BaseScriptComponent implements FooMit.BarMit {
 // export class MqttClient extends Wolfy87EventEmitter.EventEmitter {
 // export class MqttClient extends events.EventEmitter {
   // private _socket: net.Socket | tls.TLSSocket;
+  private internetModule: InternetModule = require("LensStudio:InternetModule");
   
   _options: ConnectOptions;// private _options: ConnectOptions;
   _connected: boolean;
@@ -557,13 +561,14 @@ export class MqttClient2 extends BaseScriptComponent implements FooMit.BarMit {
   }
    
   onStart() {
+     print("MqttClient2 onStart()");
      // XXX Hardcoded
      // TODO: set these up in the class component
      // 
      // See different test server options
      // http://www.steves-internet-guide.com/mqtt-hosting-brokers-and-servers/#list
      var options : ConnectOptions = {
-      url: "test.mosquitto.org:1881/mqtt",// options.host,
+      url: "ws://broker.emqx.io:8083/mqtt",// options.host,
       // : 1881, // options.port,
       // username: null, // options.username,
       // password: null, // options.password,
@@ -586,7 +591,9 @@ export class MqttClient2 extends BaseScriptComponent implements FooMit.BarMit {
     this._keepAliveTimer = this.createEvent("DelayedCallbackEvent");
     // this._options = options;
     // XXX hardcoded value
-    this._ws = this.remoteServiceModule.createWebSocket("wss://test.mosquitto.org:8081/mqtt");
+    // this.webSocket = this.internetModule.createWebSocket(this.serverUrl);
+    // this._ws = this.internetModule.createWebSocket("wss://test.mosquitto.org:8081");
+    this._ws = this.internetModule.createWebSocket("wss://rtops.net:1883");
     this._ws.binaryType = 'blob';
         
     print("initializing mqtt clientId" + options.clientId);

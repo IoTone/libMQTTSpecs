@@ -14,7 +14,8 @@ export enum InteractorInputType {
   BtController = 1 << 3,
   CustomController = 1 << 4,
   Mouse = 1 << 5,
-  All = BothHands | Mobile | BtController | CustomController | Mouse,
+  Sync = 1 << 6,
+  All = BothHands | Mobile | BtController | CustomController | Mouse
 }
 
 /**
@@ -26,7 +27,7 @@ export enum TargetingMode {
   Direct = 1 << 0,
   Indirect = 1 << 1,
   Poke = 1 << 2, // Poke is mutually exclusive with Direct and Indirect
-  All = Direct | Indirect | Poke,
+  All = Direct | Indirect | Poke
 }
 
 /**
@@ -42,7 +43,7 @@ export enum InteractorTriggerType {
   None = 0,
   Pinch = 1 << 0,
   Poke = 1 << 1,
-  Select = Pinch | Poke,
+  Select = Pinch | Poke
 }
 
 /**
@@ -52,7 +53,7 @@ export enum InteractorTriggerType {
  */
 export enum DragType {
   SixDof = 0,
-  Touchpad = 1,
+  Touchpad = 1
 }
 
 /**

@@ -8,6 +8,7 @@ import BaseInteractor from "./BaseInteractor"
  */
 export type ColliderTargetProviderConfig = {
   shouldPreventTargetUpdate?: () => boolean
+  sceneObjectName?: string
 }
 
 /**
@@ -22,13 +23,11 @@ export abstract class ColliderTargetProvider extends TargetProvider {
   protected interactor: BaseInteractor
   constructor(
     interactor: BaseInteractor,
-    protected config: ColliderTargetProviderConfig,
+    protected config: ColliderTargetProviderConfig
   ) {
     super()
     this.interactor = interactor
-    this.ownerSceneObject = global.scene.createSceneObject(
-      "ColliderTargetProvider",
-    )
+    this.ownerSceneObject = global.scene.createSceneObject(config.sceneObjectName ?? "ColliderTargetProvider")
     this.ownerSceneObject.setParent(this.interactor.sceneObject)
   }
 
@@ -65,9 +64,7 @@ export abstract class ColliderTargetProvider extends TargetProvider {
    * @returns the direct collider position for direct manipulation
    */
   get colliderPosition(): vec3 {
-    return this.isAvailable()
-      ? this.ownerSceneObject.getTransform().getWorldPosition()
-      : vec3.zero()
+    return this.isAvailable() ? this.ownerSceneObject.getTransform().getWorldPosition() : vec3.zero()
   }
 
   /**
@@ -103,7 +100,7 @@ export abstract class ColliderTargetProvider extends TargetProvider {
     radius: number,
     onOverlapStay: ((eventArgs: OverlapStayEventArgs) => void) | null,
     onOverlapExit: ((eventArgs: OverlapExitEventArgs) => void) | null,
-    debugDrawEnabled: boolean,
+    debugDrawEnabled: boolean
   ): ColliderComponent {
     const collider = sceneObject.createComponent("Physics.ColliderComponent")
 
@@ -124,23 +121,13 @@ export abstract class ColliderTargetProvider extends TargetProvider {
     return collider
   }
 
-  protected onColliderOverlapStay(
-    event: OverlapEnterEventArgs,
-    allowOutOfFovInteraction = false,
-  ): void {
-    if (this.config.shouldPreventTargetUpdate?.()) {
-      return
-    }
-
+  protected onColliderOverlapStay(event: OverlapEnterEventArgs, allowOutOfFovInteraction = false): void {
     const hits: RayCastHit[] = event.currentOverlaps
       .map((overlap) => {
         try {
           return {
             collider: overlap.collider,
-            distance: overlap.collider
-              .getTransform()
-              .getWorldPosition()
-              .distance(this.endPoint),
+            distance: overlap.collider.getTransform().getWorldPosition().distance(this.endPoint),
             normal: vec3.zero(),
             position: this.endPoint,
             skipRemaining: false,
@@ -149,7 +136,7 @@ export abstract class ColliderTargetProvider extends TargetProvider {
             getTypeName: overlap.collider.getTypeName,
             isTypeOf: overlap.collider.isOfType,
             isSame: overlap.collider.isSame,
-            isOfType: overlap.collider.isOfType,
+            isOfType: overlap.collider.isOfType
           } as RayCastHit
         } catch {
           return null
@@ -157,19 +144,19 @@ export abstract class ColliderTargetProvider extends TargetProvider {
       })
       .filter(notEmpty)
 
-    this._currentInteractableHitInfo = this.getInteractableHitFromRayCast(
-      hits,
-      0,
-      allowOutOfFovInteraction,
-    )
+    this.updateCurrentInteractableSet(hits)
+
+    if (this.config.shouldPreventTargetUpdate?.()) {
+      return
+    }
+
+    this._currentInteractableHitInfo = this.getInteractableHitFromRayCast(hits, 0, allowOutOfFovInteraction)
 
     this.updateInteractionPlanesFromOverlap(event.currentOverlaps)
   }
 
   protected onColliderOverlapExit(event: OverlapEnterEventArgs): void {
-    if (
-      event.overlap.collider === this._currentInteractableHitInfo?.hit.collider
-    ) {
+    if (event.overlap.collider === this._currentInteractableHitInfo?.hit.collider) {
       this._currentInteractableHitInfo = null
     }
 
@@ -178,9 +165,7 @@ export abstract class ColliderTargetProvider extends TargetProvider {
 
   protected updateInteractionPlanesFromOverlap(overlaps: Overlap[]): void {
     for (const overlap of overlaps) {
-      const plane = overlap.collider
-        .getSceneObject()
-        .getComponent(InteractionPlane.getTypeName())
+      const plane = overlap.collider.getSceneObject().getComponent(InteractionPlane.getTypeName())
       if (plane !== null && !this._currentInteractionPlanes.includes(plane)) {
         this._currentInteractionPlanes.push(plane)
       }
@@ -188,9 +173,7 @@ export abstract class ColliderTargetProvider extends TargetProvider {
   }
 
   protected removeInteractionPlaneFromOverlap(overlap: Overlap): void {
-    const plane = overlap.collider
-      .getSceneObject()
-      .getComponent(InteractionPlane.getTypeName())
+    const plane = overlap.collider.getSceneObject().getComponent(InteractionPlane.getTypeName())
     if (plane !== null) {
       const index = this.currentInteractionPlanes.indexOf(plane)
 

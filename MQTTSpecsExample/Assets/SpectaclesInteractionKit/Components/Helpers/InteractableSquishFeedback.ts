@@ -3,19 +3,29 @@ import {validate} from "../../Utils/validate"
 import {Interactable} from "../Interaction/Interactable/Interactable"
 
 /**
- * This class provides visual feedback by squishing a specified SceneObject when it is hovered or pinched. It allows customization of the squish amount along the x-axis and y-axis.
+ * This class provides visual feedback by squishing a specified SceneObject when it is hovered or triggered. It allows
+ * customization of the squish amount along the x-axis and y-axis.
  */
 @component
 export class InteractableSquishFeedback extends BaseScriptComponent {
+  /**
+   * This is the SceneObject that will be squished on hover/trigger.
+   */
   @input
-  @hint("This is the SceneObject that will be squished on hover/pinch")
+  @hint("This is the SceneObject that will be squished on hover/trigger.")
   squishObject!: SceneObject
+  /**
+   * This is how much the squishObject will squish along the y-axis.
+   */
   @input
-  @hint("This is how much the squishObject will squish along the y-axis")
+  @hint("This is how much the squishObject will squish along the y-axis.")
   @widget(new SliderWidget(0, 1, 0.01))
   verticalSquish: number = 0.5
+  /**
+   * This is how much the squishObject will squish along the x-axis.
+   */
   @input
-  @hint("This is how much the squishObject will squish along the x-axis")
+  @hint("This is how much the squishObject will squish along the x-axis.")
   @widget(new SliderWidget(0, 1.5, 0.01))
   horizontalSquish: number = 0.5
 
@@ -48,14 +58,12 @@ export class InteractableSquishFeedback extends BaseScriptComponent {
     this.squishScale = new vec3(
       this.initialScale.x * this.horizontalSquish,
       this.initialScale.y * this.verticalSquish,
-      this.initialScale.z,
+      this.initialScale.z
     )
 
-    this.interactable = this.getSceneObject().getComponent(
-      Interactable.getTypeName(),
-    )
+    this.interactable = this.getSceneObject().getComponent(Interactable.getTypeName())
     if (!this.interactable) {
-      throw new Error("PointerSquishVisual script requires an Interactable")
+      throw new Error("InteractableSquishFeedback script requires an Interactable")
     }
 
     this.setupInteractableCallbacks()
@@ -72,23 +80,15 @@ export class InteractableSquishFeedback extends BaseScriptComponent {
     validate(this.squishScale)
 
     const currentPinch = event.interactor.interactionStrength
-    if (
-      currentPinch !== null &&
-      this.initialPinch !== null &&
-      this.squishEnabled
-    ) {
+    if (currentPinch !== null && this.initialPinch !== null && this.squishEnabled) {
       const pinchScale = MathUtils.remap(
         Math.max(this.initialPinch, currentPinch),
         Math.min(this.initialPinch, 0.95),
         1,
         0,
-        1,
+        1
       )
-      this.squishObject
-        .getTransform()
-        .setLocalScale(
-          vec3.lerp(this.initialScale, this.squishScale, pinchScale),
-        )
+      this.squishObject.getTransform().setLocalScale(vec3.lerp(this.initialScale, this.squishScale, pinchScale))
     }
   }
 

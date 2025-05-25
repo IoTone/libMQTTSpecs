@@ -1,4 +1,4 @@
-- !<AssetImportMetadata/7be45b88-d645-4f9c-83fb-be8543a71f9b>
+- !<AssetImportMetadata/18e781a4-5e0f-0abd-b84a-c5afb9c3b39f>
   ImportedAssetIds:
     TypeScriptAsset: !<reference> 987cf782-2e7d-4ce0-b5f8-6e0483f168f0
   ImporterName: TypeScriptAssetImporter
@@ -38,3 +38,6 @@
     -
       {}
   DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  SetupScript:
+    code: ""
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000

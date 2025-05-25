@@ -3,11 +3,7 @@ import {BaseHand} from "../../../Providers/HandInputData/BaseHand"
 import {HandInputData} from "../../../Providers/HandInputData/HandInputData"
 import {Keypoint} from "../../../Providers/HandInputData/Keypoint"
 import NativeLogger from "../../../Utils/NativeLogger"
-import {
-  OneEuroFilter,
-  OneEuroFilterConfig,
-  OneEuroFilterVec3,
-} from "../../../Utils/OneEuroFilter"
+import {OneEuroFilter, OneEuroFilterConfig, OneEuroFilterVec3} from "../../../Utils/OneEuroFilter"
 import {validate} from "../../../Utils/validate"
 import {RaycastInfo} from "../RayProvider"
 
@@ -52,44 +48,44 @@ export const LEFT_HAND = "left"
 
 const DEFAULT_ONE_EURO_PARAMS = {
   frequency: defaultOneEuroFrequency,
-  dcutoff: defaultOneEuroDCutoff,
+  dcutoff: defaultOneEuroDCutoff
 }
 
 const KNUCKLE_ONE_EURO_FILTER_CONFIG: OneEuroFilterConfig = {
   ...DEFAULT_ONE_EURO_PARAMS,
   minCutoff: knuckleOneEuroMinCutoff,
-  beta: knuckleOneEuroBeta,
+  beta: knuckleOneEuroBeta
 }
 
 const WRIST_ONE_EURO_FILTER_CONFIG: OneEuroFilterConfig = {
   ...DEFAULT_ONE_EURO_PARAMS,
   minCutoff: wristOneEuroMinCutoff,
-  beta: wristOneEuroBeta,
+  beta: wristOneEuroBeta
 }
 
 const DIRECTION_ONE_EURO_FILTER_CONFIG: OneEuroFilterConfig = {
   ...DEFAULT_ONE_EURO_PARAMS,
   minCutoff: directionOneEuroMinCutoff,
-  beta: directionOneEuroBeta,
+  beta: directionOneEuroBeta
 }
 
 const LOCUS_ONE_EURO_FILTER_CONFIG: OneEuroFilterConfig = {
   ...DEFAULT_ONE_EURO_PARAMS,
   minCutoff: locusOneEuroMinCutoff,
-  beta: locusOneEuroBeta,
+  beta: locusOneEuroBeta
 }
 
 const SHOULDER_ONE_EURO_FILTER_CONFIG: OneEuroFilterConfig = {
   ...DEFAULT_ONE_EURO_PARAMS,
   minCutoff: shoulderOneEuroMinCutoff,
-  beta: shoulderOneEuroBeta,
+  beta: shoulderOneEuroBeta
 }
 
 const Z_ONE_EURO_FILTER_CONFIG: OneEuroFilterConfig = {
   frequency: DEFAULT_ONE_EURO_PARAMS.frequency,
   dcutoff: zOneEuroDCutoff,
   minCutoff: zOneEuroMinCutoff,
-  beta: zOneEuroBeta,
+  beta: zOneEuroBeta
 }
 
 const SMOOTHED_THUMB_SCALE = smoothedThumbScale
@@ -115,17 +111,14 @@ export default abstract class RaycastBase {
   // Native Logging
   private log = new NativeLogger(TAG)
 
-  protected camera: WorldCameraFinderProvider =
-    WorldCameraFinderProvider.getInstance()
+  protected camera: WorldCameraFinderProvider = WorldCameraFinderProvider.getInstance()
 
   protected handProvider: HandInputData = HandInputData.getInstance()
 
   protected knuckleOneEuroFilter = knuckleSmoothingEnabled
     ? new OneEuroFilterVec3(KNUCKLE_ONE_EURO_FILTER_CONFIG)
     : null
-  protected wristOneEuroFilter = wristSmoothingEnabled
-    ? new OneEuroFilterVec3(WRIST_ONE_EURO_FILTER_CONFIG)
-    : null
+  protected wristOneEuroFilter = wristSmoothingEnabled ? new OneEuroFilterVec3(WRIST_ONE_EURO_FILTER_CONFIG) : null
 
   /**
    * Direction and locus filters can be dynamically adjusted together with the same magnitude, if pinch stabilization smoothing is turned on.
@@ -133,17 +126,13 @@ export default abstract class RaycastBase {
   protected directionOneEuroFilter = directionSmoothingEnabled
     ? new OneEuroFilterVec3(DIRECTION_ONE_EURO_FILTER_CONFIG)
     : null
-  protected locusOneEuroFilter = locusSmoothingEnabled
-    ? new OneEuroFilterVec3(LOCUS_ONE_EURO_FILTER_CONFIG)
-    : null
+  protected locusOneEuroFilter = locusSmoothingEnabled ? new OneEuroFilterVec3(LOCUS_ONE_EURO_FILTER_CONFIG) : null
 
   protected shoulderOneEuroFilter = shoulderSmoothingEnabled
     ? new OneEuroFilterVec3(SHOULDER_ONE_EURO_FILTER_CONFIG)
     : null
 
-  protected handZOneEuroFilter = zSmoothingEnabled
-    ? new OneEuroFilter(Z_ONE_EURO_FILTER_CONFIG)
-    : null
+  protected handZOneEuroFilter = zSmoothingEnabled ? new OneEuroFilter(Z_ONE_EURO_FILTER_CONFIG) : null
 
   constructor(protected hand: BaseHand) {
     this.hand.onHandLost.add(() => {
@@ -168,13 +157,9 @@ export default abstract class RaycastBase {
   calculateCastAnchor(thumbKnuckle: vec3, middleKnuckle: vec3): vec3 {
     let middleFingerThumbOffset: vec3 = middleKnuckle.sub(thumbKnuckle)
     let rootMiddleFinger: vec3 = this.knuckleOneEuroFilter
-      ? thumbKnuckle.add(
-          this.knuckleOneEuroFilter.filter(middleFingerThumbOffset, getTime()),
-        )
+      ? thumbKnuckle.add(this.knuckleOneEuroFilter.filter(middleFingerThumbOffset, getTime()))
       : thumbKnuckle.add(middleFingerThumbOffset)
-    return rootMiddleFinger
-      .uniformScale(SMOOTHED_MID_SCALE)
-      .add(thumbKnuckle.uniformScale(SMOOTHED_THUMB_SCALE))
+    return rootMiddleFinger.uniformScale(SMOOTHED_MID_SCALE).add(thumbKnuckle.uniformScale(SMOOTHED_THUMB_SCALE))
   }
 
   private get stubbedKeypoints(): (Keypoint | null)[] {
@@ -184,7 +169,7 @@ export default abstract class RaycastBase {
       this.hand.ringKnuckle,
       this.hand.pinkyKnuckle,
       this.hand.thumbBaseJoint,
-      this.hand.wrist,
+      this.hand.wrist
     ]
   }
 
@@ -194,19 +179,13 @@ export default abstract class RaycastBase {
    */
   protected getWrist(): vec3 | null {
     if (this.hand.wrist === null) return null
-    return (
-      this.wristOneEuroFilter?.filter(this.hand.wrist.position, getTime()) ??
-      null
-    )
+    return this.wristOneEuroFilter?.filter(this.hand.wrist.position, getTime()) ?? null
   }
 
   /**
    * Calculates the interaction locus, where the ray cursor base is placed.
    */
-  protected calculateInteractionLocus(
-    thumbKnuckle: vec3,
-    indexKnuckle: vec3,
-  ): vec3 {
+  protected calculateInteractionLocus(thumbKnuckle: vec3, indexKnuckle: vec3): vec3 {
     return indexKnuckle
       .uniformScale(LOCUS_INDEX_KNUCKLE_SCALE)
       .add(thumbKnuckle.uniformScale(LOCUS_THUMB_KNUCKLE_SCALE))
@@ -246,7 +225,7 @@ export default abstract class RaycastBase {
     cameraToWorld: mat4,
     avgZ: number,
     filteredAvgZ: number,
-    worldPos: vec3 | null,
+    worldPos: vec3 | null
   ): vec3 | null {
     if (worldPos === null) {
       return null
@@ -258,11 +237,7 @@ export default abstract class RaycastBase {
 
     const cameraPos = cameraToWorld.inverse().multiplyPoint(worldPos)
     const newZ = cameraPos.z - avgZ + filteredAvgZ
-    const newCameraPos = new vec3(
-      (cameraPos.x / cameraPos.z) * newZ,
-      (cameraPos.y / cameraPos.z) * newZ,
-      newZ,
-    )
+    const newCameraPos = new vec3((cameraPos.x / cameraPos.z) * newZ, (cameraPos.y / cameraPos.z) * newZ, newZ)
     return cameraToWorld.multiplyPoint(newCameraPos)
   }
 
@@ -292,7 +267,7 @@ export default abstract class RaycastBase {
         mid: mid,
         wrist: wrist,
         deviceCenterToWorld: deviceCenterToWorld,
-        cameraToWorld: cameraToWorld,
+        cameraToWorld: cameraToWorld
       }
     }
 
@@ -302,7 +277,7 @@ export default abstract class RaycastBase {
         cameraToWorld,
         handZAverage.zAverage,
         handZAverage.filteredZAverage,
-        position,
+        position
       )
     }
 
@@ -312,7 +287,7 @@ export default abstract class RaycastBase {
       mid: getCorrectedPosition(mid),
       wrist: getCorrectedPosition(wrist),
       deviceCenterToWorld: deviceCenterToWorld,
-      cameraToWorld: cameraToWorld,
+      cameraToWorld: cameraToWorld
     }
   }
 

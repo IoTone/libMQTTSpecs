@@ -32,8 +32,7 @@ export default class MotionControllerProvider {
     }
 
     try {
-      this.loadedModule =
-        require("LensStudio:MotionControllerModule") as MotionControllerModule
+      this.loadedModule = require("LensStudio:MotionControllerModule") as MotionControllerModule
       return this.loadedModule
     } catch (error) {
       this.log.e(`Error creating module: ${error}`)

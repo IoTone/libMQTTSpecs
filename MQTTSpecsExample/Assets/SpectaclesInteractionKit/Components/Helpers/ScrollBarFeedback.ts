@@ -10,11 +10,20 @@ const SCALE_TWEEN_DURATION: number = 0.2
 const HOVER_SCALE: number = 0.75
 
 /**
- * This class provides visual feedback for a scrollbar by adjusting its size and scale based on interaction events such as hover. It uses animation utilities to smoothly transition between states.
+ * This class provides visual feedback for a scrollbar by adjusting its size and scale based on interaction events such
+ * as hover. It uses animation utilities to smoothly transition between states.
  */
 @component
 export class ScrollBarFeedback extends BaseScriptComponent {
+  /**
+   * Reference to the SceneObject containing the ScrollBar and Interactable components. This object will be monitored
+   * for interaction events to provide visual feedback on the scrollbar indicator.
+   */
   @input
+  @hint(
+    "Reference to the SceneObject containing the ScrollBar and Interactable components. This object will be monitored \
+for interaction events to provide visual feedback on the scrollbar indicator."
+  )
   scrollbarObject!: SceneObject
 
   private renderMeshVisual: RenderMeshVisual | undefined
@@ -31,9 +40,7 @@ export class ScrollBarFeedback extends BaseScriptComponent {
   }
 
   private init = (): void => {
-    this.interactable = this.scrollbarObject.getComponent(
-      Interactable.getTypeName(),
-    )
+    this.interactable = this.scrollbarObject.getComponent(Interactable.getTypeName())
     if (isNull(this.interactable)) {
       throw new Error("Interactable component not found in this entity!")
     }
@@ -43,9 +50,7 @@ export class ScrollBarFeedback extends BaseScriptComponent {
       throw new Error("ScrollBar component not found in this entity!")
     }
 
-    this.renderMeshVisual = this.getSceneObject().getComponent(
-      "Component.RenderMeshVisual",
-    )
+    this.renderMeshVisual = this.getSceneObject().getComponent("Component.RenderMeshVisual")
     if (this.renderMeshVisual === undefined) {
       throw new Error("RenderMeshVisual component not found in this entity!")
     }
@@ -102,36 +107,22 @@ export class ScrollBarFeedback extends BaseScriptComponent {
     }
   }
 
-  private tweenScale = (
-    currentScale: number,
-    targetScale: number,
-    endCallback = () => {},
-  ): void => {
+  private tweenScale = (currentScale: number, targetScale: number, endCallback = () => {}): void => {
     if (this.scaleCancel) this.scaleCancel.cancel()
     animate({
       duration: SCALE_TWEEN_DURATION * Math.abs(targetScale - currentScale),
       update: (t: number) => {
         if (this.renderMeshVisual !== undefined) {
-          this.renderMeshVisual.mainPass.scale = lerp(
-            currentScale,
-            targetScale,
-            t,
-          )
+          this.renderMeshVisual.mainPass.scale = lerp(currentScale, targetScale, t)
         }
       },
       ended: endCallback,
-      cancelSet: this.scaleCancel,
+      cancelSet: this.scaleCancel
     })
   }
 
   getPercentage = (): number => {
     validate(this.scrollbar)
-    return MathUtils.remap(
-      this.scrollbar.scrollPercentage,
-      0.0,
-      1.0,
-      0.03,
-      0.97,
-    )
+    return MathUtils.remap(this.scrollbar.scrollPercentage, 0.0, 1.0, 0.03, 0.97)
   }
 }

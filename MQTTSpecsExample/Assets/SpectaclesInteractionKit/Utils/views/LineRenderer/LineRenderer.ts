@@ -51,9 +51,7 @@ export default class LineRenderer extends View<LineViewConfig> {
     // Prevent hierarchy issues, such as having a component attached to a SceneObject that is parented to another scene object
     // Transformations should be done on the parent object rather than directly on the line renderer
 
-    this.meshComponent = this.container.createComponent(
-      "Component.RenderMeshVisual",
-    )
+    this.meshComponent = this.container.createComponent("Component.RenderMeshVisual")
     this.mesh = this.buildMesh()
 
     // Set up mesh component and material
@@ -166,9 +164,7 @@ export default class LineRenderer extends View<LineViewConfig> {
    */
   updateVertexPosition(index: number, newPos: vec3) {
     if (index >= this._points.length) {
-      this.log.w(
-        `Index ${index} not in range for line with ${this._points.length} points!`,
-      )
+      this.log.w(`Index ${index} not in range for line with ${this._points.length} points!`)
       return
     }
 
@@ -190,31 +186,16 @@ export default class LineRenderer extends View<LineViewConfig> {
     } else {
       // Get uv_v coords from mesh vertex data, use it to calculate uv, width, and miter
       prevPoint = this.points[index - 1]
-      uv_v =
-        this.meshVertexData[
-          index * VERTICES_PER_POINT * VERTEX_DATA_SIZE + UV_V_POSITION
-        ]
-      let prevSegment = utils.getSegmentNormalized(
-        this._points[index - 1],
-        this._points[index],
-      )
-      let nextSegment = utils.getSegmentNormalized(
-        this._points[index],
-        this._points[index + 1],
-      )
+      uv_v = this.meshVertexData[index * VERTICES_PER_POINT * VERTEX_DATA_SIZE + UV_V_POSITION]
+      let prevSegment = utils.getSegmentNormalized(this._points[index - 1], this._points[index])
+      let nextSegment = utils.getSegmentNormalized(this._points[index], this._points[index + 1])
       tangent = utils.getTangent(prevSegment, nextSegment)
     }
     let leftVertexData = utils.buildVertex(newPos, prevPoint, tangent, 0, uv_v)
     let rightVertexData = utils.buildVertex(newPos, prevPoint, tangent, 1, uv_v)
 
-    this.meshBuilder.setVertexInterleaved(
-      index * VERTICES_PER_POINT,
-      leftVertexData,
-    )
-    this.meshBuilder.setVertexInterleaved(
-      index * VERTICES_PER_POINT + 1,
-      rightVertexData,
-    )
+    this.meshBuilder.setVertexInterleaved(index * VERTICES_PER_POINT, leftVertexData)
+    this.meshBuilder.setVertexInterleaved(index * VERTICES_PER_POINT + 1, rightVertexData)
     this.meshBuilder.updateMesh()
   }
 
@@ -228,7 +209,7 @@ export default class LineRenderer extends View<LineViewConfig> {
       {name: "position", components: 3},
       {name: "prevSegment", components: 3},
       {name: "direction", components: 3},
-      {name: "texture0", components: 2},
+      {name: "texture0", components: 2}
     ])
 
     meshBuilder.topology = MeshTopology.TriangleStrip
@@ -268,9 +249,7 @@ export default class LineRenderer extends View<LineViewConfig> {
    */
   private buildGeometry() {
     if (this._points === undefined || this._points.length <= 1) {
-      this.log.w(
-        "2 or more vertices must be provided in order to render a line!",
-      )
+      this.log.w("2 or more vertices must be provided in order to render a line!")
       return
     }
 
@@ -295,17 +274,13 @@ export default class LineRenderer extends View<LineViewConfig> {
 
       // Start point - calculate width offset direction based on next vertex only
       if (i === 0) {
-        prevSegment = tangent = this._points[i + 1]
-          .sub(this._points[i])
-          .normalize()
+        prevSegment = tangent = this._points[i + 1].sub(this._points[i]).normalize()
         uv_v = 0
       }
 
       // End point - calculate width offset direction based on previous vertex only
       else if (i === this._points.length - 1) {
-        prevSegment = tangent = this._points[i]
-          .sub(this._points[i - 1])
-          .normalize()
+        prevSegment = tangent = this._points[i].sub(this._points[i - 1]).normalize()
         uv_v = 1
       }
 
@@ -329,7 +304,7 @@ export default class LineRenderer extends View<LineViewConfig> {
       vertexData.splice(
         dataIndex,
         SEGMENT_DATA_SIZE,
-        ...utils.buildSegment(this._points[i], prevSegment, tangent, uv_v),
+        ...utils.buildSegment(this._points[i], prevSegment, tangent, uv_v)
       )
 
       if (i <= this._points.length - 1) {

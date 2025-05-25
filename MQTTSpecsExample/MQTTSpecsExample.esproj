@@ -1,24 +1,24 @@
 studioVersion:
   major: 5
-  minor: 7
-  patch: 2
-  build: 25030805
+  minor: 9
+  patch: 1
+  build: 25051422
   type: Public
-coreVersion: 301
-clientVersion: 13.300000
-updateCheckpoint: 55
+coreVersion: 309
+clientVersion: 13.380000
+updateCheckpoint: 57
 sceneId: 0a1ccb1a-fe88-4fbb-9883-e3af3c75fd99
 viewConfig:
   simulation:
-    device: No Simulation
-    cameraFov: 66.519997
-    fullFrameAspect: nan
+    device: Spectacles (2024)
+    cameraFov: nan
+    fullFrameAspect: 0.666660
     resolutionScale: 1.000000
     viewport: Maximized
     output: Live
     stereoOutputEye: Center
-    deviceTypeOverride: Unknown
-  cameraType: Front
+    deviceTypeOverride: Spectacles
+  cameraType: Back
 metaInfo:
   hints:
     []
@@ -39,3 +39,14 @@ metaInfo:
   fromTemplateUrl: Lens Studio 5.7.2.25030805
   activationCamera: Front
   sourceMapEnabled: false
+  usingMinClientVersions: false
+  androidMinClientVersion:
+    major: 0
+    minor: 0
+    patch: 0
+    build: 0
+  iOSMinClientVersion:
+    major: 0
+    minor: 0
+    patch: 0
+    build: 0

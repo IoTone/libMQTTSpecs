@@ -4,7 +4,7 @@ export enum VisualStyle {
   Full = 0,
   Split = 1,
   FadedEnd = 2,
-  FadedStart = 3,
+  FadedStart = 3
 }
 
 /**

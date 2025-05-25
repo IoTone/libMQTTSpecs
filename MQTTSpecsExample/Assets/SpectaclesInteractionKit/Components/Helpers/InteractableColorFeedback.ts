@@ -2,30 +2,45 @@ import {validate} from "../../Utils/validate"
 import {Interactable} from "../Interaction/Interactable/Interactable"
 
 /**
- * This class provides visual feedback by changing the color of mesh visuals based on interaction events such as hover, pinch, and disable. It allows customization of colors for different interaction states.
+ * This class provides visual feedback by changing the color of mesh visuals based on interaction events such as hover,
+ * pinch, and disable. It allows customization of colors for different interaction states.
  */
 @component
 export class InteractableColorFeedback extends BaseScriptComponent {
+  /**
+   * The color applied when the Interactables are in their default state (not being interacted with).
+   */
   @input("vec4", "{0.28, 0.28, 0.28, 1}")
+  @hint("The color applied when the Interactables are in their default state (not being interacted with).")
   @widget(new ColorWidget())
   defaultColor: vec4 = new vec4(0.28, 0.28, 0.28, 1)
-
+  /**
+   * The color applied to Interactables when an Interactor is hovering over it.
+   */
   @input("vec4", "{0.28, 0.28, 0.28, 1}")
+  @hint("The color applied to Interactables when an Interactor is hovering over it.")
   @widget(new ColorWidget())
   hoverColor: vec4 = new vec4(0.28, 0.28, 0.28, 1)
-
+  /**
+   * The color applied to Interactables when they are being actively pinched.
+   */
   @input("vec4", "{0.46, 0.46, 0.46, 1}")
+  @hint("The color applied to Interactables when they are being actively pinched.")
   @widget(new ColorWidget())
   pinchedColor: vec4 = new vec4(0.46, 0.46, 0.46, 1)
-
+  /**
+   * The color applied to Interactables when they are disabled.
+   */
   @input("vec4", "{1, 1, 1, 0}")
+  @hint("The color applied to Interactables when they are disabled.")
   @widget(new ColorWidget())
   disabledColor: vec4 = new vec4(1, 1, 1, 0)
 
+  /**
+   * The meshes which will have their baseColor changed on pinch/hover/enable/disable events.
+   */
   @input
-  @hint(
-    "The meshes which will have their baseColor changed on pinch/hover events",
-  )
+  @hint("The meshes which will have their baseColor changed on pinch/hover/enable/disable events.")
   meshVisuals: RenderMeshVisual[] = []
 
   private interactable: Interactable | null = null
@@ -43,13 +58,8 @@ export class InteractableColorFeedback extends BaseScriptComponent {
   }
 
   init(): void {
-    this.interactable = this.getSceneObject().getComponent(
-      Interactable.getTypeName(),
-    )
-    validate(
-      this.interactable,
-      "InteractableColorFeedback requires Interactable.",
-    )
+    this.interactable = this.getSceneObject().getComponent(Interactable.getTypeName())
+    validate(this.interactable, "InteractableColorFeedback requires Interactable.")
     this.setupMaterials()
     this.setupInteractableCallbacks(this.interactable)
   }

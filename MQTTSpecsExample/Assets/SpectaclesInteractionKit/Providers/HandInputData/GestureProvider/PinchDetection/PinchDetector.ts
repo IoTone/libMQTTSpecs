@@ -1,9 +1,9 @@
 import {PublicApi} from "../../../../Utils/Event"
 import HciPinchDetectionStrategy, {
-  HciPinchDetectionStrategyConfig,
+  HciPinchDetectionStrategyConfig
 } from "./DetectionStrategies/HciPinchDetectionStrategy"
 import HeuristicPinchDetectionStrategy, {
-  HeuristicPinchDetectionStrategyConfig,
+  HeuristicPinchDetectionStrategyConfig
 } from "./DetectionStrategies/HeuristicPinchDetectionStrategy"
 import {PinchDetectionStrategy} from "./DetectionStrategies/PinchDetectionStrategy"
 import PinchDetectorStateMachine from "./PinchDetectorStateMachine"
@@ -13,7 +13,7 @@ const TAG = "PinchDetector"
 export enum PinchDetectionSelection {
   Heuristic = "Heuristic",
   LensCoreML = "LensCore ML",
-  Mock = "Mock",
+  Mock = "Mock"
 }
 
 export type PinchDetectorConfig = HciPinchDetectionStrategyConfig &
@@ -94,16 +94,14 @@ export class PinchDetector {
       case PinchDetectionSelection.Heuristic: {
         return new HeuristicPinchDetectionStrategy({
           ...this.config,
-          pinchDownThreshold: this.config.pinchDownThreshold,
+          pinchDownThreshold: this.config.pinchDownThreshold
         })
       }
       case PinchDetectionSelection.LensCoreML: {
         return new HciPinchDetectionStrategy(this.config)
       }
       default: {
-        throw new Error(
-          `${TAG}: No matching PinchDetectionSelection found, could not create strategy`,
-        )
+        throw new Error(`${TAG}: No matching PinchDetectionSelection found, could not create strategy`)
       }
     }
   }

@@ -48,142 +48,204 @@ export type DragUpdate = {
 }
 
 /**
- * This class represents a numerical slider control powered by Interaction Kit's hand tracking interactions. It allows users to adjust a value by sliding a handle along a track.
+ * This class represents a numerical slider control powered by Interaction Kit's hand tracking interactions. It allows
+ * users to adjust a value by sliding a handle along a track.
  */
 @component
 export class Slider extends BaseScriptComponent {
+  /**
+   * The minimum numeric value of the slider.
+   */
   @input
-  @hint("The minimum numeric value of the slider")
+  @hint("The minimum numeric value of the slider.")
   private _minValue: number = 0
   @input
-  @hint("The maximum numeric value of the slider")
+  /**
+   * The maximum numeric value of the slider.
+   */
+  @hint("The maximum numeric value of the slider.")
   private _maxValue: number = 1
+  /**
+   * The initial numeric value of the slider.
+   */
   @input
-  @hint("The initial numeric value of the slider")
+  @hint("The initial numeric value of the slider.")
   startValue: number = 0.5
+  /**
+   * Enable this to change the slider's value in steps rather than continuously.
+   */
+  @input
+  @hint("Enable this to change the slider's value in steps rather than continuously.")
+  stepBehavior: boolean = false
+  /**
+   * The size of the steps that the slider's value will be changed in. A value of 0 means continuous (non-stepped)
+   * behavior. Must be greater than or equal to 0 and less than the range between min and max values.
+   */
   @input
   @hint(
-    "Enable this to change the slider's value in steps rather than continuously",
+    "The size of the steps that the slider's value will be changed in. A value of 0 means continuous (non-stepped) \
+behavior. Must be greater than or equal to 0 and less than the range between min and max values."
   )
-  stepBehavior: boolean = false
-  @input
-  @hint("The size of the steps that the slider's value will be changed in.")
   @showIf("stepBehavior", true)
   private _stepSize: number = 0
 
+  /**
+   * The duration of the toggle animation in seconds.
+   */
   @input
-  @showIf("isToggleable", true)
   @hint("The duration of the toggle animation in seconds.")
   toggleDuration: number = 0.2
 
   @ui.separator
+  /**
+   * The position of the slider knob when the minimum value is reached.
+   */
   @input
   @hint("The position of the slider knob when the minimum value is reached.")
   sliderMin!: SceneObject
+  /**
+   * The position of the slider knob when the maximum value is reached.
+   */
   @input
   @hint("The position of the slider knob when the maximum value is reached.")
   sliderMax!: SceneObject
+  /**
+   * The SceneObject representing the knob of the slider which will be moved along the path between the positions
+   * provided by sliderMin and sliderMax when the value is updated. Please ensure the SceneObject has an Interactable
+   * component attached.
+   */
   @input("SceneObject")
   @hint(
-    "The SceneObject representing the knob of the slider which will be moved along the path between the positions provided by sliderMin and sliderMax when the value is updated. Please ensure the SceneObject has an Interactable component attached.",
+    "The SceneObject representing the knob of the slider which will be moved along the path between the positions \
+provided by sliderMin and sliderMax when the value is updated. Please ensure the SceneObject has an Interactable \
+component attached."
   )
   private _sliderKnob: SceneObject | undefined
 
   @ui.separator
+  /**
+   * Enable this to add functions from another script to this component's callback events.
+   */
   @input
-  @hint(
-    "Enable this to add functions from another script to this component's callback events",
-  )
+  @hint("Enable this to add functions from another script to this component's callback events.")
   editEventCallbacks: boolean = false
 
   @ui.group_start("On Hover Enter Callbacks")
   @showIf("editEventCallbacks")
+  /**
+   * The script containing functions to be called on hover enter.
+   */
   @input("Component.ScriptComponent")
-  @hint("The script containing functions to be called on hover enter")
+  @hint("The script containing functions to be called on hover enter.")
   @allowUndefined
   private customFunctionForOnHoverEnter: ScriptComponent | undefined
+  /**
+   * The names for the functions on the provided script, to be called on hover enter.
+   */
   @input
-  @hint(
-    "The names for the functions on the provided script, to be called on hover enter",
-  )
+  @hint("The names for the functions on the provided script, to be called on hover enter.")
   @allowUndefined
   private onHoverEnterFunctionNames: string[] = []
   @ui.group_end
   @ui.group_start("On Hover Exit Callbacks")
   @showIf("editEventCallbacks")
+  /**
+   * The script containing functions to be called on hover exit.
+   */
   @input("Component.ScriptComponent")
-  @hint("The script containing functions to be called on hover exit")
+  @hint("The script containing functions to be called on hover exit.")
   @allowUndefined
   private customFunctionForOnHoverExit: ScriptComponent | undefined
+  /**
+   * The names for the functions on the provided script, to be called on hover exit.
+   */
   @input
-  @hint(
-    "The names for the functions on the provided script, to be called on hover exit",
-  )
+  @hint("The names for the functions on the provided script, to be called on hover exit.")
   @allowUndefined
   private onHoverExitFunctionNames: string[] = []
   @ui.group_end
   @ui.group_start("On Slide Start Callbacks")
   @showIf("editEventCallbacks")
+  /**
+   * The script containing functions to be called on slide start.
+   */
   @input("Component.ScriptComponent")
-  @hint("The script containing functions to be called on slide start")
+  @hint("The script containing functions to be called on slide start.")
   @allowUndefined
   private customFunctionForOnSlideStart: ScriptComponent | undefined
+  /**
+   * The names for the functions on the provided script, to be called on slide start.
+   */
   @input
-  @hint(
-    "The names for the functions on the provided script, to be called on slide start",
-  )
+  @hint("The names for the functions on the provided script, to be called on slide start.")
   @allowUndefined
   private onSlideStartFunctionNames: string[] = []
   @ui.group_end
   @ui.group_start("On Slide End Callbacks")
   @showIf("editEventCallbacks")
+  /**
+   * The script containing functions to be called on slide end.
+   */
   @input("Component.ScriptComponent")
-  @hint("The script containing functions to be called on slide end")
+  @hint("The script containing functions to be called on slide end.")
   @allowUndefined
   private customFunctionForOnSlideEnd: ScriptComponent | undefined
+  /**
+   * The names for the functions on the provided script, to be called on slide end.
+   */
   @input
-  @hint(
-    "The names for the functions on the provided script, to be called on slide end",
-  )
+  @hint("The names for the functions on the provided script, to be called on slide end.")
   @allowUndefined
   private onSlideEndFunctionNames: string[] = []
   @ui.group_end
   @ui.group_start("On Value Update Callbacks")
   @showIf("editEventCallbacks")
+  /**
+   * The script containing functions to be called on value update.
+   */
   @input("Component.ScriptComponent")
-  @hint("The script containing functions to be called on value update")
+  @hint("The script containing functions to be called on value update.")
   @allowUndefined
   private customFunctionForOnValueUpdate: ScriptComponent | undefined
+  /**
+   * The names for the functions on the provided script, to be called on value update.
+   */
   @input
-  @hint(
-    "The names for the functions on the provided script, to be called on value update",
-  )
+  @hint("The names for the functions on the provided script, to be called on value update.")
   @allowUndefined
   private onValueUpdateFunctionNames: string[] = []
   @ui.group_end
   @ui.group_start("On Min Value Reached Callbacks")
   @showIf("editEventCallbacks")
+  /**
+   * The script containing functions to be called on min value reached.
+   */
   @input("Component.ScriptComponent")
-  @hint("The script containing functions to be called on min value reached")
+  @hint("The script containing functions to be called on min value reached.")
   @allowUndefined
   private customFunctionForOnMinValueReached: ScriptComponent | undefined
+  /**
+   * The names for the functions on the provided script, to be called when minimum value is reached.
+   */
   @input
-  @hint(
-    "The names for the functions on the provided script, to be called when minimum value is reached",
-  )
+  @hint("The names for the functions on the provided script, to be called when minimum value is reached.")
   @allowUndefined
   private onMinValueReachedFunctionNames: string[] = []
   @ui.group_end
   @ui.group_start("On Max Value Reached Callbacks")
   @showIf("editEventCallbacks")
+  /**
+   * The script containing functions to be called on max value reached.
+   */
   @input("Component.ScriptComponent")
-  @hint("The script containing functions to be called on max value reached")
+  @hint("The script containing functions to be called on max value reached.")
   @allowUndefined
   private customFunctionForOnMaxValueReached: ScriptComponent | undefined
+  /**
+   * The names for the functions on the provided script, to be called when maximum value is reached.
+   */
   @input
-  @hint(
-    "The names for the functions on the provided script, to be called when maximum value is reached",
-  )
+  @hint("The names for the functions on the provided script, to be called when maximum value is reached.")
   @allowUndefined
   private onMaxValueReachedFunctionNames: string[] = []
   @ui.group_end
@@ -230,23 +292,15 @@ export class Slider extends BaseScriptComponent {
     validate(this.sliderKnob)
 
     this.interactable = this.sliderKnob.getComponent(Interactable.getTypeName())
-    this.sliderKnobScreenTransform = this.sliderKnob.getComponent(
-      "Component.ScreenTransform",
-    )
+    this.sliderKnobScreenTransform = this.sliderKnob.getComponent("Component.ScreenTransform")
 
     this.transform = this.getTransform()
 
     this.sliderBounds = {
-      start: this.transform
-        .getInvertedWorldTransform()
-        .multiplyPoint(this.sliderMin.getTransform().getWorldPosition()),
-      end: this.transform
-        .getInvertedWorldTransform()
-        .multiplyPoint(this.sliderMax.getTransform().getWorldPosition()),
-      minAnchor: this.sliderMin.getComponent("Component.ScreenTransform")
-        .anchors,
-      maxAnchor: this.sliderMax.getComponent("Component.ScreenTransform")
-        .anchors,
+      start: this.transform.getInvertedWorldTransform().multiplyPoint(this.sliderMin.getTransform().getWorldPosition()),
+      end: this.transform.getInvertedWorldTransform().multiplyPoint(this.sliderMax.getTransform().getWorldPosition()),
+      minAnchor: this.sliderMin.getComponent("Component.ScreenTransform").anchors,
+      maxAnchor: this.sliderMax.getComponent("Component.ScreenTransform").anchors
     }
 
     this._startPosition = this.sliderBounds.start
@@ -275,16 +329,11 @@ export class Slider extends BaseScriptComponent {
     this.onMaxValueReached = this.onMaxValueReachedEvent.publicApi()
 
     if (this._minValue > this._maxValue || this._maxValue < this._minValue) {
-      throw new Error(
-        "Error: SliderComponent's maxValue must be less than its minValue.",
-      )
+      throw new Error("Error: SliderComponent's maxValue must be less than its minValue.")
     }
-    if (
-      this._stepSize < 0 ||
-      this._stepSize > this._maxValue - this._minValue
-    ) {
+    if (this._stepSize < 0 || this._stepSize > this._maxValue - this._minValue) {
       throw new Error(
-        "Error: SliderComponent's stepSize must be greater than or equal to 0, and less than its value range.",
+        "Error: SliderComponent's stepSize must be greater than or equal to 0, and less than its value range."
       )
     }
     this.updateUI()
@@ -293,12 +342,12 @@ export class Slider extends BaseScriptComponent {
     this.createEvent("OnStartEvent").bind(() => {
       if (!this.interactable) {
         throw new Error(
-          "Slider Knob must contain an Interactable component for the slider to work - please ensure that one is added to the SceneObject.",
+          "Slider Knob must contain an Interactable component for the slider to work - please ensure that one is added to the SceneObject."
         )
       }
       if (!this.sliderKnobScreenTransform) {
         throw new Error(
-          "Slider Knob must be a Screen Transform for the slider to work - please ensure that one is added to the SceneObject.",
+          "Slider Knob must be a Screen Transform for the slider to work - please ensure that one is added to the SceneObject."
         )
       }
       this.setupInteractable()
@@ -310,65 +359,38 @@ export class Slider extends BaseScriptComponent {
 
     if (this.editEventCallbacks) {
       if (this.customFunctionForOnHoverEnter) {
-        this.onHoverEnter.add(
-          createCallback<void>(
-            this.customFunctionForOnHoverEnter,
-            this.onHoverEnterFunctionNames,
-          ),
-        )
+        this.onHoverEnter.add(createCallback<void>(this.customFunctionForOnHoverEnter, this.onHoverEnterFunctionNames))
       }
 
       if (this.customFunctionForOnHoverExit) {
-        this.onHoverExit.add(
-          createCallback<void>(
-            this.customFunctionForOnHoverExit,
-            this.onHoverExitFunctionNames,
-          ),
-        )
+        this.onHoverExit.add(createCallback<void>(this.customFunctionForOnHoverExit, this.onHoverExitFunctionNames))
       }
 
       if (this.customFunctionForOnSlideStart) {
         this.onSlideStart.add(
-          createCallback<number>(
-            this.customFunctionForOnSlideStart,
-            this.onSlideStartFunctionNames,
-          ),
+          createCallback<number>(this.customFunctionForOnSlideStart, this.onSlideStartFunctionNames)
         )
       }
 
       if (this.customFunctionForOnSlideEnd) {
-        this.onSlideEnd.add(
-          createCallback<number>(
-            this.customFunctionForOnSlideEnd,
-            this.onSlideEndFunctionNames,
-          ),
-        )
+        this.onSlideEnd.add(createCallback<number>(this.customFunctionForOnSlideEnd, this.onSlideEndFunctionNames))
       }
 
       if (this.customFunctionForOnValueUpdate) {
         this.onValueUpdate.add(
-          createCallback<number>(
-            this.customFunctionForOnValueUpdate,
-            this.onValueUpdateFunctionNames,
-          ),
+          createCallback<number>(this.customFunctionForOnValueUpdate, this.onValueUpdateFunctionNames)
         )
       }
 
       if (this.customFunctionForOnMinValueReached) {
         this.onMinValueReached.add(
-          createCallback<number>(
-            this.customFunctionForOnMinValueReached,
-            this.onMinValueReachedFunctionNames,
-          ),
+          createCallback<number>(this.customFunctionForOnMinValueReached, this.onMinValueReachedFunctionNames)
         )
       }
 
       if (this.customFunctionForOnMaxValueReached) {
         this.onMaxValueReached.add(
-          createCallback<number>(
-            this.customFunctionForOnMaxValueReached,
-            this.onMaxValueReachedFunctionNames,
-          ),
+          createCallback<number>(this.customFunctionForOnMaxValueReached, this.onMaxValueReachedFunctionNames)
         )
       }
     }
@@ -381,7 +403,7 @@ export class Slider extends BaseScriptComponent {
   set minValue(value: number) {
     if (value >= this._maxValue) {
       this.log.e(
-        `Could not set minimum value to ${value} as it cannot be greater than or equal to the maximum value: ${this._maxValue}`,
+        `Could not set minimum value to ${value} as it cannot be greater than or equal to the maximum value: ${this._maxValue}`
       )
       return
     }
@@ -391,7 +413,7 @@ export class Slider extends BaseScriptComponent {
     let displayValue = this.sliderState.displayValue
     if (value > this.sliderState.displayValue) {
       this.log.w(
-        `Setting current value ${this.sliderState.displayValue} to the new minimum value ${value} provided as it is now out of range.`,
+        `Setting current value ${this.sliderState.displayValue} to the new minimum value ${value} provided as it is now out of range.`
       )
       displayValue = value
     }
@@ -405,7 +427,7 @@ export class Slider extends BaseScriptComponent {
   set maxValue(value: number) {
     if (value <= this._minValue) {
       this.log.e(
-        `Could not set maximum value to ${value} as it cannot be less than or equal to the minimum value: ${this._minValue}`,
+        `Could not set maximum value to ${value} as it cannot be less than or equal to the minimum value: ${this._minValue}`
       )
       return
     }
@@ -415,7 +437,7 @@ export class Slider extends BaseScriptComponent {
     let displayValue = this.sliderState.displayValue
     if (value < this.sliderState.displayValue) {
       this.log.w(
-        `Setting current value ${this.sliderState.displayValue} to the new maximum value ${value} provided as it is now out of range.`,
+        `Setting current value ${this.sliderState.displayValue} to the new maximum value ${value} provided as it is now out of range.`
       )
       displayValue = value
     }
@@ -427,12 +449,12 @@ export class Slider extends BaseScriptComponent {
   set currentValue(value: number) {
     if (value < this._minValue) {
       this.log.w(
-        `Slider value will be set to the minimum value: ${this._minValue} as the provided value ${value} was less than the minimum value allowed.`,
+        `Slider value will be set to the minimum value: ${this._minValue} as the provided value ${value} was less than the minimum value allowed.`
       )
       value = this._minValue
     } else if (value > this._maxValue) {
       this.log.w(
-        `Slider value will be set to the maximum value: ${this._maxValue} as the provided value ${value} was greater than the maximum value allowed.`,
+        `Slider value will be set to the maximum value: ${this._maxValue} as the provided value ${value} was greater than the maximum value allowed.`
       )
       value = this._maxValue
     }
@@ -444,14 +466,10 @@ export class Slider extends BaseScriptComponent {
   }
   set stepSize(stepSize: number) {
     if (stepSize > this._maxValue - this._minValue) {
-      this.log.e(
-        `Could not set step size to ${stepSize} as it must be less than the slider's value range.`,
-      )
+      this.log.e(`Could not set step size to ${stepSize} as it must be less than the slider's value range.`)
       return
     } else if (stepSize < 0) {
-      this.log.e(
-        `Could not set step size to ${stepSize} as it must be greater than or equal to 0.`,
-      )
+      this.log.e(`Could not set step size to ${stepSize} as it must be greater than or equal to 0.`)
       return
     }
     this._stepSize = stepSize
@@ -489,7 +507,7 @@ export class Slider extends BaseScriptComponent {
       dragVector: null,
       rawValue: rawValue,
       snappedValue: snappedValue,
-      displayValue: displayValue,
+      displayValue: displayValue
     }
   }
 
@@ -503,7 +521,7 @@ export class Slider extends BaseScriptComponent {
       trackMin: min,
       trackMax: max,
       trackSize: max - min,
-      trackDirection: direction,
+      trackDirection: direction
     }
   }
 
@@ -513,7 +531,7 @@ export class Slider extends BaseScriptComponent {
   private setupInteractable() {
     if (this.interactable === null) {
       throw new Error(
-        "Slider Knob must contain an Interactable component for the slider to work - please ensure that one is added to the SceneObject.",
+        "Slider Knob must contain an Interactable component for the slider to work - please ensure that one is added to the SceneObject."
       )
     }
 
@@ -525,13 +543,13 @@ export class Slider extends BaseScriptComponent {
     this.unsubscribeBag.push(
       this.interactable.onHoverEnter.add(() => {
         this.onHoverEnterEvent.invoke()
-      }),
+      })
     )
 
     this.unsubscribeBag.push(
       this.interactable.onHoverExit.add(() => {
         this.onHoverExitEvent.invoke()
-      }),
+      })
     )
 
     this.unsubscribeBag.push(
@@ -543,13 +561,10 @@ export class Slider extends BaseScriptComponent {
         this.onSlideStartEvent.invoke(this.sliderState.displayValue)
         this.isDragging = true
         this.updateSliderState({
-          dragVector:
-            event.interactor.dragType !== DragType.Touchpad
-              ? event.planecastDragVector
-              : event.dragVector,
-          dragPoint: event.interactor.planecastPoint,
+          dragVector: event.interactor.dragType !== DragType.Touchpad ? event.planecastDragVector : event.dragVector,
+          dragPoint: event.interactor.planecastPoint
         })
-      }),
+      })
     )
 
     this.unsubscribeBag.push(
@@ -558,13 +573,10 @@ export class Slider extends BaseScriptComponent {
         validate(event.interactor.planecastPoint)
 
         this.updateSliderState({
-          dragVector:
-            event.interactor.dragType !== DragType.Touchpad
-              ? event.planecastDragVector
-              : event.dragVector,
-          dragPoint: event.interactor.planecastPoint,
+          dragVector: event.interactor.dragType !== DragType.Touchpad ? event.planecastDragVector : event.dragVector,
+          dragPoint: event.interactor.planecastPoint
         })
-      }),
+      })
     )
 
     this.unsubscribeBag.push(
@@ -573,13 +585,13 @@ export class Slider extends BaseScriptComponent {
         this.onSlideEndEvent.invoke(this.sliderState.displayValue)
         this.isDragging = false
         this.updateSliderState(null)
-      }),
+      })
     )
 
     this.unsubscribeBag.push(
       this.interactable.onTriggerEnd.add(() => {
         this.toggleSliderState()
-      }),
+      })
     )
   }
 
@@ -591,14 +603,11 @@ export class Slider extends BaseScriptComponent {
     }
     validate(this.trackState)
 
-    dragVector = this.transform
-      .getInvertedWorldTransform()
-      .multiplyDirection(dragVector)
+    dragVector = this.transform.getInvertedWorldTransform().multiplyDirection(dragVector)
     return MathUtils.clamp(
-      this.sliderState.rawValue +
-        this.trackState.trackDirection.dot(dragVector),
+      this.sliderState.rawValue + this.trackState.trackDirection.dot(dragVector),
       this.trackState.trackMin,
-      this.trackState.trackMax,
+      this.trackState.trackMax
     )
   }
 
@@ -610,7 +619,7 @@ export class Slider extends BaseScriptComponent {
       this.trackState.trackMin,
       this.trackState.trackMax,
       this._minValue,
-      this._maxValue,
+      this._maxValue
     )
     return this.getSteppedDisplayValue(displayValue)
   }
@@ -623,15 +632,13 @@ export class Slider extends BaseScriptComponent {
       this._minValue,
       this._maxValue,
       this.trackState.trackMin,
-      this.trackState.trackMax,
+      this.trackState.trackMax
     )
   }
 
   private getSteppedDisplayValue(displayValue: number): number {
     return this._stepSize > 0
-      ? this._minValue +
-          Math.round((displayValue - this._minValue) / this._stepSize) *
-            this._stepSize
+      ? this._minValue + Math.round((displayValue - this._minValue) / this._stepSize) * this._stepSize
       : displayValue
   }
 
@@ -647,9 +654,7 @@ export class Slider extends BaseScriptComponent {
       return
     }
 
-    const localizedDragPoint = this.transform
-      .getInvertedWorldTransform()
-      .multiplyPoint(dragUpdate.dragPoint)
+    const localizedDragPoint = this.transform.getInvertedWorldTransform().multiplyPoint(dragUpdate.dragPoint)
 
     // Check that the drag point is between the start/end points.
     const dragPointCheck = this.checkOutsideTrackBoundary(localizedDragPoint)
@@ -674,7 +679,7 @@ export class Slider extends BaseScriptComponent {
       dragVector: dragUpdate.dragVector,
       rawValue: rawValue,
       snappedValue: snappedValue,
-      displayValue: displayValue,
+      displayValue: displayValue
     }
     this.updateUI()
   }
@@ -684,16 +689,9 @@ export class Slider extends BaseScriptComponent {
     validate(this.trackState)
 
     const isPastStartPoint =
-      localPoint
-        .sub(this.sliderBounds.start)
-        .angleTo(this.trackState.trackDirection) >
-      Math.PI / 2
+      localPoint.sub(this.sliderBounds.start).angleTo(this.trackState.trackDirection) > Math.PI / 2
 
-    const isPastEndPoint =
-      localPoint
-        .sub(this.sliderBounds.end)
-        .angleTo(this.trackState.trackDirection) <
-      Math.PI / 2
+    const isPastEndPoint = localPoint.sub(this.sliderBounds.end).angleTo(this.trackState.trackDirection) < Math.PI / 2
 
     if (isPastStartPoint) {
       return -1
@@ -735,10 +733,8 @@ export class Slider extends BaseScriptComponent {
         validate(this.maxBound)
 
         const lerpValue = toggledOn ? t : 1 - t
-        this.sliderKnobScreenTransform.anchors.setCenter(
-          vec2.lerp(this.minBound, this.maxBound, lerpValue),
-        )
-      },
+        this.sliderKnobScreenTransform.anchors.setCenter(vec2.lerp(this.minBound, this.maxBound, lerpValue))
+      }
     })
   }
 
@@ -758,7 +754,7 @@ export class Slider extends BaseScriptComponent {
       dragVector: null,
       rawValue: snappedValue,
       snappedValue: snappedValue,
-      displayValue: displayValue,
+      displayValue: displayValue
     }
     this.updateUI()
   }
@@ -775,9 +771,8 @@ export class Slider extends BaseScriptComponent {
       vec2.lerp(
         this.minBound,
         this.maxBound,
-        (this.sliderState.snappedValue - this.trackState.trackMin) /
-          this.trackState.trackSize,
-      ),
+        (this.sliderState.snappedValue - this.trackState.trackMin) / this.trackState.trackSize
+      )
     )
   }
 

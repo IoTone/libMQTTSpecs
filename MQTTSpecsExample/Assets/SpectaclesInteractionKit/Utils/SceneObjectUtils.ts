@@ -5,18 +5,12 @@
  * @param name - The name of the SceneObject to search for.
  * @returns The first SceneObject with the given name if it exists in the tree, or undefined otherwise.
  */
-export function findSceneObjectByName(
-  root: SceneObject | null,
-  name: string,
-): SceneObject | null {
+export function findSceneObjectByName(root: SceneObject | null, name: string): SceneObject | null {
   if (root === null) {
     const rootObjectCount = global.scene.getRootObjectsCount()
     let current = 0
     while (current < rootObjectCount) {
-      const result = findSceneObjectByName(
-        global.scene.getRootObject(current),
-        name,
-      )
+      const result = findSceneObjectByName(global.scene.getRootObject(current), name)
       if (result) {
         return result
       }
@@ -44,10 +38,7 @@ export function findSceneObjectByName(
  * @returns true, if sceneObject is a descendant of root,
  * otherwise, returns false.
  */
-export function isDescendantOf(
-  sceneObject: SceneObject,
-  root: SceneObject,
-): boolean {
+export function isDescendantOf(sceneObject: SceneObject, root: SceneObject): boolean {
   if (sceneObject === root) {
     return true
   }

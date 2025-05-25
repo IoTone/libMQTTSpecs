@@ -1,4 +1,4 @@
-- !<AssetImportMetadata/66bd0c85-a78e-4456-989b-91d2714ba289>
+- !<AssetImportMetadata/b4b758cd-2df6-3629-3fb7-41ad53983888>
   ImportedAssetIds:
     TypeScriptAsset: !<reference> 7dc6e4d3-064e-4472-8f3f-703858b25a64
   ImporterName: TypeScriptAssetImporter
@@ -38,10 +38,13 @@
   DefaultScriptInputs:
     - meshes: !<reference.RenderMesh[]>
         []
-      material: !<reference.Material> 00000000-0000-0000-0000-000000000000
       thresholds: !<float[]>
         []
+      material: !<reference.Material> 00000000-0000-0000-0000-000000000000
   ScriptTypes:
     -
       {}
   DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  SetupScript:
+    code: ""
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000

@@ -1,10 +1,6 @@
 import {InteractableHitInfo} from "../../Providers/TargetProvider/TargetProvider"
 import BaseInteractor from "../Interactor/BaseInteractor"
-import {
-  InteractorInputType,
-  InteractorTriggerType,
-  TargetingMode,
-} from "../Interactor/Interactor"
+import {InteractorInputType, InteractorTriggerType, TargetingMode} from "../Interactor/Interactor"
 import MouseTargetProvider from "../Interactor/MouseTargetProvider"
 import {TouchRayProvider} from "../Interactor/TouchRayProvider"
 
@@ -21,20 +17,46 @@ const TARGETING_VOLUME_MULTIPLIER = 1
 @component
 export class MouseInteractor extends BaseInteractor {
   @ui.group_start("MouseInteractor")
+  /**
+   * Sets the return value of MouseInteractor.activeTargetingMode for cases where non-indirect targeting needs to be
+   * tested specifically. Useful whenever your code has checks for interactor.activeTargetingMode === TargetingMode.X.
+   */
   @input
   @hint(
-    "Sets the return value of MouseInteractor.activeTargetingMode for cases where non-indirect targeting needs to be tested specifically. Useful whenever your code has checks for interactor.activeTargetingMode === TargetingMode.X.",
+    "Sets the return value of MouseInteractor.activeTargetingMode for cases where non-indirect targeting needs to be \
+tested specifically. Useful whenever your code has checks for interactor.activeTargetingMode === TargetingMode.X."
   )
   @widget(
     new ComboBoxWidget([
       new ComboBoxItem("Direct", 1),
       new ComboBoxItem("Indirect", 2),
       new ComboBoxItem("All", 3),
-      new ComboBoxItem("Poke", 4),
-    ]),
+      new ComboBoxItem("Poke", 4)
+    ])
   )
   private mouseTargetingMode: number = 2
   @ui.group_end
+  /**
+   * Moves the interactor in depth to help test 3D interactions in z space.
+   */
+  @input
+  @hint("Moves the interactor in depth to help test 3D interactions in z space.")
+  private moveInDepth: boolean = false
+
+  /**
+   * Controls the maximum distance (in cm) that the mouse interactor will move back and forth along its ray direction
+   * when moveInDepth is enabled. Higher values create larger depth movements, simulating interaction across a wider
+   * z-range for testing 3D interactions.
+   */
+  @input
+  @showIf("moveInDepth", true)
+  @hint(
+    "Controls the maximum distance (in cm) that the mouse interactor will move back and forth along its ray direction \
+    when moveInDepth is enabled. Higher values create larger depth movements, simulating interaction across a wider \
+    z-range for testing 3D interactions."
+  )
+  private moveInDepthAmount: number = 5
+
   private isDown = false
 
   private touchRayProvider!: TouchRayProvider
@@ -54,7 +76,7 @@ export class MouseInteractor extends BaseInteractor {
         return this.currentInteractable !== null && this.isDown
       },
       spherecastRadii: this.spherecastRadii,
-      spherecastDistanceThresholds: this.spherecastDistanceThresholds,
+      spherecastDistanceThresholds: this.spherecastDistanceThresholds
     })
   }
 
@@ -68,7 +90,12 @@ export class MouseInteractor extends BaseInteractor {
   }
 
   get startPoint(): vec3 | null {
-    return this.mouseTargetProvider.startPoint
+    let p = this.mouseTargetProvider.startPoint
+    if (this.moveInDepth) {
+      const moveAmount = (Math.sin(getTime()) + 1) * 0.5 * this.moveInDepthAmount
+      p = p.add(this.mouseTargetProvider.direction.uniformScale(moveAmount))
+    }
+    return p
   }
 
   get endPoint(): vec3 | null {
@@ -80,15 +107,11 @@ export class MouseInteractor extends BaseInteractor {
   }
 
   get distanceToTarget(): number | null {
-    return (
-      this.mouseTargetProvider.currentInteractableHitInfo?.hit.distance ?? null
-    )
+    return this.mouseTargetProvider.currentInteractableHitInfo?.hit.distance ?? null
   }
 
   get targetHitPosition(): vec3 | null {
-    return (
-      this.mouseTargetProvider.currentInteractableHitInfo?.hit.position ?? null
-    )
+    return this.mouseTargetProvider.currentInteractableHitInfo?.hit.position ?? null
   }
 
   get targetHitInfo(): InteractableHitInfo | null {
@@ -132,12 +155,10 @@ export class MouseInteractor extends BaseInteractor {
   }
 
   isTargeting(): boolean {
-    return (
-      this.touchRayProvider !== undefined && this.touchRayProvider.isAvailable()
-    )
+    return this.touchRayProvider !== undefined && this.touchRayProvider.isAvailable()
   }
 
-  override updateState(): void {
+  updateState(): void {
     super.updateState()
 
     if (!this.isActive()) {
@@ -146,16 +167,15 @@ export class MouseInteractor extends BaseInteractor {
 
     this.mouseTargetProvider.update()
 
-    this.currentInteractable =
-      this.mouseTargetProvider.currentInteractableHitInfo?.interactable ?? null
+    this.currentInteractable = this.mouseTargetProvider.currentInteractableHitInfo?.interactable ?? null
 
-    this.currentTrigger = this.isDown
-      ? InteractorTriggerType.Select
-      : InteractorTriggerType.None
+    this.currentTrigger = this.isDown ? InteractorTriggerType.Select : InteractorTriggerType.None
 
     this.updateDragVector()
 
     this.processTriggerEvents()
+
+    this.handleSelectionLifecycle(this.mouseTargetProvider)
   }
 
   protected clearCurrentHitInfo(): void {
@@ -173,13 +193,9 @@ export class MouseInteractor extends BaseInteractor {
   }
 
   private defineTouchEvents(): void {
-    this.createEvent("TouchStartEvent").bind((...args) =>
-      this.onTouchStartEvent(...args),
-    )
+    this.createEvent("TouchStartEvent").bind((...args) => this.onTouchStartEvent(...args))
 
-    this.createEvent("TouchEndEvent").bind((...args) =>
-      this.onTouchEndEvent(...args),
-    )
+    this.createEvent("TouchEndEvent").bind((...args) => this.onTouchEndEvent(...args))
   }
   private onTouchStartEvent(ev: TouchStartEvent): void {
     this.isDown = true

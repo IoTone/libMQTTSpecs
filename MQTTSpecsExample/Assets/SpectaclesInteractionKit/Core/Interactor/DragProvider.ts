@@ -51,10 +51,7 @@ export class DragProvider {
    * @param currentPosition - position that is used to compute the drag vector
    * @returns the dragVector as a {@link vec3} if dragging and null otherwise
    */
-  getDragVector(
-    currentPosition: vec3 | null,
-    enableInstantDrag: boolean | null,
-  ): vec3 | null {
+  getDragVector(currentPosition: vec3 | null, enableInstantDrag: boolean | null): vec3 | null {
     if (currentPosition === null) {
       return null
     }
@@ -75,18 +72,13 @@ export class DragProvider {
     return dragVector
   }
 
-  private isDragDetected(
-    position: vec3,
-    enableInstantDrag: boolean | null,
-  ): boolean {
+  private isDragDetected(position: vec3, enableInstantDrag: boolean | null): boolean {
     if (this._originPosition === null) {
       this._originPosition = position
       return false
     }
 
     const originDelta = position.sub(this._originPosition)
-    return (
-      originDelta.length >= this.dragThreshold || (enableInstantDrag ?? false)
-    )
+    return originDelta.length >= this.dragThreshold || (enableInstantDrag ?? false)
   }
 }

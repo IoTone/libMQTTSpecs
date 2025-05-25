@@ -223,9 +223,7 @@ export class OneEuroFilter extends OneEuroFilterBase {
     }
     this.lasttime = timestamp
     // Estimate the current variation per second
-    const dvalue = this.x.hasLastRawValue()
-      ? (value - this.x.lastRawValue()) * this.frequency
-      : 0.0
+    const dvalue = this.x.hasLastRawValue() ? (value - this.x.lastRawValue()) * this.frequency : 0.0
     const edvalue = this.dx.filterWithAlpha(dvalue, this.alpha(this.dcutoff))
 
     // Use it to update the cutoff frequency
@@ -272,19 +270,13 @@ export class OneEuroFilterVec2 extends OneEuroFilterBase {
     }
     this.lasttime = timestamp
     // Estimate the current variation per second
-    const dValueX = this.x.hasLastRawValue()
-      ? (value.x - this.x.lastRawValue()) * this.frequency
-      : 0.0
-    const dValueY = this.y.hasLastRawValue()
-      ? (value.y - this.y.lastRawValue()) * this.frequency
-      : 0.0
+    const dValueX = this.x.hasLastRawValue() ? (value.x - this.x.lastRawValue()) * this.frequency : 0.0
+    const dValueY = this.y.hasLastRawValue() ? (value.y - this.y.lastRawValue()) * this.frequency : 0.0
 
     const edValueX = this.dx.filterWithAlpha(dValueX, this.alpha(this.dcutoff))
     const edValueY = this.dy.filterWithAlpha(dValueY, this.alpha(this.dcutoff))
 
-    const edValueXyNorm = Math.sqrt(
-      Math.pow(edValueX, 2) + Math.pow(edValueY, 2),
-    )
+    const edValueXyNorm = Math.sqrt(Math.pow(edValueX, 2) + Math.pow(edValueY, 2))
 
     // Use it to update the cutoff frequency
     const cutoff = this.minCutoff + this.beta * Math.abs(edValueXyNorm)
@@ -343,23 +335,12 @@ export class OneEuroFilterVec3 extends OneEuroFilterBase {
     }
     this.lasttime = timestamp
     // Estimate the current variation per second
-    const dValueX = this.x.hasLastRawValue()
-      ? (value.x - this.x.lastRawValue()) * this.frequency
-      : 0.0
-    const dValueY = this.y.hasLastRawValue()
-      ? (value.y - this.y.lastRawValue()) * this.frequency
-      : 0.0
-    const dValueZ = this.z.hasLastRawValue()
-      ? (value.z - this.z.lastRawValue()) * this.frequency
-      : 0.0
+    const dValueX = this.x.hasLastRawValue() ? (value.x - this.x.lastRawValue()) * this.frequency : 0.0
+    const dValueY = this.y.hasLastRawValue() ? (value.y - this.y.lastRawValue()) * this.frequency : 0.0
+    const dValueZ = this.z.hasLastRawValue() ? (value.z - this.z.lastRawValue()) * this.frequency : 0.0
 
-    const edValueXyzNorm = Math.sqrt(
-      Math.pow(dValueX, 2) + Math.pow(dValueY, 2) + Math.pow(dValueZ, 2),
-    )
-    const newSpeed = this.speed.filterWithAlpha(
-      edValueXyzNorm,
-      this.alpha(this.dcutoff),
-    )
+    const edValueXyzNorm = Math.sqrt(Math.pow(dValueX, 2) + Math.pow(dValueY, 2) + Math.pow(dValueZ, 2))
+    const newSpeed = this.speed.filterWithAlpha(edValueXyzNorm, this.alpha(this.dcutoff))
 
     // Use it to update the cutoff frequency
     const cutoff = this.minCutoff + this.beta * Math.abs(newSpeed)
@@ -418,10 +399,7 @@ export class OneEuroFilterQuat extends OneEuroFilterBase {
     const deltaAngle = Math.acos(mag)
     const newSpeed = deltaAngle * this.frequency
 
-    const filteredSpeed = this.speed.filterWithAlpha(
-      newSpeed,
-      this.alpha(this.dcutoff),
-    )
+    const filteredSpeed = this.speed.filterWithAlpha(newSpeed, this.alpha(this.dcutoff))
     // Use it to update the cutoff frequency
     const cutoff = this.minCutoff + this.beta * Math.abs(filteredSpeed)
 
@@ -462,7 +440,7 @@ class LowPassFilter_v2<T> implements Filter<T> {
 
   constructor(
     public alpha: number,
-    private sampleOps: SampleOps<T>,
+    private sampleOps: SampleOps<T>
   ) {}
 
   /**
@@ -496,10 +474,7 @@ class LowPassFilter_v2<T> implements Filter<T> {
     }
 
     const scaledValue = this.sampleOps.uniformScale(sample, this.alpha)
-    const scaledPrevValue = this.sampleOps.uniformScale(
-      this.previousValue,
-      1 - this.alpha,
-    )
+    const scaledPrevValue = this.sampleOps.uniformScale(this.previousValue, 1 - this.alpha)
     const smoothedValue = this.sampleOps.add(scaledValue, scaledPrevValue)
 
     this.previousValue = smoothedValue

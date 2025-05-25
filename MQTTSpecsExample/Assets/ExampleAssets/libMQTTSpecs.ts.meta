@@ -37,3 +37,6 @@
       {}
   InputLines:
     - // @input Asset.RemoteServiceModule remoteServiceModule
+  SetupScript:
+    code: ""
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000

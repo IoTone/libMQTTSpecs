@@ -29,7 +29,7 @@ export class HandInputData {
   private config: HandInputDataConfig
   constructor() {
     this.config = {
-      dominantHand: "right",
+      dominantHand: "right"
     }
     this.leftHand = this.createHand("left")
     this.rightHand = this.createHand("right")
@@ -52,7 +52,7 @@ export class HandInputData {
   private createHand(handType: HandType): TrackedHand {
     return new TrackedHand({
       handType: handType,
-      isDominantHand: handType === this.config.dominantHand,
+      isDominantHand: handType === this.config.dominantHand
     })
   }
 
@@ -63,8 +63,7 @@ export class HandInputData {
     return this.getHand(this.config.dominantHand)
   }
   public getNonDominantHand(): TrackedHand {
-    const nonDominantHandType =
-      this.config.dominantHand === "right" ? "left" : "right"
+    const nonDominantHandType = this.config.dominantHand === "right" ? "left" : "right"
     return this.getHand(nonDominantHandType)
   }
   public setDominantHand(dominant: HandType) {

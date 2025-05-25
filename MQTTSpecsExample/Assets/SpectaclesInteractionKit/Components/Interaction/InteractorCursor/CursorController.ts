@@ -1,7 +1,4 @@
-import {
-  Interactor,
-  InteractorInputType,
-} from "../../../Core/Interactor/Interactor"
+import {Interactor, InteractorInputType} from "../../../Core/Interactor/Interactor"
 
 import {InteractionManager} from "../../../Core/InteractionManager/InteractionManager"
 import BaseInteractor from "../../../Core/Interactor/BaseInteractor"
@@ -16,14 +13,10 @@ export class CursorController extends BaseScriptComponent {
   private cursorControllerProvider = CursorControllerProvider.getInstance()
 
   onAwake(): void {
-    const interactors = InteractionManager.getInstance().getInteractorsByType(
-      InteractorInputType.All,
-    )
+    const interactors = InteractionManager.getInstance().getInteractorsByType(InteractorInputType.All)
 
     interactors.forEach((interactor: Interactor) => {
-      const cursor = this.getSceneObject().createComponent(
-        InteractorCursor.getTypeName(),
-      )
+      const cursor = this.getSceneObject().createComponent(InteractorCursor.getTypeName())
       cursor.interactor = interactor as BaseInteractor
     })
   }
@@ -52,9 +45,7 @@ export class CursorController extends BaseScriptComponent {
    * @param inputType - The InteractorInputType to get the cursor for
    * @returns the InteractorCursor for the requested InteractorInputType, or null if it doesn't exist
    */
-  getCursorByInputType(
-    inputType: InteractorInputType,
-  ): InteractorCursor | null {
+  getCursorByInputType(inputType: InteractorInputType): InteractorCursor | null {
     return this.cursorControllerProvider.getCursorByInputType(inputType)
   }
 
