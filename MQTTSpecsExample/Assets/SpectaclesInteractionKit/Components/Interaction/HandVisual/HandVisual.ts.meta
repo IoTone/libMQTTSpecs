@@ -19,7 +19,7 @@
     - '// @ui {"widget":"group_start", "label":"Hand Visual"}'
     - '// @input string handType {"widget":"combobox", "values":[{"label":"Left", "value":"left"}, {"label":"Right", "value":"right"}]}'
     - '// @input string selectVisual = "Default" {"widget":"combobox", "values":[{"label":"Default", "value":"Default"}, {"label":"Occluder", "value":"Occluder"}]}'
-    - // @input HandInteractor handInteractor
+    - // @input AssignableType handInteractor
     - // @input Component.RenderMeshVisual handMesh
     - '// @input float handMeshRenderOrder = 9999 {"hint":"The desired render order of the handMesh"}'
     - '// @input SceneObject root {"hint":"Parent of both the rig and the mesh"}'
@@ -139,7 +139,10 @@
     {}
   DefaultScriptInputs:
     - handType: ""
+      selectVisual: Default
+      handInteractor: !<MappingBased.AssignableType> 00000000-0000-0000-0000-000000000000
       handMesh: !<reference.RenderMeshVisual> 00000000-0000-0000-0000-000000000000
+      handMeshRenderOrder: !<float> 9999.000000
       root: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       autoJointMapping: true
       wrist: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
@@ -168,27 +171,27 @@
       pinkyMidJoint: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       pinkyUpperJoint: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       pinkyTip: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
-      occluderUnitPlaneMesh: !<reference.RenderMesh> 00000000-0000-0000-0000-000000000000
-      radialGradientOcclusionMaterial: !<reference.Material> 00000000-0000-0000-0000-000000000000
+      shouldThumbPokeGlow: false
       unitPlaneMesh: !<reference.RenderMesh> 00000000-0000-0000-0000-000000000000
       tipGlowMaterial: !<reference.Material> 00000000-0000-0000-0000-000000000000
-      tapProximityThreshold: !<float> 0.000000
-      pinchTexture: !<reference.Texture> 00000000-0000-0000-0000-000000000000
-      tapTexture: !<reference.Texture> 00000000-0000-0000-0000-000000000000
-      handMeshRenderOrder: !<float> 9999.000000
-      tipGlowRenderOrder: !<float> 10000.000000
-      gradientQuadRenderOrder: !<float> 9997.000000
-      occluderEnabled: false
-      selectVisual: Default
-      handInteractor: !<MappingBased.HandInteractor> 00000000-0000-0000-0000-000000000000
-      shouldThumbPokeGlow: false
-      handOutlineMaterial: !<reference.Material> 00000000-0000-0000-0000-000000000000
-      handOccluderMaterial: !<reference.Material> 00000000-0000-0000-0000-000000000000
       hoverColor: !<Vec4> {x: 0.000000, y: 0.000000, z: 0.000000, w: 0.000000}
       triggerColor: !<Vec4> {x: 0.000000, y: 0.000000, z: 0.000000, w: 0.000000}
       behindColor: !<Vec4> {x: 0.000000, y: 0.000000, z: 0.000000, w: 0.000000}
+      tapProximityThreshold: !<float> 0.000000
+      pinchTexture: !<reference.Texture> 00000000-0000-0000-0000-000000000000
+      tapTexture: !<reference.Texture> 00000000-0000-0000-0000-000000000000
+      tipGlowRenderOrder: !<float> 10000.000000
+      occluderEnabled: false
+      occluderUnitPlaneMesh: !<reference.RenderMesh> 00000000-0000-0000-0000-000000000000
+      radialGradientOcclusionMaterial: !<reference.Material> 00000000-0000-0000-0000-000000000000
+      gradientQuadRenderOrder: !<float> 9997.000000
+      handOutlineMaterial: !<reference.Material> 00000000-0000-0000-0000-000000000000
+      handOccluderMaterial: !<reference.Material> 00000000-0000-0000-0000-000000000000
   ScriptTypes:
     -
       {}
   SvgIcon: ""
   DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  SetupScript:
+    code: ""
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000

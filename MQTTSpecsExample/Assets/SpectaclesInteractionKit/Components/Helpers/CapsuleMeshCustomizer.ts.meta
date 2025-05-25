@@ -45,11 +45,14 @@
     - meshVisual: !<reference.RenderMeshVisual> 00000000-0000-0000-0000-000000000000
       capsuleLength: !<float> 10.000000
       radius: !<float> 1.000000
-      radianStepCount: !<float> 16.000000
-      cylinderStepCount: !<float> 16.000000
-      endXStepCount: !<float> 32.000000
+      radianStepCount: 16
+      cylinderStepCount: 16
+      endXStepCount: 32
   ScriptTypes:
     -
       {}
   SvgIcon: ""
   DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  SetupScript:
+    code: ""
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000

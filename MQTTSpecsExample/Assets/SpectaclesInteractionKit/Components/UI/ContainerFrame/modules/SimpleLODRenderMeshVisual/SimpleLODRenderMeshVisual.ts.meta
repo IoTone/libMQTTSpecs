@@ -38,10 +38,13 @@
   DefaultScriptInputs:
     - meshes: !<reference.RenderMesh[]>
         []
-      material: !<reference.Material> 00000000-0000-0000-0000-000000000000
       thresholds: !<float[]>
         []
+      material: !<reference.Material> 00000000-0000-0000-0000-000000000000
   ScriptTypes:
     -
       {}
   DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  SetupScript:
+    code: ""
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000

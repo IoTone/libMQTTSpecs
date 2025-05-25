@@ -65,6 +65,7 @@
   DepthStencilRenderTarget: !<reference> 00000000-0000-0000-0000-000000000000
   MaskTexture: !<reference> 00000000-0000-0000-0000-000000000000
   RayTracing: !<reference> 00000000-0000-0000-0000-000000000000
+  DevicePropertiesSource: !<reference> 00000000-0000-0000-0000-000000000000
 - !<SceneObject/0005641c-028d-459a-0000-000000014b4d>
   PrefabRemaps:
     []
@@ -1814,7 +1815,7 @@
   ScriptInputs:
     "":
       sobj: !<reference.SceneObject> 6b910d5c-841e-4285-92d4-cc6c98237703
-      toggles: !<MappingBased.ToggleButton> 67977592-c471-4440-9b58-118b4081a98a
+      toggles: !<MappingBased.AssignableType> 67977592-c471-4440-9b58-118b4081a98a
   ScriptTypes:
     "":
       {}
@@ -2339,7 +2340,7 @@
     "":
       handType: right
       selectVisual: Default
-      handInteractor: !<MappingBased.HandInteractor> a8a8ab4d-5a7d-44c0-a107-a70d7422ba5d
+      handInteractor: !<MappingBased.AssignableType> a8a8ab4d-5a7d-44c0-a107-a70d7422ba5d
       handMesh: !<reference.RenderMeshVisual> 17799a7a-ae5b-45f3-82f9-7f381ccfe852
       root: !<reference.SceneObject> 6ac1f29f-e8a1-4b55-b62f-ad59bf1ac94a
       autoJointMapping: true
@@ -2804,6 +2805,7 @@
     LineSpacing: 1.000000
     CapitalizationOverride: None
     CapitilizationOverride: None
+  EnableBatching: false
   ShadowMode: None
 - !<SceneObject/9dc93b02-8797-4f30-be2c-2900453c0630>
   PrefabRemaps:
@@ -2908,7 +2910,7 @@
     "":
       handType: left
       selectVisual: Default
-      handInteractor: !<MappingBased.HandInteractor> 9fff4510-bcdd-4fba-98ce-81e08c9532f0
+      handInteractor: !<MappingBased.AssignableType> 9fff4510-bcdd-4fba-98ce-81e08c9532f0
       handMesh: !<reference.RenderMeshVisual> 12851166-5453-4e14-b5e2-9b9d33b24ba6
       root: !<reference.SceneObject> e4645a0e-45e2-441c-9139-3319e4e8de82
       autoJointMapping: true

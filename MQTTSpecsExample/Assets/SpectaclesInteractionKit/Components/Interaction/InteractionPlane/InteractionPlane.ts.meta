@@ -36,9 +36,9 @@
   DefaultScriptInputs:
     - _planeSize: !<Vec2> {x: 10.000000, y: 10.000000}
       _proximityDistance: !<float> 20.000000
+      _directZoneDistance: 7.500000
       _drawDebug: false
       _behindDistance: !<float> 5.000000
-      _directZoneDistance: 7.500000
   ScriptTypes:
     -
       {}
@@ -49,3 +49,6 @@
     - // @input bool _drawDebug
     - // @input float _behindDistance
   DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  SetupScript:
+    code: ""
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000

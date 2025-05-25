@@ -31,9 +31,9 @@
   ScriptTypesHidden:
     {}
   DefaultScriptInputs:
-    - allRocketParts: !<reference.ObjectPrefab[]>
+    - rocket: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      allRocketParts: !<reference.ObjectPrefab[]>
         []
-      rocket: !<reference.ScriptComponent> 00000000-0000-0000-0000-000000000000
   ScriptTypes:
     -
       {}
@@ -41,3 +41,6 @@
     - // @input SceneObject rocket
     - "// @input Asset.ObjectPrefab[] allRocketParts = {}"
   DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  SetupScript:
+    code: ""
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000

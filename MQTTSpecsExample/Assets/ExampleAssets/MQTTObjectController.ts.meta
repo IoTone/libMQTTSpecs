@@ -33,10 +33,13 @@
   DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
   DefaultScriptInputs:
     - sobj: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
-      toggles: !<MappingBased.ToggleButton> 00000000-0000-0000-0000-000000000000
+      toggles: !<MappingBased.AssignableType> 00000000-0000-0000-0000-000000000000
   ScriptTypes:
     -
       {}
   InputLines:
     - // @input SceneObject sobj
-    - // @input ToggleButton toggles
+    - // @input AssignableType toggles
+  SetupScript:
+    code: ""
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000

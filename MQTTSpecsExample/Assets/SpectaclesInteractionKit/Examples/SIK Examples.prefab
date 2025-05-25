@@ -81,6 +81,7 @@
     LineSpacing: 1.000000
     CapitalizationOverride: None
     CapitilizationOverride: None
+  EnableBatching: false
   ShadowMode: None
 - !<SceneObject/06225e3a-c944-427f-8511-9e0281796bba>
   PrefabRemaps:

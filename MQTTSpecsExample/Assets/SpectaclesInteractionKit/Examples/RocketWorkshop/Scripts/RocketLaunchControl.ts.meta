@@ -43,36 +43,39 @@
   ScriptTypesHidden:
     {}
   DefaultScriptInputs:
-    - slider: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+    - slider: !<MappingBased.AssignableType> 00000000-0000-0000-0000-000000000000
       animationAButton: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       animationBButton: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       animationCButton: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       launchButton: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
-      rocketAnimationPlayer: !<reference.AnimationPlayer> 00000000-0000-0000-0000-000000000000
+      rocketConf: !<MappingBased.AssignableType_1> 00000000-0000-0000-0000-000000000000
       launchSparks: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
-      rocketConf: !<MappingBased.RocketConfigurator> 00000000-0000-0000-0000-000000000000
-      flightPathText: !<reference.Text> 00000000-0000-0000-0000-000000000000
-      launchPlatformToggleButton: !<MappingBased.ToggleButton> 00000000-0000-0000-0000-000000000000
-      launchPlatform: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      rocketAnimationPlayer: !<reference.AnimationPlayer> 00000000-0000-0000-0000-000000000000
       rocketAudioComponent: !<reference.AudioComponent> 00000000-0000-0000-0000-000000000000
       rocketLaunchSFX: !<reference.AudioTrackAsset> 00000000-0000-0000-0000-000000000000
       rocketLandSFX: !<reference.AudioTrackAsset> 00000000-0000-0000-0000-000000000000
+      flightPathText: !<reference.Text> 00000000-0000-0000-0000-000000000000
+      launchPlatformToggleButton: !<MappingBased.AssignableType_2> 00000000-0000-0000-0000-000000000000
+      launchPlatform: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
   ScriptTypes:
     -
       {}
   InputLines:
-    - // @input Slider slider
+    - // @input AssignableType slider
     - // @input SceneObject animationAButton
     - // @input SceneObject animationBButton
     - // @input SceneObject animationCButton
     - // @input SceneObject launchButton
-    - // @input RocketConfigurator rocketConf
+    - // @input AssignableType_1 rocketConf
     - // @input SceneObject launchSparks
     - // @input Component.AnimationPlayer rocketAnimationPlayer
     - // @input Component.AudioComponent rocketAudioComponent
     - // @input Asset.AudioTrackAsset rocketLaunchSFX
     - // @input Asset.AudioTrackAsset rocketLandSFX
     - // @input Component.Text flightPathText
-    - // @input ToggleButton launchPlatformToggleButton
+    - // @input AssignableType_2 launchPlatformToggleButton
     - // @input SceneObject launchPlatform
   DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  SetupScript:
+    code: ""
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000

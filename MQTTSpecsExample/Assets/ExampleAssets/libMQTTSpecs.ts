@@ -185,7 +185,7 @@ export class MqttClientLib2 extends EventEmitter<MqttEvents> {
   private _connected: boolean;
   private _packetId: number;
   private _keepAliveTimer?: number;
-
+  private internetModule: InternetModule = require("LensStudio:InternetModule");
   constructor(options: ConnectOptions, private parent: MqttClient2) {
     super();
     this._options = {
@@ -277,14 +277,16 @@ export class MqttClientLib2 extends EventEmitter<MqttEvents> {
     const packet = this._createPacket();
     packet.writeByte((PacketType.CONNECT << 4) | 0);
 
-    const protocolBytes = this._stringToBytes('MQTT');
+    // const protocolBytes = this._stringToBytes('MQTT');
+    const protocolBytes = this._altStringToBytes('MQTT');
     packet.writeUInt16(protocolBytes.length);
     packet.append(protocolBytes);
     packet.writeByte(4); // MQTT 3.1.1
     packet.writeByte(0x02); // Clean session
     packet.writeUInt16(this._options.keepAlive || 60);
 
-    const clientIdBytes = this._stringToBytes(this._options.clientId || '');
+    // const clientIdBytes = this._stringToBytes(this._options.clientId || '');
+    const clientIdBytes = this._altStringToBytes(this._options.clientId || '');
     packet.writeUInt16(clientIdBytes.length);
     packet.append(clientIdBytes);
 
@@ -304,6 +306,7 @@ export class MqttClientLib2 extends EventEmitter<MqttEvents> {
   }
 
   private _onMessage(event: WebSocketMessageEvent): void {
+    print("_onMessage()");
     let data: Uint8Array;
     if (typeof event.data === 'string') {
       data = this._stringToBytes(event.data);
@@ -368,6 +371,7 @@ export class MqttClientLib2 extends EventEmitter<MqttEvents> {
   }
 
   private _onError(event: WebSocketErrorEvent): void {
+    print("_onError()");
     this.emit('error', new Error(`WebSocket error: unknown WS error`));
     this._ws?.close();
   }
@@ -385,6 +389,7 @@ export class MqttClientLib2 extends EventEmitter<MqttEvents> {
   }
 
   private _writePacket(packet: { bytes: Uint8Array }): void {
+    print("_writePacket()");
     const length = packet.bytes.length;
     const lengthBuffer = this._createPacket();
     let remainingLength = length;
@@ -403,6 +408,7 @@ export class MqttClientLib2 extends EventEmitter<MqttEvents> {
   }
 
   private _readPacket(): { type: number; flags: number; length: number } | null {
+    print("_readPacket()");
     if (this._buffer.length - this._offset < 2) {
       return null;
     }
@@ -454,11 +460,15 @@ export class MqttClientLib2 extends EventEmitter<MqttEvents> {
     let length = 0;
 
     const ensureCapacity = (needed: number) => {
-      if (length + needed > capacity) {
+      // if (length + needed > capacity) {
+      if ((length + needed > capacity) || (length + needed > bytes.length) ) {
         capacity = Math.max(capacity * 2, length + needed);
         const newBytes = new Uint8Array(capacity);
         newBytes.set(bytes);
         bytes = newBytes;
+        print("ensureCapacity() -> now " + bytes.length);
+      } else {
+        print("ensureCapacity() -> keeping it at " + bytes.length);          
       }
     };
 
@@ -481,6 +491,7 @@ export class MqttClientLib2 extends EventEmitter<MqttEvents> {
       },
       append: (data: Uint8Array) => {
         ensureCapacity(data.length);
+        print("data length: " + data.length + " " + length + " " + bytes.length);
         bytes.set(data, length);
         length += data.length;
         bytes = bytes.subarray(0, length);
@@ -507,6 +518,11 @@ export class MqttClientLib2 extends EventEmitter<MqttEvents> {
     return String.fromCharCode(...slice);
   }
 
+  private _altStringToBytes(str: string): Uint8Array {
+    const textEncoder = new TextEncoder();
+    const uint8Array = textEncoder.encode(str);
+    return uint8Array;
+  }
   private _stringToBytes(str: string): Uint8Array {
     const bytes = new Uint8Array(str.length);
     for (let i = 0; i < str.length; i++) {
@@ -548,7 +564,7 @@ export class MqttClient2 extends BaseScriptComponent implements FooMit.BarMit {
   _ws: WebSocket;
   _mqtteventhandler? : MqttClientLib2; // Wolfy87EventEmitter.EventEmitter;
   _globaleventemitter : this;
-    
+  private internetModule: InternetModule = require("LensStudio:InternetModule");
     
   onAwake() {
     this.createEvent("OnStartEvent").bind(() => {
@@ -586,10 +602,13 @@ export class MqttClient2 extends BaseScriptComponent implements FooMit.BarMit {
     this._keepAliveTimer = this.createEvent("DelayedCallbackEvent");
     // this._options = options;
     // XXX hardcoded value
-    this._ws = this.remoteServiceModule.createWebSocket("wss://test.mosquitto.org:8081/mqtt");
+    // this._ws = this.internetModule.createWebSocket("wss://rtops.net");
+    this._ws = this.internetModule.createWebSocket("wss://realityair.quokka-hippocampus.ts.net/mqtt");
+        
     this._ws.binaryType = 'blob';
         
     print("initializing mqtt clientId" + options.clientId);
+    
     
         /*
     this._options = {

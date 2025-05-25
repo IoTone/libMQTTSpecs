@@ -36,11 +36,11 @@
   ScriptTypesHidden:
     {}
   DefaultScriptInputs:
-    - enableHorizontalScroll: false
+    - _debugDrawEnabled: false
+      enableHorizontalScroll: false
       enableVerticalScroll: true
-      enableScrollLimit: true
-      _debugDrawEnabled: false
       _enableScrollInertia: true
+      enableScrollLimit: true
       _scrollLimit: 0.300000
       scrollAreaBounds: !<Vec2> {x: 1.000000, y: 1.000000}
   ScriptTypes:
@@ -56,3 +56,6 @@
     - '// @input vec2 scrollAreaBounds = "{1, 1}"'
   SvgIcon: ""
   DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  SetupScript:
+    code: ""
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000

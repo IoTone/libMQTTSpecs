@@ -32,9 +32,9 @@
   ScriptTypesHidden:
     {}
   DefaultScriptInputs:
-    - enableFilter: false
-      _interactor: !<reference.BaseInteractor> 00000000-0000-0000-0000-000000000000
-      enableCursorHolding: true
+    - enableCursorHolding: true
+      enableFilter: false
+      _interactor: !<reference.ScriptComponent> 00000000-0000-0000-0000-000000000000
   ScriptTypes:
     -
       {}
@@ -44,3 +44,6 @@
     - // @input Component.ScriptComponent _interactor
   SvgIcon: ""
   DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  SetupScript:
+    code: ""
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000

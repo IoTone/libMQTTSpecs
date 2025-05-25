@@ -42,10 +42,8 @@
   ScriptTypesHidden:
     {}
   DefaultScriptInputs:
-    - handType: right
-      raycastAlgorithm: Proxy
+    - _drawDebug: false
       sphereCastEnabled: false
-      indirectTargetingVolumeMultiplier: !<float> 1.000000
       spherecastRadii: !<float[]>
         - 0.500000
         - 2.000000
@@ -55,12 +53,14 @@
         - 12.000000
         - 30.000000
       _maxRaycastDistance: !<float> 500.000000
+      indirectTargetingVolumeMultiplier: !<float> 1.000000
       indirectDragThreshold: !<float> 40.000000
-      directDragThreshold: !<float> 3.000000
+      handType: right
+      raycastAlgorithm: Proxy
       forcePokeOnNonDominantPalmProximity: false
       directColliderEnterRadius: !<float> 1.000000
       directColliderExitRadius: 1.500000
-      _drawDebug: false
+      directDragThreshold: !<float> 3.000000
   ScriptTypes:
     -
       {}
@@ -90,3 +90,6 @@
     - '// @ui {"widget":"group_end"}'
   SvgIcon: ""
   DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  SetupScript:
+    code: ""
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000

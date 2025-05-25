@@ -278,6 +278,7 @@
     CapitalizationOverride: None
     CapitilizationOverride: None
   ShadowMode: None
+  EnableBatching: false
 - !<ObjectPrefabAssetData/3c1a725d-5721-447b-9c77-4d091667a0e8>
   SourceRemaps:
     - 001ebd4f-3877-4182-94e0-a89a515f3f41: 7a6350dc-47f1-451c-9f9d-3fb105a108f2

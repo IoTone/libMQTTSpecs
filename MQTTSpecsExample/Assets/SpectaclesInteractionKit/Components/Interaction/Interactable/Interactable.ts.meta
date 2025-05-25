@@ -38,8 +38,8 @@
     {}
   DefaultScriptInputs:
     - targetingMode: !<float> 3.000000
-      isScrollable: false
       enableInstantDrag: false
+      isScrollable: false
       allowMultipleInteractors: true
       enablePokeDirectionality: false
       acceptableXDirections: !<float> 3.000000
@@ -60,3 +60,6 @@
     - '// @input float acceptableZDirections = 3 {"label":"Z", "widget":"combobox", "values":[{"label":"None", "value":0}, {"label":"Forward", "value":1}, {"label":"Back", "value":2}, {"label":"All", "value":3}], "showIf":"enablePokeDirectionality"}'
   SvgIcon: ""
   DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  SetupScript:
+    code: ""
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000

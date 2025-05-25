@@ -60,11 +60,11 @@
       showStretchZProperties: false
       zStretchFactorMin: !<float> 1.000000
       zStretchFactorMax: !<float> 12.000000
+      useFilter: true
       showFilterProperties: false
       minCutoff: !<float> 2.000000
       beta: 0.015000
       dcutoff: !<float> 1.000000
-      useFilter: true
       showTranslationProperties: false
       _enableXTranslation: true
       _enableYTranslation: true
@@ -100,3 +100,6 @@
     - '// @ui {"widget":"group_end"}'
   SvgIcon: ""
   DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  SetupScript:
+    code: ""
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000

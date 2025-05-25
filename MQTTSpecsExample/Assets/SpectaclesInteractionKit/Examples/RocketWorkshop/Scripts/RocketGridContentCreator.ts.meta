@@ -31,13 +31,16 @@
   ScriptTypesHidden:
     {}
   DefaultScriptInputs:
-    - objectPrefabs: !<reference.ObjectPrefab[]>
+    - rocketConfigurator: !<MappingBased.AssignableType> 00000000-0000-0000-0000-000000000000
+      objectPrefabs: !<reference.ObjectPrefab[]>
         []
-      rocketConfigurator: !<MappingBased.RocketConfigurator> 00000000-0000-0000-0000-000000000000
   ScriptTypes:
     -
       {}
   InputLines:
-    - // @input RocketConfigurator rocketConfigurator
+    - // @input AssignableType rocketConfigurator
     - "// @input Asset.ObjectPrefab[] objectPrefabs = {}"
   DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  SetupScript:
+    code: ""
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000

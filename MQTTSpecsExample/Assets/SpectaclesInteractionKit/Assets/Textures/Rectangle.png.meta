@@ -9,9 +9,8 @@
   AssetDataMap:
     Texture: !<own> 00000000-0000-0000-0000-000000000000
   CompressionSettings: !<SingleCompressionSettings>
-    CompressionSettings: !<TextureCompressionSettings>
-      Level: None
-    CompressorName: Size
+    CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+    CompressorName: None
   PackagePolicy: CannotBeUnpacked
   DependentFiles:
     []

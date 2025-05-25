@@ -39,8 +39,8 @@
   ScriptTypesHidden:
     {}
   DefaultScriptInputs:
-    - sphereCastEnabled: false
-      indirectTargetingVolumeMultiplier: !<float> 1.000000
+    - _drawDebug: false
+      sphereCastEnabled: false
       spherecastRadii: !<float[]>
         - 0.500000
         - 2.000000
@@ -50,11 +50,11 @@
         - 12.000000
         - 30.000000
       _maxRaycastDistance: !<float> 500.000000
+      indirectTargetingVolumeMultiplier: !<float> 1.000000
       indirectDragThreshold: !<float> 3.000000
-      touchpadDragThreshold: 0.050000
-      _touchpadScrollSpeed: !<float> 250.000000
       initializePositionAndRotationFilter: true
-      _drawDebug: false
+      _touchpadScrollSpeed: !<float> 250.000000
+      touchpadDragThreshold: 0.050000
   ScriptTypes:
     -
       {}
@@ -81,3 +81,6 @@
     - '// @ui {"widget":"group_end"}'
   SvgIcon: ""
   DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  SetupScript:
+    code: ""
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000

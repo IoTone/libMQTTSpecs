@@ -53,13 +53,14 @@
   ScriptTypesHidden:
     {}
   DefaultScriptInputs:
-    - startValue: 0.500000
+    - _minValue: !<float> 0.000000
+      _maxValue: !<float> 1.000000
+      startValue: 0.500000
       stepBehavior: false
+      _stepSize: !<float> 0.000000
+      toggleDuration: 0.200000
       sliderMin: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       sliderMax: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
-      _minValue: !<float> 0.000000
-      _maxValue: !<float> 1.000000
-      _stepSize: !<float> 0.000000
       _sliderKnob: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       editEventCallbacks: false
       customFunctionForOnHoverEnter: !<reference.ScriptComponent> 00000000-0000-0000-0000-000000000000
@@ -83,7 +84,6 @@
       customFunctionForOnMaxValueReached: !<reference.ScriptComponent> 00000000-0000-0000-0000-000000000000
       onMaxValueReachedFunctionNames: !<string[]>
         []
-      toggleDuration: 0.200000
   ScriptTypes:
     -
       {}
@@ -130,3 +130,6 @@
     - '// @ui {"widget":"group_end"}'
   SvgIcon: ""
   DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  SetupScript:
+    code: ""
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000

@@ -96,30 +96,33 @@
   ScriptTypesHidden:
     {}
   DefaultScriptInputs:
-    - allowScaling: true
+    - autoShowHide: true
+      innerSize: !<Vec2> {x: 32.000000, y: 32.000000}
+      border: !<float> 4.000000
+      constantPadding: !<Vec2> {x: 0.000000, y: 0.000000}
+      allowScaling: true
+      autoScaleContent: true
+      isContentInteractable: false
+      allowTranslation: true
+      minimumSize: !<Vec2> {x: 10.000000, y: 10.000000}
+      maximumSize: !<Vec2> {x: 300.000000, y: 300.000000}
       useBillboarding: false
+      xOnTranslate: false
+      xAlways: false
+      yOnTranslate: false
+      yAlways: false
       useSnapping: false
+      itemSnapping: false
+      worldSnapping: false
       showFollowButton: false
       useFOVFollow: false
       isFollowing: false
       showCloseButton: true
-      border: !<float> 4.000000
-      autoScaleContent: true
-      isContentInteractable: false
-      autoShowHide: true
-      minimumSize: !<Vec2> {x: 10.000000, y: 10.000000}
-      maximumSize: !<Vec2> {x: 300.000000, y: 300.000000}
-      yOnTranslate: false
-      xOnTranslate: false
-      xAlways: false
-      yAlways: false
-      innerSize: !<Vec2> {x: 32.000000, y: 32.000000}
-      constantPadding: !<Vec2> {x: 0.000000, y: 0.000000}
-      allowTranslation: true
-      worldSnapping: false
-      itemSnapping: false
       _enableInteractionPlane: false
   ScriptTypes:
     -
       {}
   DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  SetupScript:
+    code: ""
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000

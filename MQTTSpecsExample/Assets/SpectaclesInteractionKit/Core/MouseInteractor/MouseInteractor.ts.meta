@@ -37,7 +37,8 @@
   ScriptTypesHidden:
     {}
   DefaultScriptInputs:
-    - sphereCastEnabled: false
+    - _drawDebug: false
+      sphereCastEnabled: false
       spherecastRadii: !<float[]>
         - 0.500000
         - 2.000000
@@ -49,7 +50,6 @@
       _maxRaycastDistance: !<float> 500.000000
       indirectTargetingVolumeMultiplier: !<float> 1.000000
       indirectDragThreshold: !<float> 3.000000
-      _drawDebug: false
       mouseTargetingMode: !<float> 2.000000
   ScriptTypes:
     -
@@ -75,3 +75,6 @@
     - '// @ui {"widget":"group_end"}'
   SvgIcon: ""
   DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  SetupScript:
+    code: ""
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000

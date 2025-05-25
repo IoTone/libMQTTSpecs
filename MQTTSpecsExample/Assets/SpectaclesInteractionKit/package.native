@@ -2,9 +2,9 @@
   PackagePath: ""
   StudioVersion:
     major: 5
-    minor: 7
-    patch: 0
-    build: 25021204
+    minor: 9
+    patch: 1
+    build: 25051422
     type: Unset
   Description: |-
     Release
@@ -19,15 +19,18 @@
     - Ensure the device type override is set to Spectacles (cogwheel at the top-right of the preview panel > Device Type Override > Spectacles).
     - Ensure that this package is unpacked in your scene (right-click the package in Asset Browser and unpack if given the option).
   SvgIcon: ""
+  SetupScript:
+    code: ""
   InternalVersion: 3
   VersionMajor: 0
   VersionMinor: 11
   VersionPatch: 0
-  UpdateCheckpoint: 55
+  UpdateCheckpoint: 57
   ExportUid: 2103d25e-7c18-4e97-b47c-4020ab1bcf42
   ComponentUid: 0f7a0bbe-777c-41a5-b979-0b0430f25836
   CurrentVisibility: Editable
   MaxVisibility: Editable
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
   Instantiable: !<reference> 00000000-0000-0000-0000-000000000000
   AssetLibraryDependencyStructure: !<AssetLibraryDependencyStructure>
     Name: SpectaclesInteractionKit
@@ -38,5 +41,5 @@
       minor: 11
       patch: 0
       build: 0
-  coreVersion: 300
-  clientVersion: 13.290000
+  coreVersion: 309
+  clientVersion: 13.380000

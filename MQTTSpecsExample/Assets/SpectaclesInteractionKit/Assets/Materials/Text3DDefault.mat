@@ -4,7 +4,15 @@
     - !<own> 74670268-b685-4e50-90c2-5417153e72ea
 - !<PassInfo/74670268-b685-4e50-90c2-5417153e72ea>
   CachedProperties:
-    []
+    - overrideTimeDelta:
+        typeIdx: 1
+        value: 0.000000
+    - overrideTimeElapsed:
+        typeIdx: 1
+        value: 0.000000
+    - overrideTimeEnabled:
+        typeIdx: 0
+        value: 0
   DepthWrite: true
   DepthTest: true
   DepthFunction: LessEqual
@@ -164,15 +172,6 @@
     outerEdgeStartingColor:
       typeIdx: 5
       value: {x: 0.130000, y: 1.000000, z: 0.820000, w: 1.000000}
-    overrideTimeDelta:
-      typeIdx: 1
-      value: 0.000000
-    overrideTimeElapsed:
-      typeIdx: 1
-      value: 0.000000
-    overrideTimeEnabled:
-      typeIdx: 0
-      value: 0
   Pass: !<reference> 666aa455-6dd0-46e9-aa01-06f9859dc70f
   RTCaster: false
   RTReceiver: false
