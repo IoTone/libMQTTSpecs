@@ -155,6 +155,7 @@ interface ConnectOptions {
   url: string; // WebSocket URL (e.g., ws://broker:9001/mqtt)
   clientId?: string;
   keepAlive?: number;
+  protocolVersion?: number;
 }
 
 // Constants for MQTT packet types
@@ -177,7 +178,6 @@ const enum PacketType {
 
 // Simple MQTT Client
 export class MqttClientLib2 extends EventEmitter<MqttEvents> {
-  // private _ws?: ls.WebSocket;
   private _ws?: WebSocket;
   private _buffer: Uint8Array;
   private _offset: number;
@@ -192,6 +192,7 @@ export class MqttClientLib2 extends EventEmitter<MqttEvents> {
       url: options.url,
       clientId: options.clientId,
       keepAlive: options.keepAlive,
+      protocolVersion: options.protocolVersion ?? 4 // MQTT 3.1.1
     };
     this._buffer = new Uint8Array(0);
     this._offset = 0;
@@ -200,12 +201,14 @@ export class MqttClientLib2 extends EventEmitter<MqttEvents> {
   }
 
   public connect(): void {
+    
     if (this._connected) {
       this.emit('error', new Error('Already connected'));
       return;
     }
 
     try {
+      print("connect()");
       // this._ws = new ls.WebSocket(this._options.url);
       this.parent._ws.onopen = this._onConnect.bind(this);
       this.parent._ws.onmessage = this._onMessage.bind(this);
@@ -217,6 +220,7 @@ export class MqttClientLib2 extends EventEmitter<MqttEvents> {
   }
 
   public disconnect(): void {
+    print("disconnect()");
     if (!this._connected) {
       this.emit('error', new Error('Not connected'));
       return;
@@ -229,6 +233,7 @@ export class MqttClientLib2 extends EventEmitter<MqttEvents> {
   }
 
   public publish(topic: string, payload: string | Uint8Array, qos: 0 | 1 = 0): void {
+    print("publish()");
     if (!this._connected) {
       this.emit('error', new Error('Not connected'));
       return;
@@ -252,6 +257,7 @@ export class MqttClientLib2 extends EventEmitter<MqttEvents> {
   }
 
   public subscribe(topic: string, qos: 0 | 1 = 0): void {
+    print("subscribe()");
     if (!this._connected) {
       this.emit('error', new Error('Not connected'));
       return;
@@ -271,29 +277,78 @@ export class MqttClientLib2 extends EventEmitter<MqttEvents> {
     this._writePacket(packet);
   }
 
+  /**
+   * Perform MQTT connection set up once the transport is active
+   *
+   */
   private _onConnect(): void {
+    print("_onConnect()");
+    this._connected = true;  
+        
+    
+    const packet = new PacketBuilder();
+    packet.writeByte(PacketType.CONNECT << 4);
+
+    // Protocol name and version
+    const protocol = this._stringToBytes('MQTT');
+    packet.writeUInt16(protocol.length);
+    packet.append(protocol);
+    packet.writeByte(this._options.protocolVersion!); // 4 for MQTT 3.1.1
+    packet.writeByte(0x02); // Clean session
+    packet.writeUInt16(this._options.keepAlive!);
+
+    // Client ID
+    const clientId = this._stringToBytes(this._options.clientId!);
+    packet.writeUInt16(clientId.length);
+    packet.append(clientId);
+
+    this._sendPacket(PacketType.CONNECT, packet.build());
+    // this._writePacket(packet.build());
+        
+    // Start keep-alive
+    if (this._options.keepAlive! > 0) {
+      const interval = this._options.keepAlive! * 1000;
+      // this._sendPing();
+      /*
+      this._keepAliveTimer = ls.global.scene.createTimer(() => {
+        this.sendPacket(PacketType.PINGREQ, new Uint8Array(0));
+      }, interval / 1000); */
+    }
+
+    this._connected = true;
+    
+    this.emit('connect');
+  }
+    
+  private _onConnectOrig(): void {
+    print("_onConnect()");
     this._connected = true;
 
     const packet = this._createPacket();
     packet.writeByte((PacketType.CONNECT << 4) | 0);
 
-    // const protocolBytes = this._stringToBytes('MQTT');
-    const protocolBytes = this._altStringToBytes('MQTT');
+    const protocolBytes = this._stringToBytes('MQTT');
+        
+    // const protocolBytes = this._altStringToBytes('MQTT');
+    print("Protocol bytes (remaining Length): " + protocolBytes.length);
+        
     packet.writeUInt16(protocolBytes.length);
     packet.append(protocolBytes);
     packet.writeByte(4); // MQTT 3.1.1
     packet.writeByte(0x02); // Clean session
     packet.writeUInt16(this._options.keepAlive || 60);
 
+        
     // const clientIdBytes = this._stringToBytes(this._options.clientId || '');
     const clientIdBytes = this._altStringToBytes(this._options.clientId || '');
     packet.writeUInt16(clientIdBytes.length);
     packet.append(clientIdBytes);
-
+    print("CONNECT packet length: " + packet.bytes.length);
     this._writePacket(packet);
 
     if (this._options.keepAlive && this._options.keepAlive > 0) {
       const interval = this._options.keepAlive * 1000;
+      this._sendPing();
       /*
       this._keepAliveTimer = ls.global.scene.createTimer(() => {
         this._sendPing();
@@ -306,7 +361,7 @@ export class MqttClientLib2 extends EventEmitter<MqttEvents> {
   }
 
   private _onMessage(event: WebSocketMessageEvent): void {
-    print("_onMessage()");
+    print("----------------> _onMessage()");
     let data: Uint8Array;
     if (typeof event.data === 'string') {
       data = this._stringToBytes(event.data);
@@ -389,11 +444,11 @@ export class MqttClientLib2 extends EventEmitter<MqttEvents> {
   }
 
   private _writePacket(packet: { bytes: Uint8Array }): void {
-    print("_writePacket()");
+    
     const length = packet.bytes.length;
     const lengthBuffer = this._createPacket();
     let remainingLength = length;
-
+    print("_writePacket(): " + remainingLength);
     do {
       let encodedByte = remainingLength % 128;
       remainingLength = Math.floor(remainingLength / 128);
@@ -405,6 +460,30 @@ export class MqttClientLib2 extends EventEmitter<MqttEvents> {
 
     const finalPacket = this._appendBytes(packet.bytes, lengthBuffer.bytes);
     this._ws?.send(finalPacket);
+    print("_writePacket sent: " + finalPacket);
+  }
+    
+  private _sendPacket(type: PacketType, payload: Uint8Array): void {
+    const header = new PacketBuilder();
+    header.writeByte(type << 4);
+
+    let length = payload.length;
+    const lengthBytes = new PacketBuilder();
+    do {
+      let encodedByte = length % 128;
+      length = Math.floor(length / 128);
+      if (length > 0) encodedByte |= 0x80;
+      lengthBytes.writeByte(encodedByte);
+    } while (length > 0);
+
+    // const packet = this._appendBytes(header.build().bytes, payload);
+    // const finalPacket = this._appendBytes(packet, lengthBytes.build().bytes);
+    // this._ws?.send(finalPacket);
+    const packet = this._appendBytes(header.build(), payload);
+    const finalPacket = this._appendBytes(packet, lengthBytes.build());
+    this._ws?.send(finalPacket);
+    print("_sentPacket sent: " + finalPacket);
+    print("_sentPacket sent: " + finalPacket.reduce((a, b) => a + b.toString(16).padStart(2, '0'), ''));
   }
 
   private _readPacket(): { type: number; flags: number; length: number } | null {
@@ -413,6 +492,7 @@ export class MqttClientLib2 extends EventEmitter<MqttEvents> {
       return null;
     }
 
+        
     const firstByte = this._readByte();
     const type = (firstByte >> 4) & 0x0f;
     const flags = firstByte & 0x0f;
@@ -440,6 +520,7 @@ export class MqttClientLib2 extends EventEmitter<MqttEvents> {
   }
 
   private _sendPing(): void {
+    print("_sendPing()");
     const packet = this._createPacket();
     packet.writeByte((PacketType.PINGREQ << 4) | 0);
     this._writePacket(packet);
@@ -456,12 +537,14 @@ export class MqttClientLib2 extends EventEmitter<MqttEvents> {
   // Uint8Array helpers
   private _createPacket(): { bytes: Uint8Array; writeByte: (value: number) => void; writeUInt16: (value: number) => void; append: (data: Uint8Array) => void } {
     let bytes = new Uint8Array(0);
-    let capacity = 16;
+    let capacity = 16; // This is the min number of bits, smallest packet is 2 bytes
     let length = 0;
 
+    
     const ensureCapacity = (needed: number) => {
       // if (length + needed > capacity) {
-      if ((length + needed > capacity) || (length + needed > bytes.length) ) {
+      print("ensureCapacity needs: " + needed);
+      if ((length + needed > capacity) || (((length + needed)*8) > bytes.length) ) {
         capacity = Math.max(capacity * 2, length + needed);
         const newBytes = new Uint8Array(capacity);
         newBytes.set(bytes);
@@ -539,7 +622,48 @@ export class MqttClientLib2 extends EventEmitter<MqttEvents> {
   }
 }
 
+// Helper class for building packets
+class PacketBuilder {
+  private bytes: Uint8Array;
+  private length: number = 0;
+  private capacity: number = 16;
 
+  constructor() {
+    this.bytes = new Uint8Array(this.capacity);
+  }
+
+  writeByte(value: number): void {
+    if (value < 0 || value > 255) throw new Error('Byte out of range');
+    this.ensureCapacity(1);
+    this.bytes[this.length++] = value;
+  }
+
+  writeUInt16(value: number): void {
+    if (value < 0 || value > 65535) throw new Error('UInt16 out of range');
+    this.ensureCapacity(2);
+    this.bytes[this.length++] = (value >> 8) & 0xff;
+    this.bytes[this.length++] = value & 0xff;
+  }
+
+  append(data: Uint8Array): void {
+    this.ensureCapacity(data.length);
+    this.bytes.set(data, this.length);
+    this.length += data.length;
+  }
+
+  build(): Uint8Array {
+    return this.bytes.subarray(0, this.length);
+  }
+
+  private ensureCapacity(needed: number): void {
+    if (this.length + needed > this.capacity) {
+      this.capacity = Math.max(this.capacity * 2, this.length + needed);
+      const newBytes = new Uint8Array(this.capacity);
+      newBytes.set(this.bytes);
+      this.bytes = newBytes;
+    }
+  }
+}
 
 
 
@@ -604,11 +728,9 @@ export class MqttClient2 extends BaseScriptComponent implements FooMit.BarMit {
     // XXX hardcoded value
     // this._ws = this.internetModule.createWebSocket("wss://rtops.net");
     this._ws = this.internetModule.createWebSocket("wss://realityair.quokka-hippocampus.ts.net/mqtt");
-        
     this._ws.binaryType = 'blob';
         
-    print("initializing mqtt clientId" + options.clientId);
-    
+    print("initializing mqtt clientId " + options.clientId);
     
         /*
     this._options = {
@@ -637,14 +759,14 @@ export class MqttClient2 extends BaseScriptComponent implements FooMit.BarMit {
     // configurable, an autoconnect vs manual
     this._mqtteventhandler.connect();
     this._mqtteventhandler.on('connect', () => {
-      print('Connected');
-      this._mqtteventhandler.subscribe('test/topic', 0);
+      print('-----> MQTT.Event.Connected');
+      // this._mqtteventhandler.subscribe('test/topic', 0);
       // public publish(topic: string, payload: string | Uint8Array, qos: 0 | 1 = 0): void {
-      this._mqtteventhandler.publish('test/topic', 'Hello', 0);
+      // this._mqtteventhandler.publish('test/topic', 'Hello', 0);
     });
         
     this._mqtteventhandler.on('error', (err) => {
-      print('Error:' + err.message);
+      print('MQTT.Event.Error:' + err.message);
     });
     /*
     if (this._mqtteventhandler._connected) {
@@ -669,6 +791,7 @@ export class MqttClient2 extends BaseScriptComponent implements FooMit.BarMit {
     print("hello");      
   }
 
+    
   //
   // Class Utility Functions
   //
