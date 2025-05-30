@@ -18,7 +18,7 @@ export class NewScript extends BaseScriptComponent {
     }
     
     onStart() {
-        print("onStart()");
+        print("onStart() ...");
         
         this.toggles.onStateChanged.add(
             (isToggledOn: boolean) => {

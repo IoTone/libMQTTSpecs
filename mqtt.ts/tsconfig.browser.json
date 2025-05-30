@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "outDir": "./dist.browser",
+    "module": "CommonJS",
+    "target": "es2020",
+    "declaration": true,
+    "declarationMap": true,
+    "moduleResolution": "node"
+  },
+  "include": [
+    "./src/index.ts"
+  ]
+}

@@ -47,6 +47,15 @@ Need to start, work will go on main.
 
 There is an example project provided.  It will just ping the test.mosquitto.org when the button toggle is hit.
 
+## Attributions / Dependencies
+
+- mqtt.ts https://github.com/srishina/mqtt.ts
+- typed-emitter (ts) https://github.com/andywer/typed-emitter/tree/v1.3.1
+
+## Specifications
+
+- mqtt 3.1.1 https://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html
+
 ## Known Issues
 
 - Needs to support MQTT > 3.1

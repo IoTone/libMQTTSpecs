@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "outDir": "./dist.browser.demo",
+    "rootDir": "./demo",
+    "module": "CommonJS",
+    "target": "es2020",
+    "moduleResolution": "node"
+  },
+  "include": [
+    "./demo/helper.ts",
+  ]
+}
