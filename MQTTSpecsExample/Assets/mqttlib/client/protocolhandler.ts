@@ -535,6 +535,8 @@ export class ProtocolHandler implements PingerCallback {
             return;
         }
         this.mqttStastics.numBytesSent += buf.byteLength;
+        print(buf);
+        print("_sentPacket sent: " + buf.reduce((a, b) => a + b.toString(16).padStart(2, '0'), ''));
         this.webSocket.send(buf);
     }
 

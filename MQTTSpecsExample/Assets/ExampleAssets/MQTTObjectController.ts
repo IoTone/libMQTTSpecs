@@ -16,9 +16,6 @@ export class MQTTObjectController extends BaseScriptComponent {
         this.createEvent("OnStartEvent").bind(() => {
             this.onStart();
         });
-        const mqttClient = new MQTTClient("wss://mqtt.eclipseprojects.io:443/mqtt ", {timeout: 10000}, this);
-        const connack = await mqttClient.connect({cleanStart: true, keepAlive: 0});
-        print("Started mqtt");
     }
     
     onStart() {
@@ -32,9 +29,17 @@ export class MQTTObjectController extends BaseScriptComponent {
             } else {
                 // this.launchPlatform.enabled = false
                 print("toggleOff");
+                this.initMQTT();
             }
             },
        );
+    }
+    
+    async initMQTT() {
+        
+        const mqttClient = new MQTTClient("wss://mqtt.eclipseprojects.io:443/mqtt", {timeout: 2000}, this);
+        const connack = await mqttClient.connect({cleanStart: true, keepAlive: 0});
+        print("Started mqtt");
     }
     
     
