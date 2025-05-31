@@ -4,7 +4,7 @@ import {ToggleButton} from "../SpectaclesInteractionKit/Components/UI/ToggleButt
 
 
 @component
-export class NewScript extends BaseScriptComponent {
+export class MQTTObjectController extends BaseScriptComponent {
     @input
     sobj!: SceneObject
     @input
