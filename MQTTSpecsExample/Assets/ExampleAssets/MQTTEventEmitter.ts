@@ -7,8 +7,8 @@
 // Project: https://github.com/Wolfy87/EventEmitter
 // Definitions by: ryiwamoto <https://github.com/ryiwamoto>
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
-declare class EventEmitter extends Wolfy87EventEmitter.EventEmitter {}
-
+// declare class EventEmitter extends Wolfy87EventEmitter.EventEmitter {}
+// export = EventEmitter;
 // XXX
 // declare class EventEmitter extends Wolfy87EventEmitter.EventEmitter {}
 // export = EventEmitter;

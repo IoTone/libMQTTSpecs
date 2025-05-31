@@ -339,8 +339,8 @@ export class ProtocolHandler implements PingerCallback {
             }
             this.webSocket.binaryType = 'arraybuffer';
             */
-            // XXX hardcoded TODO
-            this.webSocket = this.internetModule.createWebSocket("wss://myserver.net");
+            this.webSocket = this.internetModule.createWebSocket(this.uri);
+            // XXX Need to convert handling of arraybuffer to blob            
             this.webSocket.binaryType = 'blob';
 
             // this.webSocket.onclose = (event: CloseEvent) => {
@@ -357,12 +357,15 @@ export class ProtocolHandler implements PingerCallback {
                 }
                 */
                 e = new Error('Websocket closed normally we think');
-                this.internalDisconnect(e);
+                print("protocolhandler WebSocket.onclose");
+                // Do we need this?
+                // this.internalDisconnect(e);
             };
 
             // PORTING
             // this.webSocket.onerror = (error: Event) => {
             this.webSocket.onerror = (event: WebSocketErrorEvent) => {
+                print("protocolhandler WebSocket.onerror");                
                 // this.connectingPromise?.reject(error);
                 this.connectingPromise?.reject(new Error("WebSocket error for unknown reason"));
                 this.connected = false;
@@ -371,6 +374,7 @@ export class ProtocolHandler implements PingerCallback {
             // PORTING
             // this.webSocket.onmessage = (evt: MessageEvent) => {
             this.webSocket.onmessage = async (evt: WebSocketMessageEvent) => {
+                print("protocolhandler WebSocket.onmessage");
                 if (evt.data instanceof Blob) {
                     // Binary frame, can be retrieved as either Uint8Array or string
                     const bytes = await evt.data.bytes();
@@ -380,6 +384,7 @@ export class ProtocolHandler implements PingerCallback {
             };
 
             this.webSocket.onopen = () => {
+                print("protocohandler WebSocket.onopen");
                 this.protocolConnect();
             };
 

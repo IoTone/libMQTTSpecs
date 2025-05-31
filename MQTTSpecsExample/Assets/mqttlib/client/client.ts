@@ -8,8 +8,10 @@ import type { MQTTConnect } from '../message/connect';
 
 import type { MessageEvents } from './eventhandler';
 
-import { EventEmitter } from 'events';
-import type TypedEmitter from 'typed-emitter';
+// PORTING (node:events DNE)
+// import { EventEmitter } from 'events';
+import {EventEmitter} from "../utils/node-eventemitter";
+import type TypedEmitter from '../typed-emitter';
 import type { MQTTDisconnect } from '../message/disconnect';
 import { MQTTDisconnectReason } from '../message/disconnect';
 import type { MQTTStatstics } from '../utils/constants';
@@ -25,17 +27,21 @@ const defaultOpts = {
 /**
  * MQTT Client object
  */
+// PORTING
 export class MQTTClient extends (EventEmitter as new () => TypedEmitter<MessageEvents>) {
+// export class MQTTClient extends (EventEmitter<MqttEvents>) {
     private protocolHandler!: ProtocolHandler;
     private uri: string;
+    private scriptComp?: BaseScriptComponent;
 
     /**
      * constructor
      * @param url MQTT broker where the client should attempt a connection
      */
-    constructor(uri: string, options: Partial<Options> = {}) {
+    constructor(uri: string, options: Partial<Options> = {}, sceneObj: BaseScriptComponent) {
         super();
-        this.protocolHandler = new ProtocolHandler(uri, Object.assign(defaultOpts, options), this);
+        this.scriptComp = sceneObj;
+        this.protocolHandler = new ProtocolHandler(uri, Object.assign(defaultOpts, options), this, this.scriptComp);
         this.uri = uri;
     }
 
